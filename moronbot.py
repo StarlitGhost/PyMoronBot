@@ -1,4 +1,4 @@
-import sys, platform, os, traceback
+import sys, platform, os, traceback, datetime
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 
@@ -6,10 +6,6 @@ from IRCResponse import IRCResponse, ResponseType
 from IRCMessage import IRCMessage
 from FunctionHandler import AutoLoadFunctions
 import GlobalVars
-
-abspath = os.path.abspath(__file__)
-dname = os.path.dirname(abspath)
-os.chdir(dname)
 
 class MoronBot(irc.IRCClient):
 
@@ -34,14 +30,35 @@ class MoronBot(irc.IRCClient):
             self.join(channel)
     
     def privmsg(self, user, channel, msg):
-        print "%s <%s> %s" % (channel, user.split('!')[0], msg)
         message = IRCMessage('PRIVMSG', user, channel, msg)
+        self.log("<{0}> {1}".format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
 
     def action(self, user, channel, msg):
-        print "%s *%s %s*" % (channel, user.split('!')[0], msg)
         message = IRCMessage('ACTION', user, channel, msg)
+        self.log("*{0} {1}*".format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
+    
+    def noticed(self, user, channel, msg):
+        message = IRCMessage('NOTICE', user, channel, msg)
+        self.log("[{0}] {1}".format(message.User.Name, message.MessageString), message.ReplyTo)
+        self.handleMessage(message)
+    
+    def irc_NICK(self, prefix, params):
+        oldNick = prefix.split('!')[0]
+        newNick = params[0]
+        self.log("{0} is now known as {1}".format(oldNick, newNick), '')
+    
+    def irc_JOIN(self, prefix, params):
+        message = IRCMessage('JOIN', prefix, params[0], '')
+        self.log(" >> {0} ({1}@{2}) joined {3}".format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo), message.ReplyTo)
+    
+    def irc_PART(self, prefix, params):
+        partMessage = ""
+        if len(params) > 1:
+            partMessage = ", message: "+" ".join(params[1:])
+        message = IRCMessage('PART', prefix, params[0], partMessage)
+        self.log(" << {0} ({1}@{2}) left {3}{4}".format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo, partMessage), message.ReplyTo)
 
     def sendResponse(self, response):
         if (response == None):
@@ -51,10 +68,13 @@ class MoronBot(irc.IRCClient):
         
         if (response.Type == ResponseType.Say):
             self.msg(response.Target, response.Response)
+            self.log("<{0}> {1}".format(self.nickname, response.Response), response.Target)
         elif (response.Type == ResponseType.Do):
             self.describe(response.Target, response.Response)
+            self.log("*{0} {1}*".format(self.nickname, response.Response), response.Target)
         elif (response.Type == ResponseType.Notice):
             self.notice(response.Target, response.Response)
+            self.log("[{0}] {1}".format(self.nickname, response.Response), response.Target)
         elif (response.Type == ResponseType.Raw):
             self.sendLine(response.Response)
 
@@ -76,6 +96,22 @@ class MoronBot(irc.IRCClient):
         for response in self.responses:
             self.sendResponse(response)
         self.responses = []
+        
+    def log(self, text, target):
+        now = datetime.datetime.utcnow()
+        time = now.strftime("[%H:%M]")
+        data = "{0} {1}".format(time, text)
+        print target, data
+        
+        fileName = "{0}{1}.txt".format(target, now.strftime("-%Y%m%d"))
+        fileDirs = os.path.join(GlobalVars.logPath, GlobalVars.server)
+        if not os.path.exists(fileDirs):
+            os.makedirs(fileDirs)
+        filePath = os.path.join(fileDirs, fileName)
+        
+        f = open(filePath, 'a+')
+        f.write(data + '\n')
+        f.close()
         
 class MoronBotFactory(protocol.ClientFactory):
 

@@ -8,9 +8,10 @@ class UserStruct:
     User = ''
 
     def __init__(self, user):
-        self.User = user
         userArray = user.split('!')
         self.Name = userArray[0]
+        userArray = userArray[1].split('@')
+        self.User = userArray[0]
         self.Hostmask = userArray[1]
 
 class IRCMessage:
