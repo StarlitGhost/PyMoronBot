@@ -12,7 +12,7 @@ import re
 import urllib, urllib2
 
 class Instantiate(Function):
-    Help = 'mtg(f) <card name> - fetches details of the Magic: The Gathering card you specify from gattherer.wizards.com. mtgf includes the flavour text, if it has any'
+    Help = 'mtg(f) <card name> - fetches details of the Magic: The Gathering card you specify from gatherer.wizards.com. mtgf includes the flavour text, if it has any'
     
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':

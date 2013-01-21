@@ -1,14 +1,16 @@
-import os
+import os, sys
 import GlobalVars
 
 def LoadFunction(path, loadAs=''):
     loadType = 'l'
     name = path
-    src = __import__('PythonFunctions.' + name, globals(), locals(), [])
+    src = __import__('Functions.' + name, globals(), locals(), [])
     if loadAs != '':
         name = loadAs
     if name in GlobalVars.functions:
         loadType = 'rel'
+        del sys.modules['Functions.'+name]
+        
     reload(src)
 
     components = name.split('.')
@@ -18,8 +20,6 @@ def LoadFunction(path, loadAs=''):
     print str(src)
         
     func = src.Instantiate()
-    
-    #del GlobalVars.functions[name]
     
     GlobalVars.functions.update({name:func})
 
@@ -35,7 +35,7 @@ def UnloadFunction(name):
     return success
 
 def AutoLoadFunctions():
-    root = os.path.join('.', 'PythonFunctions')
+    root = os.path.join('.', 'Functions')
     for item in os.listdir(root):
         if not os.path.isfile(os.path.join(root, item)):
             continue
