@@ -1,4 +1,5 @@
 import os, sys
+from glob import glob
 import GlobalVars
 
 def LoadFunction(path, loadAs=''):
@@ -10,6 +11,8 @@ def LoadFunction(path, loadAs=''):
     if name in GlobalVars.functions:
         loadType = 'rel'
         del sys.modules['Functions.'+name]
+        for f in glob ('Functions/%s.pyc' % name):
+            os.remove(f)
         
     reload(src)
 

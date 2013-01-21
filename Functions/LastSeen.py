@@ -7,7 +7,7 @@ import re
 import subprocess
 
 class Instantiate(Function):
-	Help = 'Finds a nick\'s last message'
+	Help = 'lastseen/lastsaw <nick> - finds a nick\'s last message'
 	def GetResponse(self, message):
 		if message.Type != 'PRIVMSG':
 			return

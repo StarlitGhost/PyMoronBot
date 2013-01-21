@@ -5,7 +5,7 @@ from Function import Function
 import re, math
 
 class Instantiate(Function):
-    Help = '|dbmoney <hours>'
+    Help = 'dbmoney <hours> - tells you how much money the crew would need to bus for the given number of hours'
     
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':

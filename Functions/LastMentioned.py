@@ -7,7 +7,7 @@ import re
 import subprocess
 
 class Instantiate(Function):
-	Help = 'Checks the log for the last time someone mentioned a given word or phrase'
+	Help = 'lastmention(ed)/lastsaid <text> - checks the log for the last time someone mentioned a given word or phrase'
 	def GetResponse(self, message):
 		if message.Type != 'PRIVMSG':
 			return

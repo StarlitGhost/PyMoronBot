@@ -12,7 +12,7 @@ from GlobalVars import *
 import re
 
 class Instantiate(Function):
-    Help = 'Responds with a link to the chat stats webpage'
+    Help = 'stats - Responds with a link to the chat stats webpage(s)'
 
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':

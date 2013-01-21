@@ -10,7 +10,7 @@ import subprocess
 import dateutil.parser as dparser
 
 class Instantiate(Function):
-    Help = 'Gives you a log link'
+    Help = "log (<-n>/<date>) - gives you a link to today's log, the log from -n days ago, or the log for the specified date"
     
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':

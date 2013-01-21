@@ -7,7 +7,7 @@ from MobroResponses import *
 import re
 
 class Instantiate(Function):
-	Help = 'Talkwords from your mouth'
+	Help = 'Talkwords from the mouth place - response <name> to enable/disable a particular response (might need to check the source for names)'
 	
 	def __init__(self):
 		try:
@@ -37,6 +37,12 @@ class Instantiate(Function):
 								300,
 								False))
 					
+			'''Responds to the ocean as a caffeinated Pika'''
+			self.responses.add(MobroResponse(	'ocean',
+								'mimes out a *WHOOOOSH!*',
+								'([^a-zA-Z]|^)ocean([^a-zA-Z]|$)',
+                                ResponseType.Do))		
+					
 			'''Responds to incorrect windmill assumptions'''
 			self.responses.add(MobroResponse(	'windmill',
 								['WINDMILLS DO NOT WORK THAT WAY!','GOODNIGHT!'],
@@ -63,7 +69,7 @@ class Instantiate(Function):
 								'([^a-zA-Z]|^)cheese([^a-zA-Z]|$)',
 								ResponseType.Do))
 
-			'''Responds to wat'''
+			'''Responds to JavaScript's insane shenanigans'''
 			self.responses.add(MobroResponse(	'wat',
 								'NaNNaNNaNNaN https://www.destroyallsoftware.com/talks/wat man!',
 								'([^a-zA-Z]|^)wat([^a-zA-Z]|$)'))

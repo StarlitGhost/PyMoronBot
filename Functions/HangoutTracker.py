@@ -12,29 +12,35 @@ from GlobalVars import *
 import re
 import time
 
-class Instantiate(Function):
-    Help = 'Keeps track of the last posted G+ hangout link'
-
+class data:
     lastCode = None
     lastDate = None
     lastUser = None
+
+class Instantiate(Function):
+    Help = 'hangout - gives you the last posted G+ hangout link'
+
+    hangoutDict = {}
     
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':
             return
             
-        match = re.search('^hangout$', message.Command, re.IGNORECASE)
-        if match:
-            if self.lastCode is None:
+        if message.MessageString[:1] == '|':
+            match = re.search('^hangout$', message.Command, re.IGNORECASE)
+            if match:
+                if message.ReplyTo not in self.hangoutDict:
+                    self.hangoutDict[message.ReplyTo] = None
+                if self.hangoutDict[message.ReplyTo] is None:
+                    return IRCResponse(ResponseType.Say,
+                                       'No hangouts posted here yet',
+                                       message.ReplyTo)
+                
                 return IRCResponse(ResponseType.Say,
-                                   'No hangouts posted yet',
+                                   'Last hangout posted: https://talkgadget.google.com/hangouts/%s (at %s by %s)' % (self.hangoutDict[message.ReplyTo].lastCode,
+                                                                                                                     self.hangoutDict[message.ReplyTo].lastDate,
+                                                                                                                     self.hangoutDict[message.ReplyTo].lastUser),
                                    message.ReplyTo)
-            
-            return IRCResponse(ResponseType.Say,
-                               'Last hangout posted: https://talkgadget.google.com/hangouts/%s (at %s by %s)' % (self.lastCode,
-                                                                                                                 self.lastDate,
-                                                                                                                 self.lastUser),
-                               message.ReplyTo)
         
         match = re.search('(https?\://)?(talkgadget|plus)\.google\.com/hangouts/(?P<code>(extras/talk\.google\.com/)?[^\?\s]+)',
                           message.MessageString,
@@ -43,10 +49,13 @@ class Instantiate(Function):
         if not match:
             return
         
-        if match.group('code') == self.lastCode:
+        self.hangoutDict[message.ReplyTo] = data()
+        
+        if match.group('code') == self.hangoutDict[message.ReplyTo].lastCode:
             return
         
-        self.lastCode = match.group('code')
-        self.lastUser = message.User.Name
-        self.lastDate = time.strftime('%X %x %Z')
+        self.hangoutDict[message.ReplyTo].lastCode = match.group('code')
+        self.hangoutDict[message.ReplyTo].lastUser = message.User.Name
+        self.hangoutDict[message.ReplyTo].lastDate = time.strftime('%X %x %Z')
         return
+
