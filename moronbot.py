@@ -9,24 +9,23 @@ import GlobalVars
 
 class MoronBot(irc.IRCClient):
 
-    nickname = 'PyMoronBot'
-    GlobalVars.CurrentNick = nickname
+    nickname = GlobalVars.CurrentNick
     
-    realname = 'PyMoronBot'
-    username = 'PyMoronBot'
+    realname = GlobalVars.CurrentNick
+    username = GlobalVars.CurrentNick
     
-    fingerReply = 'GET YOUR FINGER OUT OF THERE'
+    fingerReply = GlobalVars.finger
     
-    versionName = 'PyMoronBot'
-    versionNum = '0.0.1'
+    versionName = GlobalVars.CurrentNick
+    versionNum = GlobalVars.version
     versionEnv = platform.platform()
     
-    sourceURL = 'https://github.com/MatthewCox/MoronBot/'
+    sourceURL = GlobalVars.source
     
     responses = []
 
     def signedOn(self):
-        for channel in self.factory.channels:
+        for channel in GlobalVars.channels:
             self.join(channel)
     
     def privmsg(self, user, channel, msg):
@@ -47,6 +46,8 @@ class MoronBot(irc.IRCClient):
     def irc_NICK(self, prefix, params):
         oldNick = prefix.split('!')[0]
         newNick = params[0]
+        if oldNick == GlobalVars.CurrentNick:
+            GlobalVars.CurrentNick = newNick
         self.log("{0} is now known as {1}".format(oldNick, newNick), '')
     
     def irc_JOIN(self, prefix, params):
@@ -116,9 +117,6 @@ class MoronBot(irc.IRCClient):
 class MoronBotFactory(protocol.ClientFactory):
 
     protocol = MoronBot
-    
-    def __init__(self, channel):
-        self.channels = channels
 
     def clientConnectionLost(self, connector, reason):
         connector.connect()
@@ -129,7 +127,6 @@ class MoronBotFactory(protocol.ClientFactory):
 
 if __name__ == '__main__':
     AutoLoadFunctions()
-    channels = ['#unmoderated', '#help', '#survivors']
-    moronbot = MoronBotFactory(channels)
-    reactor.connectTCP('irc.desertbus.org', 6667, moronbot)
+    moronbot = MoronBotFactory()
+    reactor.connectTCP(GlobalVars.server, GlobalVars.port, moronbot)
     reactor.run()

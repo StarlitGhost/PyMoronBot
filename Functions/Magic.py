@@ -1,15 +1,9 @@
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from Function import Function
-
-import socket
-origGetAddrInfo = socket.getaddrinfo
-def getAddrInfoWrapper(host, port, family=0, socktype=0, proto=0, flags=0):
-    return origGetAddrInfo(host, port, socket.AF_INET, socktype, proto, flags)
-socket.getaddrinfo = getAddrInfoWrapper
+import WebUtils
 
 import re
-import urllib, urllib2
 
 class Instantiate(Function):
     Help = 'mtg(f) <card name> - fetches details of the Magic: The Gathering card you specify from gatherer.wizards.com. mtgf includes the flavour text, if it has any'
@@ -26,12 +20,8 @@ class Instantiate(Function):
         for param in message.ParameterList:
             searchTerm += '+[%s]' % param
         
-        opener = urllib2.build_opener()
-        opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-        
-        conn = opener.open(searchTerm)
-        page = conn.read()
-        conn.close()
+        webPage = WebUtils.FetchURL(searchTerm)
+        page = webPage.Page
         page = re.sub('\s+', ' ', page)
         page = re.sub('\n', '', page)
         

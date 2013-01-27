@@ -1,4 +1,5 @@
 from enumType import enum
+import GlobalVars
 
 TargetTypes = enum('CHANNEL', 'USER')
 
@@ -31,7 +32,10 @@ class IRCMessage:
         self.MessageList = message.strip().split(' ')
         self.MessageString = message
         self.User = UserStruct(user)
-        self.ReplyTo = channel
+        if channel == GlobalVars.CurrentNick:
+            self.ReplyTo = self.User.Name
+        else:
+            self.ReplyTo = channel
         if (channel.startswith('#')):
             self.TargetType = TargetTypes.CHANNEL
         else:
