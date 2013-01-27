@@ -15,7 +15,7 @@ class Instantiate(Function):
         if message.Type != 'PRIVMSG':
             return
         
-        match = re.search('^(?P<url>https?://[^\s]+)$', message.MessageString, re.IGNORECASE)
+        match = re.search('(?P<url>https?://[^\s]+)', message.MessageString, re.IGNORECASE)
         if not match:
             return
         
@@ -66,7 +66,7 @@ class Instantiate(Function):
         if webPage is None:
             return
         
-        match = re.search('<title\s*>[\s]+(?P<title>.*?)</title\s*>', webPage.Page, re.IGNORECASE | re.DOTALL)
+        match = re.search('<title\s*>\s*(?P<title>.*?)</title\s*>', webPage.Page, re.IGNORECASE | re.DOTALL)
         if match:
             title = match.group('title')
             title = re.sub('(\n|\r)+', '', title)
