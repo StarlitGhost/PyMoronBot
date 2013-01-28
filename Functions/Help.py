@@ -24,5 +24,6 @@ class Instantiate(Function):
                 return IRCResponse(ResponseType.Say, '"%s" not found, try "%s" without parameters to see a list of loaded function names' % (message.ParameterList[0], message.Command), message.ReplyTo)
         else:
             funcs = ', '.join(sorted(GlobalVars.functions.iterkeys(), key=lambda s: s.lower()))
-            return IRCResponse(ResponseType.Say, "Functions loaded are:\n" + funcs, message.ReplyTo)
+            return [IRCResponse(ResponseType.Say, "Functions loaded are:", message.ReplyTo),
+                    IRCResponse(ResponseType.Say, funcs, message.ReplyTo)]
 
