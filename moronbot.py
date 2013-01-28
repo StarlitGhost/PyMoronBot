@@ -62,7 +62,7 @@ class MoronBot(irc.IRCClient):
         self.log(" << {0} ({1}@{2}) left {3}{4}".format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo, partMessage), message.ReplyTo)
 
     def sendResponse(self, response):
-        if (response == None):
+        if (response == None or response.Response == None):
             return False
         
         response.Response = response.Response.decode('utf-8').encode('utf-8')

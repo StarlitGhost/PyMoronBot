@@ -5,6 +5,7 @@ def getAddrInfoWrapper(host, port, family=0, socktype=0, proto=0, flags=0):
 socket.getaddrinfo = getAddrInfoWrapper
 
 import urllib, urllib2, urlparse
+import json
 import re
 
 class WebPage():
@@ -52,4 +53,21 @@ def SendToServer(url, text=None):
         elif hasattr(e, 'code'):
             print 'The server couldn\'t fulfill the request.'
             print 'Error code: ', e.code
+
+def ShortenGoogl(url):
+    post = '{{"longUrl": "{0}"}}'.format(url)
+    
+    googlKey = 'AIzaSyCU7yKR6eTkme1cTUqFoSJxhG-v83trPy4'
+    
+    apiURL = 'https://www.googleapis.com/urlshortener/v1/url?key={0}'.format(googlKey)
+    
+    headers = {"Content-Type": "application/json"}
+    
+    try:
+        request = urllib2.Request(apiURL, post, headers)
+        response = json.loads(urllib2.urlopen(request).read())
+        return response['id']
+
+    except Exception, e:
+        print "Goo.gl error: %s" % e
 
