@@ -22,7 +22,7 @@ class Instantiate(Function):
         if re.search('\.(jpe?g|gif|png|bmp)$', match.group('url')):
             return
         
-        youtubeMatch = re.search('(www\.youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&]+)', match.group('url'))
+        youtubeMatch = re.search('(www\.youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#]+)', match.group('url'))
         if youtubeMatch:
             return self.FollowYouTube(youtubeMatch.group('videoID'), message)
         else:
