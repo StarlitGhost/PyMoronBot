@@ -3,9 +3,9 @@ import os
 functions = {}
 
 CurrentNick = 'PyMoronBot'
-server = 'irc.desertbus.org'
+server = 'irc.desertbus.org'#'irc.applejack.me'#'irc.desertbus.org'
 port = 6667
-channels = ['#unmoderated', '#survivors', '#help', '#desertbus']
+channels = ['#unmoderated', '#survivors', '#help', '#desertbus', '#games']
 admins = ['Tyranic-Moron', 'T-M|Work', 'Tyranic_Moron', 'T-M|Asleep', 'LordCustardSmingleigh']
 
 finger = 'GET YOUR FINGER OUT OF THERE'

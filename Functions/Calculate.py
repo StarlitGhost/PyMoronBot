@@ -6,9 +6,12 @@ import WebUtils
 import re
 import json
 import urllib
+import HTMLParser
 
 class Instantiate(Function):
-    Help = "calc <expr> - Uses Google\'s calculation API to give you the result of <expr>"
+    Help = "calc <expr> - Uses Google's calculation API to give you the result of <expr>"
+    
+    htmlParser = HTMLParser.HTMLParser()
     
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':
@@ -27,6 +30,12 @@ class Instantiate(Function):
         j = re.sub(r",\s*'?(\w)", r',"\1', j)
         j = re.sub(r"(\w)'?\s*:", r'\1":', j)
         j = re.sub(r":\s*'(\w)'\s*([,}])", r':"\1"\2', j)
+        j = self.htmlParser.unescape(j)
+        j = j.replace('\xa0', ',')
+        j = j.replace('\\x3c', '<')
+        j = j.replace('\\x3e', '>')
+        j = j.replace('<sup>', '^(')
+        j = j.replace('</sup>', ')')
         print j
         result = json.loads(j)
         
