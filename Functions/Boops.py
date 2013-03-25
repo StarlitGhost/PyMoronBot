@@ -34,7 +34,9 @@ class Instantiate(Function):
              "http://bit.ly/MKZqCJ",
              "http://bit.ly/QA92eW",
              "http://i.imgur.com/wtK1T.jpg",
-             "http://goo.gl/Nh4PK"]
+             "http://goo.gl/Nh4PK",
+             "http://goo.gl/ZKmt5",
+             "http://goo.gl/Juhcv"]
 
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':
