@@ -39,7 +39,7 @@ dict = {'A' : 'ALPHA',
         '6' : 'SIX',
         '7' : 'SEVEN',
         '8' : 'EIGHT',
-        '9' : 'NINE',
+        '9' : 'NINER',
         '0' : 'ZERO',
         '-' : 'DASH'}
 

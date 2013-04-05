@@ -21,7 +21,7 @@ class Instantiate(Function):
              "http://bit.ly/ACbm0J",
              "http://bit.ly/qNyEZk",
              "http://bit.ly/zJrjGF",
-             "http://bit.ly/yXmGAS",
+             "http://goo.gl/d054n", # This is called "aversion therapy."
              "http://bit.ly/aAOgj9",
              "http://bit.ly/z79CJv",
              "http://bit.ly/yODbYA",
