@@ -25,7 +25,7 @@ class Instantiate(Function):
                 feedLatest = FunctionData.LRRChecker[feedName]['lastTitle']
                 feedLink = FunctionData.LRRChecker[feedName]['lastLink']
                 
-                response = 'Latest {0}: {1} | Link: {2}'.format(feedName, feedLatest, feedLink)
+                response = 'Latest {0}: {1} | {2}'.format(feedName, feedLatest, feedLink)
                 
                 return IRCResponse(ResponseType.Say, response, message.ReplyTo)
                 
@@ -42,7 +42,7 @@ class Instantiate(Function):
                     latestTitle = feedDeets['lastTitle']
                     latestLink = feedDeets['lastLink']
                     
-            response = 'Latest {0}: {1} | Link: {2}'.format(latestFeed, latestTitle, latestLink)
+            response = 'Latest {0}: {1} | {2}'.format(latestFeed, latestTitle, latestLink)
             return IRCResponse(ResponseType.Say, response, message.ReplyTo)
 
     def handleAliases(self, series):
