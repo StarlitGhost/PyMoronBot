@@ -14,7 +14,7 @@ import re, random
 class Instantiate(Function):
     Help = 'Responds to boops with pictorial boops!'
     
-    boops = ["http://bit.ly/hraTeR",
+    boops = ["http://goo.gl/HJzfS", # feline anatomy
              "http://bit.ly/yoMzZ1",
              "http://bit.ly/zA2bUY",
              "http://bit.ly/wQoI8p",
