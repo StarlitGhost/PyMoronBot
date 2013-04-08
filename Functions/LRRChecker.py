@@ -33,7 +33,7 @@ class Instantiate(Function):
                 if feedDeets['suppress']:
                     FunctionData.LRRChecker[feedName]['suppress'] = False
                 else:
-                    response = 'New {0}! Title: {1} | Link: {2}'.format(feedName, title, link)
+                    response = 'New {0}! Title: {1} | {2}'.format(feedName, title, link)
                     responses.append(IRCResponse(ResponseType.Say, response, '#desertbus'))
             
         return responses
