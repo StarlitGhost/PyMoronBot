@@ -29,7 +29,7 @@ class Instantiate(Function):
                 
                 return IRCResponse(ResponseType.Say, response, message.ReplyTo)
                 
-            return IRCResponse(ResponseType.Say, '{0} is not one of the LRR series being monitored', message.ReplyTo)
+            return IRCResponse(ResponseType.Say, "{0} is not one of the LRR series being monitored (leave a |tell for Tyranic-Moron if it's a new series or should be an alias!)".format(message.Parameters.strip()), message.ReplyTo)
         else:
             latestDate = datetime.datetime.utcnow() - datetime.timedelta(days=365*10)
             latestFeed = None

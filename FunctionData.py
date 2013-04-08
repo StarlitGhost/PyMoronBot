@@ -10,7 +10,7 @@ LRRChecker = {
         'lastTitle': '',
         'lastLink': '',
         'lastCheck': tenMinsAgo,
-        'aliases': ['unskipable', 'unskip', 'us', 'u'],
+        'aliases': ['unskipable', 'unskip', 'us', 'u', 'skip'],
         'suppress': True },
     'LRR': {
         'url': 'http://www.escapistmagazine.com/rss/videos/list/123.xml',
@@ -26,7 +26,7 @@ LRRChecker = {
         'lastTitle': '',
         'lastLink': '',
         'lastCheck': tenMinsAgo,
-        'aliases': ["feed", "dump", "fdump", "fd", "f", 'fump'],
+        'aliases': ["feed", "dump", "fdump", "fd", "f", 'fump', 'frump'],
         'suppress': True },
     'CheckPoint': {
         'url': 'http://penny-arcade.com/feed/show/checkpoint',
@@ -42,7 +42,7 @@ LRRChecker = {
         'lastTitle': '',
         'lastLink': '',
         'lastCheck': tenMinsAgo,
-        'aliases': ["podcast", "cast", "lrrc", "llrc", "lcast", "lc"],
+        'aliases': ["podcast", "cast", "lrrc", "llrc", "lcast", "lc", 'chat'],
         'suppress': True },
     'Strip Search': {
         'url': 'http://www.penny-arcade.com/feed/show/strip-search',
