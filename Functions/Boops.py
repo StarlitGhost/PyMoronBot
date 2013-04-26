@@ -22,7 +22,7 @@ class Instantiate(Function):
              "http://bit.ly/qNyEZk",
              "http://bit.ly/zJrjGF",
              "http://goo.gl/d054n", # This is called "aversion therapy."
-             "http://bit.ly/aAOgj9",
+             "http://goo.gl/6IoB0", # my grumpy button, ur pushin' it
              "http://bit.ly/z79CJv",
              "http://bit.ly/yODbYA",
              "http://bit.ly/AdX2cw",
@@ -36,7 +36,9 @@ class Instantiate(Function):
              "http://i.imgur.com/wtK1T.jpg",
              "http://goo.gl/Nh4PK",
              "http://goo.gl/ZKmt5",
-             "http://goo.gl/Juhcv"]
+             "http://goo.gl/Juhcv",
+             "http://i.imgur.com/BLQoL61.gif", # darting boop
+             ]
 
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':
