@@ -87,14 +87,54 @@ class Instantiate(Function):
 				match = re.search('([^a-zA-Z]|^)minecraft([^a-zA-Z]|$)', message, re.IGNORECASE)
 				self.ductMatch = re.search('([^a-zA-Z]|^)(?P<duc>duc[kt]tape)([^a-zA-Z]|$)',message,re.IGNORECASE)
 				return match and self.ductMatch
-
+			
 			def ducktapeTalkwords(chatMessage):
 				return [IRCResponse(ResponseType.Say,'Just saying, %s is a dick in Minecraft' % self.ductMatch.group('duc'),chatMessage.ReplyTo)]
-
+			
 			ducktape = MobroResponse('ducktape','','')
 			ducktape.match = ducktapeMatch
 			ducktape.talkwords = ducktapeTalkwords
 			self.responses.add(ducktape)
+			
+			def boopMatch(message):
+				match = re.search('(\W|^)b[o0][o0]+ps?(\W|$)', message, re.IGNORECASE)
+				return match
+
+			def boopTalkwords(chatMessage):
+				boops = ["http://goo.gl/HJzfS", # feline anatomy
+						 "http://bit.ly/yoMzZ1",
+						 "http://bit.ly/zA2bUY",
+						 "http://bit.ly/wQoI8p",
+						 "http://bit.ly/ACbm0J",
+						 "http://bit.ly/qNyEZk",
+						 "http://bit.ly/zJrjGF",
+						 "http://goo.gl/d054n", # This is called "aversion therapy."
+						 "http://goo.gl/6IoB0", # my grumpy button, ur pushin' it
+						 "http://bit.ly/z79CJv",
+						 "http://bit.ly/yODbYA",
+						 "http://bit.ly/AdX2cw",
+						 "http://bit.ly/x9WGoy",
+						 "http://i.imgur.com/vC5gy.jpg",
+						 "http://i.imgur.com/xmzLY.gif",
+						 "http://i.imgur.com/NSAKo.jpg",
+						 "http://bit.ly/NI0jYk",
+						 "http://bit.ly/MKZqCJ",
+						 "http://bit.ly/QA92eW",
+						 "http://i.imgur.com/wtK1T.jpg",
+						 "http://goo.gl/Nh4PK",
+						 "http://goo.gl/ZKmt5",
+						 "http://goo.gl/Juhcv",
+						 "http://i.imgur.com/BLQoL61.gif", # darting boop
+						 "http://i.imgur.com/3b2lSjd.gif", # pounce boops
+						 ]
+				return [IRCResponse(ResponseType.Say,
+								   'Boop! %s' % boops[random.randrange(len(boops))],
+								   message.ReplyTo)]
+			
+			boop = MobroResponse('boop', '', '', ResponseType.Say, True, 1, True)
+			boop.match = boopMatch
+			boop.talkwords = boopTalkwords
+			self.responses.add(boop)
 
 			##################################
 			#                                #
