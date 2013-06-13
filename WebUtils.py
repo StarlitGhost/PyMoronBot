@@ -12,9 +12,9 @@ class WebPage():
     Domain = ''
     Page = ''
     
-def FetchURL(url):
+def FetchURL(url, headers=[('User-agent', 'Mozilla/5.0')]):
     opener = urllib2.build_opener()
-    opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+    opener.addheaders = headers
     
     try:
         response = opener.open(url)
