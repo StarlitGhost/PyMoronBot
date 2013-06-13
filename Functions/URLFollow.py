@@ -72,9 +72,9 @@ class Instantiate(Function):
         if webPage is None:
             return
         
-        print webPage.Page
-        
-        return
+        response = json.loads(webPage.Page)
+        title = response['data']['title']
+        return IRCResponse(ResponseType.Say, '{0}'.format(title), message.ReplyTo)
     
     def FollowStandard(self, url, message):
         webPage = WebUtils.FetchURL(url)
