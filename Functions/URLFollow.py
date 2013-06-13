@@ -5,6 +5,7 @@ import WebUtils
 
 import re
 import HTMLParser
+import json
 
 class Instantiate(Function):
     Help = 'automatic function that follows urls and grabs information about the resultant webpage'
