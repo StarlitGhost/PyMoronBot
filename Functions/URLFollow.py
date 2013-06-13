@@ -74,8 +74,17 @@ class Instantiate(Function):
             return
         
         response = json.loads(webPage.Page)
-        title = response['data']['title']
-        return IRCResponse(ResponseType.Say, '{0}'.format(title), message.ReplyTo)
+        
+        imageData = response['data']
+        
+        data = []
+        data.append(imageData['title'])
+        data.append('{0}x{1}'.format(imageData['width'], imageData['height']))
+        data.append('Animated: {0}'.format(imageData['animated']))
+        data.append('Size: {0}kb'.format(int(imageData['size'])/1024))
+        data.append('Views: {0}'.format(imageData['views']))
+        
+        return IRCResponse(ResponseType.Say, ' | '.join(data), message.ReplyTo)
     
     def FollowStandard(self, url, message):
         webPage = WebUtils.FetchURL(url)
