@@ -79,10 +79,11 @@ class Instantiate(Function):
         
         data = []
         data.append(imageData['title'])
-        data.append('{0}x{1}'.format(imageData['width'], imageData['height']))
         data.append('Animated: {0}'.format(imageData['animated']))
+        data.append('{0}x{1}'.format(imageData['width'], imageData['height']))
         data.append('Size: {0}kb'.format(int(imageData['size'])/1024))
         data.append('Views: {0}'.format(imageData['views']))
+        data.append(imageData['link'])
         
         return IRCResponse(ResponseType.Say, ' | '.join(data), message.ReplyTo)
     
