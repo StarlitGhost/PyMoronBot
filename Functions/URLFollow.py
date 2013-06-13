@@ -82,7 +82,7 @@ class Instantiate(Function):
             data.append(imageData['title'])
         else:
             webPage = WebUtils.FetchURL('http://imgur.com/{0}'.format(id))
-            title = GetTitle(webPage.Page)
+            title = self.GetTitle(webPage.Page)
             if title is not None:
                 data.append(title)
             else:
@@ -104,7 +104,7 @@ class Instantiate(Function):
         if webPage is None:
             return
         
-        title = GetTitle(webPage.Page)
+        title = self.GetTitle(webPage.Page)
         if title is not None:
             return IRCResponse(ResponseType.Say, '{0} (at {1})'.format(title, webPage.Domain), message.ReplyTo)
         
