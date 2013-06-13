@@ -22,7 +22,7 @@ class Instantiate(Function):
         if not match:
             return
         
-                           #'sss: http://stats.fugiman.com | pisg: http://silver.amazon.fooproject.net/pisg/desertbus.html'
+                           #'sss: http://www.moronic-works.co.uk/ | pisg: http://silver.amazon.fooproject.net/pisg/desertbus.html | pisg2: http://pisg.michael-wheeler.org/desertbus.html'
         return IRCResponse(ResponseType.Say,
-                           'sss: http://www.moronic-works.co.uk/ | pisg: http://silver.amazon.fooproject.net/pisg/desertbus.html',
+                           'sss: http://www.moronic-works.co.uk/ | pisg: http://pisg.michael-wheeler.org/desertbus.html',
                            message.ReplyTo)

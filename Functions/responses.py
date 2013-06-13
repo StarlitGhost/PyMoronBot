@@ -97,7 +97,7 @@ class Instantiate(Function):
 			self.responses.add(ducktape)
 			
 			def boopMatch(message):
-				match = re.search('(\W|^)b[o0][o0]+ps?(\W|$)', message, re.IGNORECASE)
+				match = re.search('\bb[o0][o0]+ps?\b', message, re.IGNORECASE)
 				return match
 
 			def boopTalkwords(chatMessage):
@@ -128,7 +128,7 @@ class Instantiate(Function):
 						 "http://i.imgur.com/3b2lSjd.gif", # pounce boops
 						 ]
 				return [IRCResponse(ResponseType.Say,
-								   'Boop! %s' % boops[random.randrange(len(boops))],
+								   'Boop! %s' % boops[random.choice(boops)],
 								   message.ReplyTo)]
 			
 			boop = MobroResponse('boop', '', '', ResponseType.Say, True, 1, True)
