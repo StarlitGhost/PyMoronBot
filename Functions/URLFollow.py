@@ -23,8 +23,11 @@ class Instantiate(Function):
             return
         
         youtubeMatch = re.search('(www\.youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#]+)', match.group('url'))
+        imgurMatch   = re.search('(i\.)?imgur.com/(?P<imgurID>[^\.]+)', match.group('url'))
         if youtubeMatch:
             return self.FollowYouTube(youtubeMatch.group('videoID'), message)
+        elif imgurMatch:
+            return self.FollowImgur(imgurMatch.group('imgurID'), message)
         else:
             return self.FollowStandard(match.group('url'), message)
         
@@ -59,7 +62,20 @@ class Instantiate(Function):
             return IRCResponse(ResponseType.Say, '{0} | {1} | {2}'.format(title, length, description), message.ReplyTo)
         
         return
+    
+    def FollowImgur(self, id, message):
+        clientID = 'cc2c410cd122a79'
+        clientSecret = '501db78ba87c47393db86c4a557073ee97efdc88'
         
+        url = 'https://api.imgur.com/3/image/{0}'.format(id)
+        headers = [('Authorization', 'Client-ID {0}'.format(clientID))]
+        
+        webPage = WebUtils.FetchURL(url, headers)
+        
+        print webPage.Page
+        
+        return
+    
     def FollowStandard(self, url, message):
         webPage = WebUtils.FetchURL(url)
         
