@@ -80,6 +80,8 @@ class Instantiate(Function):
         data = []
         if imageData['title'] is not None:
             data.append(imageData['title'])
+        else:
+            data.append('<No Title>')
         if imageData['animated']:
             data.append('Animated!')
         data.append('{0}x{1}'.format(imageData['width'], imageData['height']))
