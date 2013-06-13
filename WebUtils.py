@@ -20,7 +20,8 @@ def FetchURL(url, headers=[('User-agent', 'Mozilla/5.0')]):
         response = opener.open(url)
         pageType = response.info().gettype()
         
-        if re.match('^(text/.*|application/((rss|atom|rdf)\+)?xml(;.*)?)$', pageType):
+        #             |   text|                       rss feeds and xml|            json|
+        if re.match('^(text/.*|application/((rss|atom|rdf)\+)?xml(;.*)?|application/json)$', pageType):
             page = WebPage()
             page.Domain = urlparse.urlparse(response.geturl()).hostname
             page.Page = response.read()

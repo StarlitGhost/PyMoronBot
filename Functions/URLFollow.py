@@ -69,6 +69,9 @@ class Instantiate(Function):
         
         webPage = WebUtils.FetchURL(url, headers)
         
+        if webPage is None:
+            return
+        
         print webPage.Page
         
         return
