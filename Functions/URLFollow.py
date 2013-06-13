@@ -22,6 +22,7 @@ class Instantiate(Function):
         
         youtubeMatch = re.search('(www\.youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#]+)', match.group('url'))
         imgurMatch   = re.search('(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', match.group('url'))
+        
         if youtubeMatch:
             return self.FollowYouTube(youtubeMatch.group('videoID'), message)
         elif imgurMatch:
@@ -63,7 +64,6 @@ class Instantiate(Function):
     
     def FollowImgur(self, id, message):
         clientID = 'cc2c410cd122a79'
-        clientSecret = '501db78ba87c47393db86c4a557073ee97efdc88'
         
         url = 'https://api.imgur.com/3/image/{0}'.format(id)
         headers = [('Authorization', 'Client-ID {0}'.format(clientID))]
@@ -81,7 +81,14 @@ class Instantiate(Function):
         if imageData['title'] is not None:
             data.append(imageData['title'])
         else:
-            data.append('<No Title>')
+            webPage = WebUtils.FetchURL('http://imgur.com/{0}'.format(id))
+            title = GetTitle(webPage.Page)
+            if title is not None:
+                data.append(title)
+            else:
+                data.append('<No Title>')
+        if imageData['nsfw']:
+            data.append('\x034\x02NSFW!\x0F')
         if imageData['animated']:
             data.append('Animated!')
         data.append('{0}x{1}'.format(imageData['width'], imageData['height']))
@@ -97,7 +104,14 @@ class Instantiate(Function):
         if webPage is None:
             return
         
-        match = re.search('<title\s*>\s*(?P<title>.*?)</title\s*>', webPage.Page, re.IGNORECASE | re.DOTALL)
+        title = GetTitle(webPage.Page)
+        if title is not None:
+            return IRCResponse(ResponseType.Say, '{0} (at {1})'.format(title, webPage.Domain), message.ReplyTo)
+        
+        return
+
+    def GetTitle(self, webpage):
+        match = re.search('<title\s*>\s*(?P<title>.*?)</title\s*>', webpage, re.IGNORECASE | re.DOTALL)
         if match:
             title = match.group('title')
             title = re.sub('(\n|\r)+', '', title)
@@ -105,8 +119,7 @@ class Instantiate(Function):
             title = re.sub('\s+', ' ', title)
             title = re.sub('<[^<]+?>', '', title)
             title = self.htmlParser.unescape(title)
+            
+            return title
         
-            return IRCResponse(ResponseType.Say, '{0} (at {1})'.format(title, webPage.Domain), message.ReplyTo)
-        
-        return
-
+        return None
