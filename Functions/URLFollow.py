@@ -90,7 +90,7 @@ class Instantiate(Function):
         if imageData['nsfw']:
             data.append('\x034\x02NSFW!\x0F')
         if imageData['animated']:
-            data.append('Animated!')
+            data.append('\x032\x02Animated!\x0F')
         data.append('{0}x{1}'.format(imageData['width'], imageData['height']))
         data.append('Size: {0}kb'.format(int(imageData['size'])/1024))
         data.append('Views: {0}'.format(imageData['views']))
