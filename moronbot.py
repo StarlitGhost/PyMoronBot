@@ -1,4 +1,4 @@
-import sys, platform, os, traceback, datetime
+import sys, platform, os, traceback, datetime, codecs
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 
