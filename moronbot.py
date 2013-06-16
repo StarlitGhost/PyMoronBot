@@ -30,17 +30,17 @@ class MoronBot(irc.IRCClient):
     
     def privmsg(self, user, channel, msg):
         message = IRCMessage('PRIVMSG', user, channel, msg)
-        self.log(u"<{0}> {1}".format(message.User.Name, message.MessageString), message.ReplyTo)
+        self.log(u'<{0}> {1}'.format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
 
     def action(self, user, channel, msg):
         message = IRCMessage('ACTION', user, channel, msg)
-        self.log(u"*{0} {1}*".format(message.User.Name, message.MessageString), message.ReplyTo)
+        self.log(u'*{0} {1}*'.format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
     
     def noticed(self, user, channel, msg):
         message = IRCMessage('NOTICE', user, channel, msg)
-        self.log(u"[{0}] {1}".format(message.User.Name, message.MessageString), message.ReplyTo)
+        self.log(u'[{0}] {1}'.format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
     
     def irc_NICK(self, prefix, params):
@@ -48,18 +48,18 @@ class MoronBot(irc.IRCClient):
         newNick = params[0]
         if oldNick == GlobalVars.CurrentNick:
             GlobalVars.CurrentNick = newNick
-        self.log(u"{0} is now known as {1}".format(oldNick, newNick), '')
+        self.log(u'{0} is now known as {1}'.format(oldNick, newNick), '')
     
     def irc_JOIN(self, prefix, params):
         message = IRCMessage('JOIN', prefix, params[0], '')
-        self.log(u" >> {0} ({1}@{2}) joined {3}".format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo), message.ReplyTo)
+        self.log(u' >> {0} ({1}@{2}) joined {3}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo), message.ReplyTo)
     
     def irc_PART(self, prefix, params):
-        partMessage = ""
+        partMessage = u''
         if len(params) > 1:
-            partMessage = ", message: "+" ".join(params[1:])
+            partMessage = u', message: '+u' '.join(params[1:])
         message = IRCMessage('PART', prefix, params[0], partMessage)
-        self.log(u" << {0} ({1}@{2}) left {3}{4}".format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo, partMessage), message.ReplyTo)
+        self.log(u' << {0} ({1}@{2}) left {3}{4}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo, partMessage), message.ReplyTo)
 
     def sendResponse(self, response):
         if (response == None or response.Response == None):
@@ -69,13 +69,13 @@ class MoronBot(irc.IRCClient):
         
         if (response.Type == ResponseType.Say):
             self.msg(response.Target, response.Response)
-            self.log(u"<{0}> {1}".format(self.nickname, response.Response), response.Target)
+            self.log(u'<{0}> {1}'.format(self.nickname, response.Response), response.Target)
         elif (response.Type == ResponseType.Do):
             self.describe(response.Target, response.Response)
-            self.log(u"*{0} {1}*".format(self.nickname, response.Response), response.Target)
+            self.log(u'*{0} {1}*'.format(self.nickname, response.Response), response.Target)
         elif (response.Type == ResponseType.Notice):
             self.notice(response.Target, response.Response)
-            self.log(u"[{0}] {1}".format(self.nickname, response.Response), response.Target)
+            self.log(u'[{0}] {1}'.format(self.nickname, response.Response), response.Target)
         elif (response.Type == ResponseType.Raw):
             self.sendLine(response.Response)
 
@@ -101,7 +101,7 @@ class MoronBot(irc.IRCClient):
     def log(self, text, target):
         now = datetime.datetime.utcnow()
         time = now.strftime("[%H:%M]")
-        data = u"{0} {1}".format(time, text)
+        data = u'{0} {1}'.format(time, text)
         print target, data
         
         fileName = "{0}{1}.txt".format(target, now.strftime("-%Y%m%d"))
