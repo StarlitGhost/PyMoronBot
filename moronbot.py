@@ -65,7 +65,7 @@ class MoronBot(irc.IRCClient):
         if (response == None or response.Response == None):
             return False
         
-        response.Response = response.Response.decode('utf-8').encode('utf-8')
+        #response.Response = response.Response.decode('utf-8').encode('utf-8')
         
         if (response.Type == ResponseType.Say):
             self.msg(response.Target, response.Response)
