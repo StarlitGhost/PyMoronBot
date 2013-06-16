@@ -110,9 +110,8 @@ class MoronBot(irc.IRCClient):
             os.makedirs(fileDirs)
         filePath = os.path.join(fileDirs, fileName)
         
-        f = open(filePath, 'a+')
-        f.write(data + '\n')
-        f.close()
+        with codecs.open(filePath, 'a+', 'utf-8') as f:
+            f.write(data + '\n')
         
 class MoronBotFactory(protocol.ClientFactory):
 
