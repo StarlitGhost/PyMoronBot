@@ -65,19 +65,17 @@ class MoronBot(irc.IRCClient):
         if (response == None or response.Response == None):
             return False
         
-        response.Response = response.Response.encode('utf-8')
-        
         if (response.Type == ResponseType.Say):
-            self.msg(response.Target, response.Response)
+            self.msg(response.Target, response.Response.encode('utf-8'))
             self.log(u'<{0}> {1}'.format(self.nickname, response.Response), response.Target)
         elif (response.Type == ResponseType.Do):
-            self.describe(response.Target, response.Response)
+            self.describe(response.Target, response.Response.encode('utf-8'))
             self.log(u'*{0} {1}*'.format(self.nickname, response.Response), response.Target)
         elif (response.Type == ResponseType.Notice):
-            self.notice(response.Target, response.Response)
+            self.notice(response.Target, response.Response.encode('utf-8'))
             self.log(u'[{0}] {1}'.format(self.nickname, response.Response), response.Target)
         elif (response.Type == ResponseType.Raw):
-            self.sendLine(response.Response)
+            self.sendLine(response.Response.encode('utf-8'))
 
     def handleMessage(self, message):
         for (name, func) in GlobalVars.functions.items():
