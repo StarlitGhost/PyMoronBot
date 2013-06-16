@@ -72,13 +72,15 @@ class Instantiate(Function):
 			'''Responds to JavaScript's insane shenanigans'''
 			self.responses.add(MobroResponse(	'wat',
 								'NaNNaNNaNNaN https://www.destroyallsoftware.com/talks/wat man!',
-								'([^a-zA-Z]|^)wat([^a-zA-Z]|$)'))
+								'([^a-zA-Z]|^)wat([^a-zA-Z]|$)',
+								False))
 
 			#Sorry man, I had to. I HAD to.
 			'''Responds to Ponies'''
 			self.responses.add(MobroResponse(	'ponies',
 								'Ponies Ponies Ponies SWAG! https://www.youtube.com/watch?v=hx30VHwKa0Q',
-								'([^a-zA-Z]|^)ponies([^a-zA-Z]|$)'))
+								'([^a-zA-Z]|^)ponies([^a-zA-Z]|$)',
+								False))
 
 
 			#This one needs to mess with the object to work right.
