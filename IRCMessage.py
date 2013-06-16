@@ -21,16 +21,17 @@ class IRCMessage:
     TargetType = TargetTypes.CHANNEL
     ReplyTo = ''
     MessageList = []
-    MessageString = ''
+    MessageString = u''
     
-    Command = ''
-    Parameters = ''
+    Command = u''
+    Parameters = u''
     ParameterList = []
 
     def __init__(self, type, user, channel, message):
+        unicodeMessage = unicode(message)
         self.Type = type
-        self.MessageList = message.strip().split(' ')
-        self.MessageString = message
+        self.MessageList = unicodeMessage.strip().split(' ')
+        self.MessageString = unicodeMessage
         self.User = UserStruct(user)
         if channel == GlobalVars.CurrentNick:
             self.ReplyTo = self.User.Name
@@ -43,7 +44,7 @@ class IRCMessage:
         
         if (self.MessageList[0].startswith('\\')):
             self.Command = self.MessageList[0][1:]
-            self.Parameters = message[len(self.Command)+2:]
+            self.Parameters = unicodeMessage[len(self.Command)+2:]
             if self.Parameters.strip() is not '':
                 self.ParameterList = self.Parameters.split(' ')
         
