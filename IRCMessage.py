@@ -45,6 +45,6 @@ class IRCMessage:
         if (self.MessageList[0].startswith('\\')):
             self.Command = self.MessageList[0][1:]
             self.Parameters = unicodeMessage[len(self.Command)+2:]
-            if self.Parameters.strip() is not '':
+            if not self.Parameters.strip():
                 self.ParameterList = self.Parameters.split(' ')
         
