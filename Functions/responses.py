@@ -134,7 +134,7 @@ class Instantiate(Function):
                            'Boop! %s' % random.choice(boops),
                            message.ReplyTo)]
             
-            boop = MobroResponse('boop', '', '', ResponseType.Say, True, 1, True)
+            boop = MobroResponse('boop', '', '', ResponseType.Say, True, 120, True)
             boop.match = boopMatch
             boop.talkwords = boopTalkwords
             self.responses.add(boop)
