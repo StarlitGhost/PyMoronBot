@@ -47,5 +47,6 @@ class IRCMessage:
             self.Parameters = unicodeMessage[len(self.Command)+2:]
             if not self.Parameters.strip():
                 self.ParameterList = self.Parameters.split(' ')
+                print self.ParameterList
                 if len(self.ParameterList) == 1 and not self.ParameterList[0]:
                     self.ParameterList = []
