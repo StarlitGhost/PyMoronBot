@@ -12,6 +12,8 @@ finger = 'GET YOUR FINGER OUT OF THERE'
 version = '0.0.1'
 source = 'https://github.com/MatthewCox/PyMoronBot/'
 
+CommandChar = '\\'
+
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
