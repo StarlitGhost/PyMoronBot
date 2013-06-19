@@ -34,6 +34,7 @@ class Instantiate(Function):
         url = 'https://gdata.youtube.com/feeds/api/videos/%s?v=2&key=AI39si4LaIHfBlDmxNNRIqZjXYlDgVTmUVa7p8dSE8_bI45a9leskPQKauV7qi-qmAqjf6zjTdhwAfJxOfkxNcYOmloh8B1X9Q' % videoID
         
         webPage = WebUtils.FetchURL(url)
+        webPage.Page = webPage.Page.decode('utf-8')
         
         titleMatch = re.search('<title>(?P<title>[^<]+?)</title><content', webPage.Page)
         
@@ -47,18 +48,18 @@ class Instantiate(Function):
             m, s = divmod(int(length), 60)
             h, m = divmod(m, 60)
             if h > 0:
-                length = '{0:02d}:{1:02d}:{2:02d}'.format(h,m,s)
+                length = u'{0:02d}:{1:02d}:{2:02d}'.format(h,m,s)
             else:
-                length = '{0:02d}:{1:02d}'.format(m,s)
+                length = u'{0:02d}:{1:02d}'.format(m,s)
             description = descMatch.group('desc')
             description = re.sub('<[^<]+?>', '', description)
             description = self.htmlParser.unescape(description)
             description = re.sub('\n+', ' ', description)
             description = re.sub('\s+', ' ', description)
             if len(description) > 200:
-                description = description[:197] + '...'
+                description = description[:197] + u'...'
                 
-            return IRCResponse(ResponseType.Say, '{0} | {1} | {2}'.format(title, length, description), message.ReplyTo)
+            return IRCResponse(ResponseType.Say, u'{0} | {1} | {2}'.format(title, length, description), message.ReplyTo)
         
         return
     
@@ -86,17 +87,17 @@ class Instantiate(Function):
             if title is not None:
                 data.append(title)
             else:
-                data.append('<No Title>')
+                data.append(u'<No Title>')
         if imageData['nsfw']:
-            data.append('\x034\x02NSFW!\x0F')
-        if imageData['animated']:
-            data.append('\x032\x02Animated!\x0F')
-        data.append('{0}x{1}'.format(imageData['width'], imageData['height']))
-        data.append('Size: {0}kb'.format(int(imageData['size'])/1024))
-        data.append('Views: {0}'.format(imageData['views']))
+            data.append(u'\x034\x02NSFW!\x0F')
+        if imageData[u'animated']:
+            data.append(u'\x032\x02Animated!\x0F')
+        data.append(u'{0}x{1}'.format(imageData['width'], imageData['height']))
+        data.append(u'Size: {0}kb'.format(int(imageData['size'])/1024))
+        data.append(u'Views: {0}'.format(imageData['views']))
         #data.append(imageData['link'])
         
-        return IRCResponse(ResponseType.Say, ' | '.join(data), message.ReplyTo)
+        return IRCResponse(ResponseType.Say, u' | '.join(data), message.ReplyTo)
     
     def FollowStandard(self, url, message):
         webPage = WebUtils.FetchURL(url)
@@ -106,7 +107,7 @@ class Instantiate(Function):
         
         title = self.GetTitle(webPage.Page)
         if title is not None:
-            return IRCResponse(ResponseType.Say, '{0} (at {1})'.format(title, webPage.Domain), message.ReplyTo)
+            return IRCResponse(ResponseType.Say, u'{0} (at {1})'.format(title, webPage.Domain), message.ReplyTo)
         
         return
 
