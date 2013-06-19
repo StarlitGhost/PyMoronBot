@@ -14,10 +14,22 @@ class Instantiate(Function):
         match = re.search('^dbmoney?$', message.Command, re.IGNORECASE)
         if not match:
             return
-            
-        money = float(message.ParameterList[0])
         
-        hours = math.log((7*money)/100 + 1)/math.log(1.07)
+        if len(message.ParameterList) == 0:
+            return IRCResponse(ResponseType.Say, self.Help, message.ReplyTo)
+        
+        hours = 0.0
+        money = 0.0
+        
+        try:
+            money = float(message.ParameterList[0])
+        except ValueError:
+            return IRCResponse(ResponseType.Say, "Sorry, I don't recognize '{0}' as a number".format(message.ParameterList[0]), message.ReplyTo)
+        
+        try:
+            hours = math.log((7*money)/100 + 1)/math.log(1.07)
+        except OverflowError:
+            return IRCResponse(ResponseType.Say, "???", message.ReplyTo)
         
         reply = "With ${0:,.2f}, the team will bus for {1:,.2f} hour(s)".format(money, hours)
         

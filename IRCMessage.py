@@ -4,27 +4,28 @@ import GlobalVars
 TargetTypes = enum('CHANNEL', 'USER')
 
 class UserStruct:
-    Hostmask = ''
-    Name = ''
-    User = ''
+    Hostmask = None
+    Name = None
+    User = None
 
     def __init__(self, user):
         userArray = user.split('!')
         self.Name = userArray[0]
-        userArray = userArray[1].split('@')
-        self.User = userArray[0]
-        self.Hostmask = userArray[1]
+        if len(userArray) > 1:
+            userArray = userArray[1].split('@')
+            self.User = userArray[0]
+            self.Hostmask = userArray[1]
 
 class IRCMessage:
-    Type = ''
+    Type = None
     User = None
     TargetType = TargetTypes.CHANNEL
-    ReplyTo = ''
+    ReplyTo = None
     MessageList = []
-    MessageString = u''
+    MessageString = None
     
-    Command = u''
-    Parameters = u''
+    Command = ''
+    Parameters = ''
     ParameterList = []
 
     def __init__(self, type, user, channel, message):
