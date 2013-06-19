@@ -24,7 +24,6 @@ class MobroResponse:
             self.regex = [self.regex]
         for regex in self.regex:
             if re.search(regex, message, re.IGNORECASE):
-                print self.name
                 if not self.mustAllMatch:
                     return True
             elif self.mustAllMatch:
