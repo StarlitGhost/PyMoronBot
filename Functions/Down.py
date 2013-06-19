@@ -17,6 +17,9 @@ class Instantiate(Function):
         if not match:
             return
         
+        if len(message.ParameterList) == 0:
+            return IRCResponse(ResponseType.Say, "You didn't give a URL! Usage: {0}".format(self.Help), message.ReplyTo)
+
         url = message.Parameters
         
         webPage = WebUtils.FetchURL('http://www.downforeveryoneorjustme.com/{0}'.format(url))

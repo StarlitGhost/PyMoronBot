@@ -43,12 +43,12 @@ class MoronBot(irc.IRCClient):
         self.log(u'[{0}] {1}'.format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
     
-    def irc_NICK(self, prefix, params):
-        oldNick = prefix.split('!')[0]
-        newNick = params[0]
-        if oldNick == GlobalVars.CurrentNick:
-            GlobalVars.CurrentNick = newNick
-        self.log(u'{0} is now known as {1}'.format(oldNick, newNick), '')
+    def userRenamed(self, oldname, newname):
+        self.log(u'{0} is now known as {1}'.format(oldname, newname), '')
+    
+    def nickChanged(self, nick):
+        self.nickname = nick
+        GlobalVars.CurrentNick = nick
     
     def irc_JOIN(self, prefix, params):
         message = IRCMessage('JOIN', prefix, params[0], '')

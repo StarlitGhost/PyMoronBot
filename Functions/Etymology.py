@@ -17,6 +17,9 @@ class Instantiate(Function):
         if not match:
             return
         
+        if len(message.ParameterList) == 0:
+            return IRCResponse(ResponseType.Say, "You didn't give a word! Usage: {0}".format(self.Help), message.ReplyTo)
+        
         word = message.Parameters
         
         webPage = WebUtils.FetchURL('http://www.etymonline.com/index.php?allowed_in_frame=0&search={0}'.format(word))
@@ -24,6 +27,9 @@ class Instantiate(Function):
         etymTitle = root.find('dt')
         etymDef = root.find('dd')
         
+        if not etymTitle or not etymDef:
+            return IRCResponse(ResponseType.Say, "No etymology found for '{0}'".format(word), message.ReplyTo)
+
         response = "{0}: {1}".format(etymTitle.text.strip(), etymDef.text.strip())
         
         return IRCResponse(ResponseType.Say, response, message.ReplyTo)
