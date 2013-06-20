@@ -5,7 +5,7 @@ functions = {}
 CurrentNick = 'PyMoronBot'
 server = 'irc.desertbus.org'#'irc.applejack.me'#'irc.desertbus.org'
 port = 6667
-channels = ['#unmoderated', '#survivors', '#help', '#desertbus', '#games']
+channels = ['#survivors']#, '#desertbus', '#unmoderated', '#help', '#games']
 admins = ['Tyranic-Moron', 'T-M|Work', 'Tyranic_Moron', 'T-M|Asleep', 'LordCustardSmingleigh']
 
 finger = 'GET YOUR FINGER OUT OF THERE'

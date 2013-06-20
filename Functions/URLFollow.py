@@ -66,7 +66,18 @@ class Instantiate(Function):
     def FollowImgur(self, id, message):
         clientID = 'cc2c410cd122a79'
         
-        url = 'https://api.imgur.com/3/image/{0}'.format(id)
+        if id.startswith('gallery/'):
+            id = id.replace('gallery/', '')
+
+        url = ''
+        albumLink = False
+        if id.startswith('a/'):
+            id = id.replace('a/', '')
+            url = 'https://api.imgur.com/3/album/{0}'.format(id)
+            albumLink = True
+        else:
+            url = 'https://api.imgur.com/3/gallery/{0}'.format(id)
+
         headers = [('Authorization', 'Client-ID {0}'.format(clientID))]
         
         webPage = WebUtils.FetchURL(url, headers)
@@ -90,12 +101,18 @@ class Instantiate(Function):
                 data.append(u'<No Title>')
         if imageData['nsfw']:
             data.append(u'\x034\x02NSFW!\x0F')
-        if imageData[u'animated']:
-            data.append(u'\x032\x02Animated!\x0F')
-        data.append(u'{0}x{1}'.format(imageData['width'], imageData['height']))
-        data.append(u'Size: {0}kb'.format(int(imageData['size'])/1024))
+
+        if albumLink:
+            data.append(u'Album: {0} Images'.format(imageData['images_count']))
+        else:
+            if imageData['is_album']:
+                data.append(u'Album: {0} Images'.format(len(imageData['images'])))
+            else:
+                if imageData[u'animated']:
+                    data.append(u'\x032\x02Animated!\x0F')
+                data.append(u'{0}x{1}'.format(imageData['width'], imageData['height']))
+                data.append(u'Size: {0}kb'.format(int(imageData['size'])/1024))
         data.append(u'Views: {0}'.format(imageData['views']))
-        #data.append(imageData['link'])
         
         return IRCResponse(ResponseType.Say, u' | '.join(data), message.ReplyTo)
     
