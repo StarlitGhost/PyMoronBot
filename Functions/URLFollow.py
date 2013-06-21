@@ -96,7 +96,8 @@ class Instantiate(Function):
         if imageData['title'] is None:
             url = 'https://api.imgur.com/3/gallery/{0}'.format(id)
             webPage = WebUtils.FetchURL(url, headers)
-            imageData = json.loads(webPage.Page)['data']
+            if webPage is not None:
+                imageData = json.loads(webPage.Page)['data']
 
             if imageData['title'] is None:
                 webPage = WebUtils.FetchURL('http://imgur.com/{0}'.format(id))
