@@ -142,6 +142,7 @@ class Instantiate(Function):
         match = re.search('<title\s*>\s*(?P<title>.*?)</title\s*>', webpage, re.IGNORECASE | re.DOTALL)
         if match:
             title = match.group('title')
+            title = title.decode('utf-8')
             title = re.sub('(\n|\r)+', '', title)
             title = title.strip()
             title = re.sub('\s+', ' ', title)

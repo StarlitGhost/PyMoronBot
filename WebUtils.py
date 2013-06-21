@@ -11,6 +11,7 @@ import re
 class WebPage():
     Domain = ''
     Page = ''
+    Headers = {}
     
 def FetchURL(url, headers=[('User-agent', 'Mozilla/5.0')]):
     opener = urllib2.build_opener()
@@ -18,14 +19,17 @@ def FetchURL(url, headers=[('User-agent', 'Mozilla/5.0')]):
     
     try:
         response = opener.open(url)
-        pageType = response.info().gettype()
+        response_headers = response.info().dict
+        pageType = response_headers['content-type']
         
         #             |   text|                       rss feeds and xml|            json|
         if re.match('^(text/.*|application/((rss|atom|rdf)\+)?xml(;.*)?|application/json)$', pageType):
             page = WebPage()
             page.Domain = urlparse.urlparse(response.geturl()).hostname
+
             page.Page = response.read()
-            
+            page.Headers = response_headers
+
             response.close()
             return page
 
