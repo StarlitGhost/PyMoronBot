@@ -36,7 +36,7 @@ class Instantiate(Function):
         webPage = WebUtils.FetchURL(url)
         webPage.Page = webPage.Page.decode('utf-8')
         
-        titleMatch = re.search('<title>(?P<title>[^<]+?)</title><content', webPage.Page)
+        titleMatch = re.search('<title>(?P<title>[^<]+?)</title>', webPage.Page)
         
         if titleMatch:
             lengthMatch = re.search("<yt:duration seconds='(?P<length>[0-9]+?)'/>", webPage.Page)
