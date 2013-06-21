@@ -76,36 +76,43 @@ class Instantiate(Function):
             url = 'https://api.imgur.com/3/album/{0}'.format(id)
             albumLink = True
         else:
-            url = 'https://api.imgur.com/3/gallery/{0}'.format(id)
+            url = 'https://api.imgur.com/3/image/{0}'.format(id)
 
         headers = [('Authorization', 'Client-ID {0}'.format(clientID))]
         
         webPage = WebUtils.FetchURL(url, headers)
         
         if webPage is None:
+            url = 'https://api.imgur.com/3/gallery/{0}'.format(id)
+            webPage = WebUtils.FetchURL(url, headers)
+
+        if webPage is None:
             return
         
         response = json.loads(webPage.Page)
         
         imageData = response['data']
+
+        if imageData['title'] is None:
+            url = 'https://api.imgur.com/3/gallery/{0}'.format(id)
+            webPage = WebUtils.FetchURL(url, headers)
+            imageData = json.loads(webPage.Page)['data']
+
+            if imageData['title'] is None:
+                webPage = WebUtils.FetchURL('http://imgur.com/{0}'.format(id))
+                imageData['title'] = self.GetTitle(webPage.Page).replace(' - Imgur', '')
         
         data = []
         if imageData['title'] is not None:
             data.append(imageData['title'])
         else:
-            webPage = WebUtils.FetchURL('http://imgur.com/{0}'.format(id))
-            title = self.GetTitle(webPage.Page)
-            if title is not None:
-                data.append(title)
-            else:
-                data.append(u'<No Title>')
+            data.append(u'<No Title>')
         if imageData['nsfw']:
             data.append(u'\x034\x02NSFW!\x0F')
-
         if albumLink:
             data.append(u'Album: {0} Images'.format(imageData['images_count']))
         else:
-            if imageData['is_album']:
+            if imageData.has_key('is_album') and imageData['is_album']:
                 data.append(u'Album: {0} Images'.format(len(imageData['images'])))
             else:
                 if imageData[u'animated']:
