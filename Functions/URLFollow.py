@@ -102,6 +102,8 @@ class Instantiate(Function):
             if imageData['title'] is None:
                 webPage = WebUtils.FetchURL('http://imgur.com/{0}'.format(id))
                 imageData['title'] = self.GetTitle(webPage.Page).replace(' - Imgur', '')
+                if imageData['title'] == 'imgur: the simple image sharer':
+                    imageData['title'] = None
         
         data = []
         if imageData['title'] is not None:
