@@ -26,7 +26,7 @@ LRRChecker = {
         'lastTitle': '',
         'lastLink': '',
         'lastCheck': tenMinsAgo,
-        'aliases': ["feed", "dump", "fdump", "fd", "f", 'fump', 'frump'],
+        'aliases': ["feed", "dump", "fdump", "fd", "f", 'fump', 'frump', 'feeddump'],
         'suppress': True },
     'CheckPoint': {
         'url': 'http://penny-arcade.com/feed/show/checkpoint',
