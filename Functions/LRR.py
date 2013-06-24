@@ -9,7 +9,7 @@ import re, datetime
 class Instantiate(Function):
     @property
     def Help(self):
-        return "lrr (<series>) - returns a link to the latest LRR video, or the latest of a series if you specify one; series are: {0}".format(", ".join(FunctionData.LRRChecker.keys())))
+        return "lrr (<series>) - returns a link to the latest LRR video, or the latest of a series if you specify one; series are: {0}".format(", ".join(FunctionData.LRRChecker.keys()))
     
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':
