@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>7dd48e09-3a5a-4a79-8129-b8ae2d31d2ed</ProjectGuid>
+    <ProjectGuid>cdfdbe87-b14b-4fed-937c-73a882c3bfa1</ProjectGuid>
     <ProjectHome>..\</ProjectHome>
     <StartupFile>moronbot.py</StartupFile>
     <SearchPath>
@@ -25,9 +25,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Data\LRRChecker.py" />
     <Compile Include="enumType.py" />
     <Compile Include="Function.py" />
-    <Compile Include="FunctionData.py" />
     <Compile Include="FunctionHandler.py" />
     <Compile Include="GlobalVars.py" />
     <Compile Include="IRCMessage.py" />
@@ -35,6 +35,7 @@
     <Compile Include="MobroResponses.py" />
     <Compile Include="moronbot.py" />
     <Compile Include="reimport.py" />
+    <Compile Include="UserData.py" />
     <Compile Include="WebUtils.py" />
     <Compile Include="bs4\dammit.py" />
     <Compile Include="bs4\element.py" />
@@ -104,6 +105,48 @@
     <Compile Include="psutil\_psosx.py" />
     <Compile Include="psutil\_psposix.py" />
     <Compile Include="psutil\__init__.py" />
+    <Compile Include="storm\base.py" />
+    <Compile Include="storm\cache.py" />
+    <Compile Include="storm\compat.py" />
+    <Compile Include="storm\database.py" />
+    <Compile Include="storm\event.py" />
+    <Compile Include="storm\exceptions.py" />
+    <Compile Include="storm\expr.py" />
+    <Compile Include="storm\info.py" />
+    <Compile Include="storm\locals.py" />
+    <Compile Include="storm\properties.py" />
+    <Compile Include="storm\references.py" />
+    <Compile Include="storm\sqlobject.py" />
+    <Compile Include="storm\store.py" />
+    <Compile Include="storm\tracer.py" />
+    <Compile Include="storm\tz.py" />
+    <Compile Include="storm\uri.py" />
+    <Compile Include="storm\variables.py" />
+    <Compile Include="storm\wsgi.py" />
+    <Compile Include="storm\__init__.py" />
+    <Compile Include="storm\databases\mysql.py" />
+    <Compile Include="storm\databases\postgres.py" />
+    <Compile Include="storm\databases\sqlite.py" />
+    <Compile Include="storm\databases\__init__.py" />
+    <Compile Include="storm\django\middleware.py" />
+    <Compile Include="storm\django\stores.py" />
+    <Compile Include="storm\django\__init__.py" />
+    <Compile Include="storm\django\backend\base.py" />
+    <Compile Include="storm\django\backend\__init__.py" />
+    <Compile Include="storm\schema\patch.py" />
+    <Compile Include="storm\schema\schema.py" />
+    <Compile Include="storm\schema\__init__.py" />
+    <Compile Include="storm\twisted\testing.py" />
+    <Compile Include="storm\twisted\transact.py" />
+    <Compile Include="storm\twisted\__init__.py" />
+    <Compile Include="storm\zope\adapters.py" />
+    <Compile Include="storm\zope\interfaces.py" />
+    <Compile Include="storm\zope\metaconfigure.py" />
+    <Compile Include="storm\zope\metadirectives.py" />
+    <Compile Include="storm\zope\schema.py" />
+    <Compile Include="storm\zope\testing.py" />
+    <Compile Include="storm\zope\zstorm.py" />
+    <Compile Include="storm\zope\__init__.py" />
     <Compile Include="twisted\copyright.py" />
     <Compile Include="twisted\plugin.py" />
     <Compile Include="twisted\_version.py" />
@@ -1013,11 +1056,19 @@
     <Folder Include="bs4\tests" />
     <Folder Include="dateutil" />
     <Folder Include="Functions" />
+    <Folder Include="Data\" />
     <Folder Include="psutil" />
     <Folder Include="psutil\arch\" />
     <Folder Include="psutil\arch\bsd" />
     <Folder Include="psutil\arch\mswindows" />
     <Folder Include="psutil\arch\osx" />
+    <Folder Include="storm" />
+    <Folder Include="storm\databases" />
+    <Folder Include="storm\django" />
+    <Folder Include="storm\django\backend" />
+    <Folder Include="storm\schema" />
+    <Folder Include="storm\twisted" />
+    <Folder Include="storm\zope" />
     <Folder Include="twisted" />
     <Folder Include="twisted\application" />
     <Folder Include="twisted\application\test" />

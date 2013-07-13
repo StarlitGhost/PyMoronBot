@@ -1,7 +1,7 @@
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from Function import Function
-import FunctionData
+import Data.LRRChecker as DataStore
 import WebUtils
 
 import re, datetime
@@ -13,25 +13,25 @@ class Instantiate(Function):
     
     def GetResponse(self, message):
         responses = []
-        for feedName, feedDeets in FunctionData.LRRChecker.iteritems():
+        for feedName, feedDeets in DataStore.LRRChecker.iteritems():
             if feedDeets['lastCheck'] > datetime.datetime.utcnow() - datetime.timedelta(minutes=10):
                 continue
             
-            FunctionData.LRRChecker[feedName]['lastCheck'] = datetime.datetime.utcnow()
+            DataStore.LRRChecker[feedName]['lastCheck'] = datetime.datetime.utcnow()
             
             feedPage = WebUtils.FetchURL(feedDeets['url'])
             root = ET.fromstring(feedPage.Page)
             item = root.find('channel/item')
             
-            title = FunctionData.LRRChecker[feedName]['lastTitle'] = item.find('title').text
-            link = FunctionData.LRRChecker[feedName]['lastLink'] = WebUtils.ShortenGoogl(item.find('link').text)
+            title = DataStore.LRRChecker[feedName]['lastTitle'] = item.find('title').text
+            link = DataStore.LRRChecker[feedName]['lastLink'] = WebUtils.ShortenGoogl(item.find('link').text)
             newestDate = dparser.parse(item.find('pubDate').text, fuzzy=True, ignoretz=True)
             
             if newestDate > feedDeets['lastUpdate']:
-                FunctionData.LRRChecker[feedName]['lastUpdate'] = newestDate
+                DataStore.LRRChecker[feedName]['lastUpdate'] = newestDate
                 
                 if feedDeets['suppress']:
-                    FunctionData.LRRChecker[feedName]['suppress'] = False
+                    DataStore.LRRChecker[feedName]['suppress'] = False
                 else:
                     response = 'New {0}! Title: {1} | {2}'.format(feedName, title, link)
                     responses.append(IRCResponse(ResponseType.Say, response, '#desertbus'))

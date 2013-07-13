@@ -1,7 +1,7 @@
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from Function import Function
-import FunctionData
+import Data.LRRChecker as DataStore
 import WebUtils
 
 import re, datetime
@@ -9,7 +9,7 @@ import re, datetime
 class Instantiate(Function):
     @property
     def Help(self):
-        return "lrr (<series>) - returns a link to the latest LRR video, or the latest of a series if you specify one; series are: {0}".format(", ".join(FunctionData.LRRChecker.keys()))
+        return "lrr (<series>) - returns a link to the latest LRR video, or the latest of a series if you specify one; series are: {0}".format(", ".join(DataStore.LRRChecker.keys()))
     
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':
@@ -21,11 +21,11 @@ class Instantiate(Function):
         
         if len(message.Parameters.strip()) > 0:
             feed = self.handleAliases(message.Parameters)
-            lowerMap = dict(zip(map(lambda x:x.lower(),FunctionData.LRRChecker.iterkeys()),FunctionData.LRRChecker.iterkeys()))
+            lowerMap = dict(zip(map(lambda x:x.lower(),DataStore.LRRChecker.iterkeys()),DataStore.LRRChecker.iterkeys()))
             if feed.lower() in lowerMap:
                 feedName = lowerMap[feed.lower()]
-                feedLatest = FunctionData.LRRChecker[feedName]['lastTitle']
-                feedLink = FunctionData.LRRChecker[feedName]['lastLink']
+                feedLatest = DataStore.LRRChecker[feedName]['lastTitle']
+                feedLink = DataStore.LRRChecker[feedName]['lastLink']
                 
                 response = 'Latest {0}: {1} | {2}'.format(feedName, feedLatest, feedLink)
                 
@@ -37,7 +37,7 @@ class Instantiate(Function):
             latestFeed = None
             latestTitle = None
             latestLink = None
-            for feedName, feedDeets in FunctionData.LRRChecker.iteritems():
+            for feedName, feedDeets in DataStore.LRRChecker.iteritems():
                 if feedDeets['lastUpdate'] > latestDate:
                     latestDate = feedDeets['lastUpdate']
                     latestFeed = feedName
@@ -48,7 +48,7 @@ class Instantiate(Function):
             return IRCResponse(ResponseType.Say, response, message.ReplyTo)
 
     def handleAliases(self, series):
-        for feedName, feedDeets in FunctionData.LRRChecker.iteritems():
+        for feedName, feedDeets in DataStore.LRRChecker.iteritems():
             if series.lower() in feedDeets['aliases']:
                 return feedName
         return series

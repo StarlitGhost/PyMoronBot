@@ -26,7 +26,7 @@ class Instantiate(Function):
         if message.Type != 'PRIVMSG':
             return
             
-        match = re.search('^hangout$', message.Command, re.IGNORECASE)
+        match = re.search('^hango+?u?t$', message.Command, re.IGNORECASE)
         if match:
             if message.ReplyTo not in self.hangoutDict:
                 self.hangoutDict[message.ReplyTo] = None
