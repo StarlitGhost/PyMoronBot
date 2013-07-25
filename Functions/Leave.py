@@ -12,13 +12,13 @@ import GlobalVars
 import re
 
 class Instantiate(Function):
-    Help = "nick <nick> - changes the bot's nick to the one specified"
+    Help = "leave/gtfo - makes the bot leave the current channel"
 
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':
             return
         
-        match = re.search('^nick(name)?|name$', message.Command, re.IGNORECASE)
+        match = re.search('^leave|gtfo$', message.Command, re.IGNORECASE)
         if not match:
             return
             
