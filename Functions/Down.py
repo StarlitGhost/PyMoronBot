@@ -13,7 +13,7 @@ class Instantiate(Function):
         if message.Type != 'PRIVMSG':
             return
         
-        match = re.search('down\??', message.Command, re.IGNORECASE)
+        match = re.search('^down\??$', message.Command, re.IGNORECASE)
         if not match:
             return
         
