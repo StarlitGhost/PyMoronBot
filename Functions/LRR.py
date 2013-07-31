@@ -15,7 +15,7 @@ class Instantiate(Function):
         if message.Type != 'PRIVMSG':
             return
         
-        match = re.search('lrr|llr', message.Command, re.IGNORECASE)
+        match = re.search('^lrr|llr$', message.Command, re.IGNORECASE)
         if not match:
             return
         

@@ -14,7 +14,7 @@ class Instantiate(Function):
         if message.Type != 'PRIVMSG':
             return
         
-        match = re.search('def(ine)?', message.Command, re.IGNORECASE)
+        match = re.search('^def(ine)?$', message.Command, re.IGNORECASE)
         if not match:
             return
         
