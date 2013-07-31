@@ -50,21 +50,17 @@ class Instantiate(Function):
                                                                   self.ChatMapDB['DB']))
         store = Store(db)
 
-        result = store.execute("SELECT nick, latitude, longitude FROM {0} WHERE nick='{1}'".format(self.ChatMapDB['Table'], message.User.Name))
+        result = store.execute("SELECT nick, latitude, longitude FROM " + self.ChatMapDB['Table'] + " WHERE nick=%s", [message.User.Name])
 
         response = 'There has been a fatal error updating your GPS coordinates. Please contact Emily to let her know.'
 
         if result.rowcount == 1:
-            result = store.execute("UPDATE {0} SET latitude={1}, longitude={2} WHERE nick='{3}'".format(self.ChatMapDB['Table'],
-                                                                                                        lat, lon,
-                                                                                                        message.User.Name))
+            result = store.execute("UPDATE " + self.ChatMapDB['Table'] + " SET latitude=%s, longitude=%s WHERE nick=%s", [lat, lon, message.User.Name])
             if result:
                 response = 'Your chatmap position has been updated with the new GPS coordinates!'
 
         elif result.rowcount == 0:
-            result = store.execute("INSERT INTO {0} (nick, latitude, longitude) VALUES('{1}', {2}, {3})".format(self.ChatMapDB['Table'],
-                                                                                                                message.User.Name,
-                                                                                                                lat, lon))
+            result = store.execute("INSERT INTO " + self.ChatMapDB['Table'] + " (nick, latitude, longitude) VALUES(%s, %s, %s)", [message.User.Name, lat, lon])
             if result:
                 response = 'You are now on the chatmap at the specified GPS coordinates!'
 
@@ -82,10 +78,10 @@ class Instantiate(Function):
                                                                   self.ChatMapDB['DB']))
         store = Store(db)
 
-        result = store.execute("SELECT nick, latitude, longitude FROM {0} WHERE nick='{1}'".format(self.ChatMapDB['Table'], message.User.Name))
+        result = store.execute("SELECT nick, latitude, longitude FROM " + self.ChatMapDB['Table'] + " WHERE nick=%s", [message.User.Name])
 
         if result.rowcount == 1:
-            result = store.execute("DELETE FROM {0} WHERE nick='{1}'".format(self.ChatMapDB['Table'], message.User.Name))
+            result = store.execute("DELETE FROM " + self.ChatMapDB['Table'] + " WHERE nick=%s", [message.User.Name])
 
             if result:
                 response = 'Your chatmap record has been deleted!'
