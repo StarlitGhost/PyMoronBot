@@ -9,7 +9,10 @@ import subprocess
 
 import dateutil.parser as dparser
 
+import StringUtils
+
 class Instantiate(Function):
+    
     Help = "log (<-n>/<date>) - gives you a link to today's log, the log from -n days ago, or the log for the specified date"
     
     def GetResponse(self, message):
@@ -22,7 +25,7 @@ class Instantiate(Function):
         
         date = datetime.datetime.utcnow();
         if len(message.ParameterList) == 1:
-            if self.is_number(message.ParameterList[0]):
+            if StringUtils.is_number(message.ParameterList[0]):
                 date += datetime.timedelta(days = int(message.ParameterList[0]))
             else:
                 try:
@@ -38,11 +41,3 @@ class Instantiate(Function):
         else:
             output = "Log for " + date.strftime('%Y/%m/%d') + ": http://www.moronic-works.co.uk/logs/?l=" + hash
             return IRCResponse(ResponseType.Say, output, message.ReplyTo)
-            
-    def is_number(self, s):
-        try:
-            float(s)
-            return True
-        except ValueError:
-            return False
-        

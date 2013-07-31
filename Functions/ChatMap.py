@@ -9,19 +9,130 @@ from IRCResponse import IRCResponse, ResponseType
 from Function import Function
 from GlobalVars import *
 
-import re
+import re, json
+
+from storm.locals import *
+
+import StringUtils
 
 class Instantiate(Function):
-    Help = 'chatmap - Responds with a link to the chatmap page. TODO: the rest of the chatmap stuff'
+
+    ChatMapDB = None
+
+    def __init__(self):
+        try:
+            with open('Data/ChatMapDB.json', 'r') as f:
+                self.ChatMapDB = json.load(f)
+        except IOError:
+            pass
+
+    def add(self, message):
+        """add lat,lon - adds a nick to the chat map, or updates if already added"""
+
+        coords = ''.join(message.ParameterList[1:])
+        if not ',' in coords:
+            return 'lat,lon coords must be comma separated'
+        (lat,lon) = coords.split(',')
+        if not StringUtils.is_number(lat) or not StringUtils.is_number(lon):
+            return 'latitude or longitude are not numeric'
+
+        (lat,lon) = float(lat),float(lon)
+
+        if not -90.0 < lat < 90.0:
+            return 'latitude is outside valid range (-90 -> 90)'
+        if not -180.0 < lon < 180.0:
+            return 'longitude is outside valid range (-180 -> 180)'
+
+        db = create_database("mysql://{0}:{1}@{2}:{3}/{4}".format(self.ChatMapDB['User'],
+                                                                  self.ChatMapDB['Password'],
+                                                                  self.ChatMapDB['Host'],
+                                                                  3306,
+                                                                  self.ChatMapDB['DB']))
+        store = Store(db)
+
+        result = store.execute("SELECT nick, latitude, longitude FROM {0} WHERE nick='{1}'".format(self.ChatMapDB['Table'], message.User.Name))
+
+        response = 'There has been a fatal error updating your GPS coordinates. Please contact Emily to let her know.'
+
+        if result.rowcount == 1:
+            result = store.execute("UPDATE {0} SET latitude={1}, longitude={2} WHERE nick='{3}'".format(self.ChatMapDB['Table'],
+                                                                                                        lat, lon,
+                                                                                                        message.User.Name))
+            if result:
+                response = 'Your chatmap position has been updated with the new GPS coordinates!'
+
+        elif result.rowcount == 0:
+            result = store.execute("INSERT INTO {0} (nick, latitude, longitude) VALUES('{1}', {2}, {3})".format(self.ChatMapDB['Table'],
+                                                                                                                message.User.Name,
+                                                                                                                lat, lon))
+            if result:
+                response = 'You are now on the chatmap at the specified GPS coordinates!'
+
+        store.close()
+
+        return response
+
+    def delete(self, message):
+        """del - deletes a nick from the chat map"""
+
+        db = create_database("mysql://{0}:{1}@{2}:{3}/{4}".format(self.ChatMapDB['User'],
+                                                                  self.ChatMapDB['Password'],
+                                                                  self.ChatMapDB['Host'],
+                                                                  3306,
+                                                                  self.ChatMapDB['DB']))
+        store = Store(db)
+
+        result = store.execute("SELECT nick, latitude, longitude FROM {0} WHERE nick='{1}'".format(self.ChatMapDB['Table'], message.User.Name))
+
+        if result.rowcount == 1:
+            result = store.execute("DELETE FROM {0} WHERE nick='{1}'".format(self.ChatMapDB['Table'], message.User.Name))
+
+            if result:
+                response = 'Your chatmap record has been deleted!'
+
+        elif result.rowcount == 0:
+            return 'You do not currently have a chatmap record, and therefore cannot be deleted.'
+
+        store.close()
+
+        return response
+
+    subCommands = {'add': add, 'del': delete}
+
+    def Help(self, message):
+        subCommand = None
+        if len(message.ParameterList) > 1:
+            subCommand = message.ParameterList[1]
+        if subCommand is not None:
+            if subCommand in self.subCommands:
+                return 'chatmap {0}'.format(self.subCommands[subCommand].__doc__)
+            else:
+                return self.UnrecognizedSubcommand(subCommand)
+        else:
+            return 'chatmap ({0}) - where are the people of #DesertBus? Links to a Chat Map using the Google Maps API'.format('/'.join(self.subCommands.keys()))
 
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':
             return
         
-        match = re.search('^chatmap$', message.Command, re.IGNORECASE)
+        match = re.search('^(chat)?map$', message.Command, re.IGNORECASE)
         if not match:
             return
         
-        return IRCResponse(ResponseType.Say,
-                           'The Wonderful World of #desertbus People! http://www.tsukiakariusagi.net/chatmap.php',
-                           message.ReplyTo)
+        subCommand = None
+        if len(message.ParameterList) > 0:
+            subCommand = message.ParameterList[0]
+            if subCommand not in self.subCommands:
+                return IRCResponse(ResponseType.Say, self.UnrecognizedSubcommand(subCommand), message.ReplyTo)
+            
+            response = self.subCommands[message.ParameterList[0]](self, message)
+
+            return IRCResponse(ResponseType.Say, response, message.ReplyTo)
+
+        else:
+            return IRCResponse(ResponseType.Say,
+                               'The Wonderful World of #desertbus People! http://www.tsukiakariusagi.net/chatmap.php',
+                               message.ReplyTo)
+
+    def UnrecognizedSubcommand(self, subCommand):
+        return 'unrecognized subcommand \'{0}\', available subcommands for chatmap are: {1}'.format(subCommand, ', '.join(self.subCommands.keys()))

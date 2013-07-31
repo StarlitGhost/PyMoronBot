@@ -6,6 +6,7 @@ import GlobalVars
 import re
 
 class Instantiate(Function):
+
     Help = 'command(s)/help/function(s) (<function>) - Returns a list of loaded functions, or the help text of a particular function if one is specified'
     
     def GetResponse(self, message):
@@ -19,7 +20,11 @@ class Instantiate(Function):
         if len(message.ParameterList) > 0:
             lowerMap = dict(zip(map(lambda x:x.lower(),GlobalVars.functions.iterkeys()),GlobalVars.functions.iterkeys()))
             if (message.ParameterList[0].lower() in lowerMap):
-                return IRCResponse(ResponseType.Say, GlobalVars.functions[lowerMap[message.ParameterList[0].lower()]].Help, message.ReplyTo)
+                func = GlobalVars.functions[lowerMap[message.ParameterList[0].lower()]]
+                if isinstance(func.Help, basestring):
+                    return IRCResponse(ResponseType.Say, func.Help, message.ReplyTo)
+                else:
+                    return IRCResponse(ResponseType.Say, func.Help(message), message.ReplyTo)
             else:
                 return IRCResponse(ResponseType.Say, '"%s" not found, try "%s" without parameters to see a list of loaded function names' % (message.ParameterList[0], message.Command), message.ReplyTo)
         else:

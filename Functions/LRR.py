@@ -7,8 +7,8 @@ import WebUtils
 import re, datetime
 
 class Instantiate(Function):
-    @property
-    def Help(self):
+
+    def Help(self, message):
         return "lrr (<series>) - returns a link to the latest LRR video, or the latest of a series if you specify one; series are: {0}".format(", ".join(DataStore.LRRChecker.keys()))
     
     def GetResponse(self, message):

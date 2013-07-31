@@ -9,8 +9,9 @@ import xml.etree.ElementTree as ET
 import dateutil.parser as dparser
 
 class Instantiate(Function):
+
     Help = "Automatic function, scans LRR video RSS feeds and reports new items in the channel."
-    
+
     def GetResponse(self, message):
         responses = []
         for feedName, feedDeets in DataStore.LRRChecker.iteritems():

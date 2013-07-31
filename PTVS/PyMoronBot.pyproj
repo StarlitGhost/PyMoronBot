@@ -25,6 +25,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Data\__init__.py" />
     <Compile Include="Data\LRRChecker.py" />
     <Compile Include="enumType.py" />
     <Compile Include="Function.py" />
@@ -35,6 +36,7 @@
     <Compile Include="MobroResponses.py" />
     <Compile Include="moronbot.py" />
     <Compile Include="reimport.py" />
+    <Compile Include="StringUtils.py" />
     <Compile Include="UserData.py" />
     <Compile Include="WebUtils.py" />
     <Compile Include="bs4\dammit.py" />

@@ -18,6 +18,7 @@ class data:
     lastUser = None
 
 class Instantiate(Function):
+
     Help = 'hangout - gives you the last posted G+ hangout link'
 
     hangoutDict = {}
