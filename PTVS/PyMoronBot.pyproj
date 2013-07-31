@@ -30,6 +30,7 @@
     <Compile Include="enumType.py" />
     <Compile Include="Function.py" />
     <Compile Include="FunctionHandler.py" />
+    <Compile Include="Functions\Dinner.py" />
     <Compile Include="GlobalVars.py" />
     <Compile Include="IRCMessage.py" />
     <Compile Include="IRCResponse.py" />
