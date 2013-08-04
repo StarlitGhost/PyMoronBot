@@ -106,32 +106,38 @@ class Instantiate(Function):
                 return match
             
             def boopTalkwords(message):
-                boops = ["http://goo.gl/HJzfS", # feline anatomy
-                    "http://bit.ly/yoMzZ1",
-                    "http://bit.ly/zA2bUY",
-                    "http://bit.ly/wQoI8p",
-                    "http://bit.ly/ACbm0J",
-                    "http://bit.ly/qNyEZk",
-                    "http://bit.ly/zJrjGF",
-                    "http://goo.gl/d054n", # This is called "aversion therapy."
-                    "http://goo.gl/6IoB0", # my grumpy button, ur pushin' it
-                    "http://bit.ly/z79CJv",
-                    "http://bit.ly/yODbYA",
-                    "http://bit.ly/AdX2cw",
-                    "http://bit.ly/x9WGoy",
-                    "http://i.imgur.com/vC5gy.jpg",
-                    "http://i.imgur.com/xmzLY.gif",
-                    "http://i.imgur.com/NSAKo.jpg",
-                    "http://bit.ly/NI0jYk",
-                    "http://bit.ly/MKZqCJ",
-                    "http://bit.ly/QA92eW",
-                    "http://i.imgur.com/wtK1T.jpg",
-                    "http://goo.gl/Nh4PK",
-                    "http://goo.gl/ZKmt5",
-                    "http://goo.gl/Juhcv",
-                    "http://i.imgur.com/BLQoL61.gif", # darting boop
-                    "http://i.imgur.com/3b2lSjd.gif", # pounce boops
-                    ]
+                boops = [
+                        "http://goo.gl/HJzfS",              # feline anatomy
+                        "http://goo.gl/Umt61b",             # not boop ur nose, bite tur nose
+                        "http://bit.ly/zA2bUY",             # i boop ur noes
+                        "http://bit.ly/wQoI8p",             # hey cat, imma boop ur head, lol
+                        "http://bit.ly/ACbm0J",             # Iz gunna boop yer nose, k?
+                        "http://bit.ly/qNyEZk",             # what do you think mr t is daydreaming about?
+                        "http://bit.ly/zJrjGF",             # jeans kitty boop
+                        "http://goo.gl/d054n",              # This is called "aversion therapy."
+                        "http://goo.gl/6IoB0",              # my grumpy button, ur pushin' it
+                        "http://bit.ly/z79CJv",             # colonel goggie in the hallway with the nose boop
+                        "http://bit.ly/yODbYA",             # You may go, but first I must boop your nose
+                        "http://bit.ly/AdX2cw",             # boop, gotchur nose
+                        "http://bit.ly/x9WGoy",             # fluttershy & rainbow dash
+                        "http://i.imgur.com/vC5gy.jpg",
+                        "http://i.imgur.com/xmzLY.gif",
+                        "http://i.imgur.com/NSAKo.jpg",
+                        "http://bit.ly/NI0jYk",
+                        "http://bit.ly/MKZqCJ",
+                        "http://bit.ly/QA92eW",
+                        "http://i.imgur.com/wtK1T.jpg",
+                        "http://goo.gl/Nh4PK",
+                        "http://goo.gl/ZKmt5",
+                        "http://goo.gl/Juhcv",
+                        "http://i.imgur.com/BLQoL61.gif",   # darting boop
+                        "http://i.imgur.com/3b2lSjd.gif",   # pounce boops
+                        "http://i.imgur.com/P83UL.gif",     # reciprocated cat boop
+                        "http://i.imgur.com/H7iNX8R.jpg",   # white cat nose boop
+                        "http://i.imgur.com/NoYdYtU.jpg",   # Lil Retriever Learns How To Boop
+                        "http://i.imgur.com/jWMdZ.jpg",     # black & white kitten boop
+                        "http://i.imgur.com/dz81Dbs.jpg",   # puppy picnic boop
+                        ]
                 return [IRCResponse(ResponseType.Say,
                            'Boop! %s' % random.choice(boops),
                            message.ReplyTo)]
