@@ -1,3 +1,9 @@
+'''
+Created on Jul 31, 2013
+
+@author: Tyranic-Moron, Emily
+'''
+
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from Function import Function
