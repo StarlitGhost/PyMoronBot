@@ -63,6 +63,7 @@
     <Compile Include="dateutil\tz.py" />
     <Compile Include="dateutil\tzwin.py" />
     <Compile Include="dateutil\__init__.py" />
+    <Compile Include="Functions\8ball.py" />
     <Compile Include="Functions\Actions.py" />
     <Compile Include="Functions\apples.py" />
     <Compile Include="Functions\Calculate.py" />

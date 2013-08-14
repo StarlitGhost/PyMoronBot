@@ -9,7 +9,7 @@ from IRCResponse import IRCResponse, ResponseType
 from Function import Function
 import GlobalVars
 
-import re
+import re, random
 
 class Instantiate(Function):
 
