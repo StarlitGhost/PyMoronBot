@@ -24,5 +24,5 @@ class Instantiate(Function):
         
         return IRCResponse(ResponseType.Say,
                            #'DB6: http://fugiman.com/DesertBus6.torrent | DB5: http://fugiman.com/De5ertBus.torrent',
-                           'DB6: http://mgnet.me/.DB6 | DB5: http://mgnet.me/.DB5',
+                           'Torrent Files: http://static.fugiman.com/ | Magnet Links: http://mgnet.me/.DB6 http://mgnet.me/.DB5',
                            message.ReplyTo)
