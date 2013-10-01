@@ -120,16 +120,16 @@ class Instantiate(Function):
                         "http://bit.ly/yODbYA",             # You may go, but first I must boop your nose
                         "http://bit.ly/AdX2cw",             # boop, gotchur nose
                         "http://bit.ly/x9WGoy",             # fluttershy & rainbow dash
-                        "http://i.imgur.com/vC5gy.jpg",
-                        "http://i.imgur.com/xmzLY.gif",
-                        "http://i.imgur.com/NSAKo.jpg",
+                        "http://i.imgur.com/vC5gy.jpg",     # dog in car boop
+                        "http://i.imgur.com/xmzLY.gif",     # cat lap booping dog
+                        "http://i.imgur.com/NSAKo.jpg",     # orange cat perma-booping dog on bed
                         "http://bit.ly/NI0jYk",
-                        "http://bit.ly/MKZqCJ",
-                        "http://bit.ly/QA92eW",
-                        "http://i.imgur.com/wtK1T.jpg",
-                        "http://goo.gl/Nh4PK",
-                        "http://goo.gl/ZKmt5",
-                        "http://goo.gl/Juhcv",
+                        "http://bit.ly/MKZqCJ",             # pinkie pie and twilight sparkle boop
+                        "http://bit.ly/QA92eW",             # elephant boop
+                        "http://i.imgur.com/wtK1T.jpg",     # jet booping tanker truck
+                        "http://goo.gl/Nh4PK",              # demon booping the earth
+                        "http://goo.gl/ZKmt5",              # (broken?)
+                        "http://goo.gl/Juhcv",              # sweetie belle booping apple bloom
                         "http://i.imgur.com/BLQoL61.gif",   # darting boop
                         "http://i.imgur.com/3b2lSjd.gif",   # pounce boops
                         "http://i.imgur.com/P83UL.gif",     # reciprocated cat boop
@@ -142,7 +142,7 @@ class Instantiate(Function):
                         "http://i.imgur.com/UaNm6fv.gif",   # boop to turn off kitten
                         "http://i.imgur.com/QmVjLNQ.png",   # snow leopard boop
                         "http://i.imgur.com/HaAovQK.gif",   # darting bed boop
-                        "http://24.media.tumblr.com/tumblr_m8saa9ZzMj1qewacoo1_r2_500.jpg", # elephant boop
+                        "http://24.media.tumblr.com/tumblr_m8saa9ZzMj1qewacoo1_r2_500.jpg", # elephant boop (duplicate)
                         ]
                 return [IRCResponse(ResponseType.Say,
                            'Boop! %s' % random.choice(boops),
