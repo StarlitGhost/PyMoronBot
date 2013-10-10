@@ -8,6 +8,8 @@ import urllib, urllib2, urlparse
 import json
 import re
 
+from Data.api_keys import load_key
+
 class WebPage():
     Domain = ''
     Page = ''
@@ -62,7 +64,10 @@ def SendToServer(url, text=None):
 def ShortenGoogl(url):
     post = '{{"longUrl": "{0}"}}'.format(url)
     
-    googlKey = 'AIzaSyCU7yKR6eTkme1cTUqFoSJxhG-v83trPy4'
+    googlKey = load_key(u'goo.gl')
+
+    if googlKey is None:
+        return "[goo.gl API key not found]"
     
     apiURL = 'https://www.googleapis.com/urlshortener/v1/url?key={0}'.format(googlKey)
     

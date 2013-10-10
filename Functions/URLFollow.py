@@ -2,6 +2,7 @@ from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from Function import Function
 import WebUtils
+from Data.api_keys import load_key
 
 import re
 import HTMLParser
@@ -11,6 +12,10 @@ class Instantiate(Function):
     Help = 'automatic function that follows urls and grabs information about the resultant webpage'
     
     htmlParser = HTMLParser.HTMLParser()
+
+    def __init__(self):
+        self.youtubeKey = load_key(u'YouTube')
+        self.imgurClientID = load_key(u'imgur Client ID')
     
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':
@@ -31,7 +36,10 @@ class Instantiate(Function):
             return self.FollowStandard(match.group('url'), message)
         
     def FollowYouTube(self, videoID, message):
-        url = 'https://gdata.youtube.com/feeds/api/videos/%s?v=2&key=AI39si4LaIHfBlDmxNNRIqZjXYlDgVTmUVa7p8dSE8_bI45a9leskPQKauV7qi-qmAqjf6zjTdhwAfJxOfkxNcYOmloh8B1X9Q' % videoID
+        if self.youtubeKey is None:
+            return IRCResponse(ResponseType.Say, '[YouTube API key not found]', message.ReplyTo)
+
+        url = 'https://gdata.youtube.com/feeds/api/videos/{0}?v=2&key={1}'.format(videoID, self.youtubeKey)
         
         webPage = WebUtils.FetchURL(url)
         webPage.Page = webPage.Page.decode('utf-8')
@@ -64,8 +72,9 @@ class Instantiate(Function):
         return
     
     def FollowImgur(self, id, message):
-        clientID = 'cc2c410cd122a79'
-        
+        if self.imgurClientID is None:
+            return IRCResponse(ResponseType.Say, '[imgur Client ID not found]', message.ReplyTo)
+
         if id.startswith('gallery/'):
             id = id.replace('gallery/', '')
 
@@ -78,7 +87,7 @@ class Instantiate(Function):
         else:
             url = 'https://api.imgur.com/3/image/{0}'.format(id)
 
-        headers = [('Authorization', 'Client-ID {0}'.format(clientID))]
+        headers = [('Authorization', 'Client-ID {0}'.format(self.imgurClientID))]
         
         webPage = WebUtils.FetchURL(url, headers)
         
