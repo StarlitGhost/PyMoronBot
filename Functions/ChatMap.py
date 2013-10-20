@@ -62,7 +62,7 @@ class Instantiate(Function):
         elif result.rowcount == 0:
             result = store.execute("INSERT INTO " + self.ChatMapDB['Table'] + " (nick, latitude, longitude) VALUES(%s, %s, %s)", [message.User.Name, lat, lon])
             if result:
-                response = 'You are now on the chatmap at the specified GPS coordinates!  Be sure to do an addYear to add the year you first started as a Survivor!'
+                response = 'You are now on the chatmap at the specified GPS coordinates! Be sure to do an addYear to add the year you first started as a Survivor!'
 
         store.close()
 
@@ -95,6 +95,9 @@ class Instantiate(Function):
             result = store.execute("UPDATE " + self.ChatMapDB['Table'] + " SET dbyear=%s WHERE nick=%s", [year, message.User.Name])
             if result:
                 response = 'Your desert bus year has been updated with your information!'
+                
+        elif result.rowcount == 0:
+            response = 'You do not currently have a chatmap record, please use add lat,lon first.'
 
         store.close()
 
@@ -119,18 +122,18 @@ class Instantiate(Function):
                 response = 'Your chatmap record has been deleted!'
 
         elif result.rowcount == 0:
-            return 'You do not currently have a chatmap record, and therefore cannot be deleted.'
+            response = 'You do not currently have a chatmap record, and therefore cannot be deleted.'
 
         store.close()
 
         return response
 
-    subCommands = {'add': add, 'del': delete, 'addYear': addYear}
+    subCommands = {'add': add, 'del': delete, 'addyear': addYear}
 
     def Help(self, message):
         subCommand = None
         if len(message.ParameterList) > 1:
-            subCommand = message.ParameterList[1]
+            subCommand = message.ParameterList[1].lower()
         if subCommand is not None:
             if subCommand in self.subCommands:
                 return 'chatmap {0}'.format(self.subCommands[subCommand].__doc__)
@@ -149,11 +152,11 @@ class Instantiate(Function):
         
         subCommand = None
         if len(message.ParameterList) > 0:
-            subCommand = message.ParameterList[0]
+            subCommand = message.ParameterList[0].lower()
             if subCommand not in self.subCommands:
                 return IRCResponse(ResponseType.Say, self.UnrecognizedSubcommand(subCommand), message.ReplyTo)
             
-            response = self.subCommands[message.ParameterList[0]](self, message)
+            response = self.subCommands[subCommand](self, message)
 
             return IRCResponse(ResponseType.Say, response, message.ReplyTo)
 
