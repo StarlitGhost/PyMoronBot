@@ -92,7 +92,7 @@ class Instantiate(Function):
         response = 'There has been a fatal error updating your Desert Bus Year. Please contact Emily to let her know.'
 
         if result.rowcount == 1:
-            result = store.execute("UPDATE " + self.ChatMapDB['Table'] + " SET dbyear=%s, WHERE nick=%s", [year, message.User.Name])
+            result = store.execute("UPDATE " + self.ChatMapDB['Table'] + " SET dbyear=%s WHERE nick=%s", [year, message.User.Name])
             if result:
                 response = 'Your desert bus year has been updated with your information!'
 
