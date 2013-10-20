@@ -75,6 +75,8 @@ class Instantiate(Function):
         if not StringUtils.is_number(year):
             return 'the desert bus year should only be numeric (1-7)'
 
+        year = int(year)
+
         if not -1 < year < 8:
             return 'the desert bus year should only be for valid years (1 -> 7)'
 
