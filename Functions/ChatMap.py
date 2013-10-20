@@ -69,7 +69,7 @@ class Instantiate(Function):
         return response
 
     def addYear(self, message):
-        """add year - updates desert bus year for the user, (first surviving year)"""
+        """addYear - updates desert bus year for the user, (first surviving year)"""
 
         year = ''.join(message.ParameterList[1:])
         if not StringUtils.is_number(year):
