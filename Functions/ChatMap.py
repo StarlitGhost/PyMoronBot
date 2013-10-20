@@ -62,7 +62,37 @@ class Instantiate(Function):
         elif result.rowcount == 0:
             result = store.execute("INSERT INTO " + self.ChatMapDB['Table'] + " (nick, latitude, longitude) VALUES(%s, %s, %s)", [message.User.Name, lat, lon])
             if result:
-                response = 'You are now on the chatmap at the specified GPS coordinates!'
+                response = 'You are now on the chatmap at the specified GPS coordinates!  Be sure to do an addYear to add the year you first started as a Survivor!'
+
+        store.close()
+
+        return response
+
+    def addYear(self, message):
+        """add year - updates desert bus year for the user, (first surviving year)"""
+
+        year = ''.join(message.ParameterList[1:])
+        if not StringUtils.is_number(year):
+            return 'the desert bus year should only be numeric (1-7)'
+
+        if not -1 < year < 8:
+            return 'the desert bus year should only be for valid years (1 -> 7)'
+
+        db = create_database("mysql://{0}:{1}@{2}:{3}/{4}".format(self.ChatMapDB['User'],
+                                                                  self.ChatMapDB['Password'],
+                                                                  self.ChatMapDB['Host'],
+                                                                  3306,
+                                                                  self.ChatMapDB['DB']))
+        store = Store(db)
+
+        result = store.execute("SELECT nick, dbyear FROM " + self.ChatMapDB['Table'] + " WHERE nick=%s", [message.User.Name])
+
+        response = 'There has been a fatal error updating your Desert Bus Year. Please contact Emily to let her know.'
+
+        if result.rowcount == 1:
+            result = store.execute("UPDATE " + self.ChatMapDB['Table'] + " SET dbyear=%s, WHERE nick=%s", [dbyear, message.User.Name])
+            if result:
+                response = 'Your desert bus year has been updated with your information!'
 
         store.close()
 
