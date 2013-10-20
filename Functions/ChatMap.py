@@ -123,7 +123,7 @@ class Instantiate(Function):
 
         return response
 
-    subCommands = {'add': add, 'del': delete}
+    subCommands = {'add': add, 'del': delete, 'addYear': addYear}
 
     def Help(self, message):
         subCommand = None
