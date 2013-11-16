@@ -5,7 +5,7 @@ from Function import Function
 import re, math
 
 class Instantiate(Function):
-    Help = 'db7bingo - outputs a link for betsy's DB7 Bingo Card'
+    Help = "db7bingo - outputs a link for betsy's DB7 Bingo Card"
     
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':
