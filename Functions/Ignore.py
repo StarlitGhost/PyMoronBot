@@ -46,4 +46,7 @@ class Instantiate(Function):
             return IRCResponse(ResponseType.Say, output, message.ReplyTo)
 
         else:
-            return IRCResponse(ResponseType.Say, self.Help, message.ReplyTo)
+            if ignores.ignoreList is not None and len(ignores.ignoreList) > 0:
+                return IRCResponse(ResponseType.Say, 'Ignored users: {0}'.format(', '.join(ignores.ignoreList)), message.ReplyTo)
+            else:
+                return IRCResponse(ResponseType.Say, 'Not currently ignoring anyone!', message.ReplyTo)
