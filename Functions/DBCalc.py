@@ -27,34 +27,34 @@ class Instantiate(Function):
 
     def Hours(self, hours):
 
-        hours = 0.0
+        f_hours = 0.0
         money = 0.0
 
         try:
-            hours = float(message.ParameterList[0])
+            f_hours = float(hours)
         except ValueError:
-            return "Sorry, I don't recognize '{0}' as a number".format(message.ParameterList[0])
+            return "Sorry, I don't recognize '{0}' as a number".format(hours)
 
         try:
-            money = (1-(1.07**hours))/(-0.07)
+            money = (1-(1.07**f_hours))/(-0.07)
         except OverflowError:
             return "The amount of money you would need for that many hours is higher than I can calculate!"
 
-        return "For {0:,} hour(s), the team needs a total of ${1:,.2f}".format(hours, money)
+        return "For {0:,} hour(s), the team needs a total of ${1:,.2f}".format(f_hours, money)
 
     def Money(self, money):
 
         hours = 0.0
-        money = 0.0
+        f_money = 0.0
 
         try:
-            money = float(message.ParameterList[0])
+            f_money = float(money)
         except ValueError:
-            return "Sorry, I don't recognize '{0}' as a number".format(message.ParameterList[0])
+            return "Sorry, I don't recognize '{0}' as a number".format(money)
 
         try:
-            hours = math.log((7*money)/100 + 1)/math.log(1.07)
+            hours = math.log((7*f_money)/100 + 1)/math.log(1.07)
         except OverflowError:
             return "???"
 
-        return "With ${0:,.2f}, the team will bus for {1:,.2f} hour(s)".format(money, hours)
+        return "With ${0:,.2f}, the team will bus for {1:,.2f} hour(s)".format(f_money, hours)
