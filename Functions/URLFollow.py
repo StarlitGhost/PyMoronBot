@@ -3,6 +3,7 @@ from IRCResponse import IRCResponse, ResponseType
 from Function import Function
 import WebUtils
 from Data.api_keys import load_key
+from Data import ignores
 
 import re
 import HTMLParser
@@ -21,6 +22,10 @@ class Instantiate(Function):
         if message.Type != 'PRIVMSG':
             return
         
+        if ignores.ignoreList is not None:
+            if message.User.Name in ignores.ignoreList:
+                return
+
         match = re.search('(?P<url>https?://[^\s]+)', message.MessageString, re.IGNORECASE)
         if not match:
             return

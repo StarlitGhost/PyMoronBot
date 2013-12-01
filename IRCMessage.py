@@ -50,5 +50,7 @@ class IRCMessage:
             if self.Parameters.strip():
                 self.ParameterList = self.Parameters.split(' ')
 
+                self.ParameterList = [param for param in self.ParameterList if param != '']
+
                 if len(self.ParameterList) == 1 and not self.ParameterList[0]:
                     self.ParameterList = []
