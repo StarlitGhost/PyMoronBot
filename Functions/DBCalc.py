@@ -19,9 +19,9 @@ class Instantiate(Function):
             return IRCResponse(ResponseType.Say, self.Help, message.ReplyTo)
 
         if message.ParameterList[0].lower() == 'hours':
-            return IRCResponse(ResponseType.Say, Hours(message.ParameterList[1]), message.ReplyTo)
+            return IRCResponse(ResponseType.Say, self.Hours(message.ParameterList[1]), message.ReplyTo)
         elif message.ParameterList[0].lower() == 'money':
-            return IRCResponse(ResponseType.Say, Money(message.ParameterList[1]), message.ReplyTo)
+            return IRCResponse(ResponseType.Say, self.Money(message.ParameterList[1]), message.ReplyTo)
         else:
             return IRCResponse(ResponseType.Say, self.Help, message.ReplyTo)
 
