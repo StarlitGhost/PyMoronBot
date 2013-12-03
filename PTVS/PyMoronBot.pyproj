@@ -32,6 +32,7 @@
     <Compile Include="enumType.py" />
     <Compile Include="Function.py" />
     <Compile Include="FunctionHandler.py" />
+    <Compile Include="Functions\DBCalc.py" />
     <Compile Include="Functions\Dinner.py" />
     <Compile Include="Functions\GPSLookup.py" />
     <Compile Include="Functions\Ignore.py" />
@@ -74,8 +75,6 @@
     <Compile Include="Functions\Calculate.py" />
     <Compile Include="Functions\ChatMap.py" />
     <Compile Include="Functions\Conversation.py" />
-    <Compile Include="Functions\dbhours.py" />
-    <Compile Include="Functions\dbmoney.py" />
     <Compile Include="Functions\Define.py" />
     <Compile Include="Functions\Do.py" />
     <Compile Include="Functions\Down.py" />
