@@ -13,8 +13,6 @@ import re
 
 import WebUtils
 
-from bs4 import BeautifulSoup
-
 class Instantiate(Function):
 
     Help = 'gif - fetches a random gif posted during Desert Bus'
