@@ -4,6 +4,8 @@ from Function import Function
 from GlobalVars import *
 from MobroResponses import *
 
+from Data import ignores
+
 import re, random
 
 class Instantiate(Function):
@@ -170,6 +172,10 @@ class Instantiate(Function):
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':
             return
+        
+        if ignores.ignoreList is not None:
+            if message.User.Name in ignores.ignoreList:
+                return
         
         if message.Command:
             match = re.search('^responses?$', message.Command, re.IGNORECASE)
