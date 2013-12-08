@@ -24,12 +24,13 @@ class Instantiate(Function):
 
         webPage = WebUtils.FetchURL(searchTerm)
 
-        if page.find('Card Name:') <= 0:
-            return IRCResponse(ResponseType.Say, 'Multiple or no cards found: ' + searchTerm, message.ReplyTo)
-
         soup = BeautifulSoup(webPage.Page)
 
-        name = soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_nameRow'}).find('div', 'value').text.strip()
+        name = soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_nameRow'})
+        if name is None:
+            return IRCResponse(ResponseType.Say, 'Multiple or no cards found: ' + searchTerm, message.ReplyTo)
+
+        name = name.find('div', 'value').text.strip()
         types = ' | T: ' + soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_typeRow'}).find('div', 'value').text.strip()
         rarity = ' | R: ' + soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_rarityRow'}).find('div', 'value').text.strip()
 
