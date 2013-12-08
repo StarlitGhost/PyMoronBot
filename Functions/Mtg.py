@@ -73,7 +73,7 @@ class Instantiate(Function):
 
         powTough = soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_ptRow'})
         if powTough is not None:
-            powTough = ' | P/T: ' + powTough.find('div', 'value').text.strip()
+            powTough = ' | P/T: ' + powTough.find('div', 'value').text.strip().replace(' ', '')
         else:
             powTough = ''
 
