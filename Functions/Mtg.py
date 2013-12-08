@@ -65,7 +65,7 @@ class Instantiate(Function):
             for text in flavTexts:
                 texts.append(unicode(text.text))
             flavText = ' | FT: ' + ' > '.join(texts)
-        else
+        else:
             flavText = ''
 
         powTough = soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_ptRow'})
