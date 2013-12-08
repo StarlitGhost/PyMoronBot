@@ -39,6 +39,7 @@ class Instantiate(Function):
             manaCost = unicode(manaCost.find('div', 'value'))
             manaCost = ' | MC: ' + re.sub('<img.+?name=([^&"]+).+?>', "\\1", manaCost)
             manaCost = re.sub('<[^>]+?>', '', manaCost)
+            manaCost = manaCost.replace('\n', '')
         else:
             manaCost = ''
 
