@@ -36,8 +36,9 @@ class Instantiate(Function):
 
         manaCost = soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_manaRow'})
         if manaCost is not None:
-            manaCost = manaCost.find('div', 'value').text.strip()
+            manaCost = unicode(manaCost.find('div', 'value'))
             manaCost = ' | MC: ' + re.sub('<img.+?name=([^&"]+).+?>', "\\1", manaCost)
+            manaCost = re.sub('<[^>]+?>', '', manaCost)
         else:
             manaCost = ''
 
@@ -76,7 +77,5 @@ class Instantiate(Function):
             powTough = ''
 
         reply = name + manaCost + convCost + types + cardText + flavText + powTough + rarity
-
-        #reply = reply.replace(u' \u2014','-').encode('ascii', 'ignore')
 
         return IRCResponse(ResponseType.Say, reply, message.ReplyTo)
