@@ -34,9 +34,11 @@
     <Compile Include="FunctionHandler.py" />
     <Compile Include="Functions\DBCalc.py" />
     <Compile Include="Functions\Dinner.py" />
+    <Compile Include="Functions\Gif.py" />
     <Compile Include="Functions\GPSLookup.py" />
     <Compile Include="Functions\Ignore.py" />
     <Compile Include="Functions\Unignore.py" />
+    <Compile Include="Functions\Update.py" />
     <Compile Include="GlobalVars.py" />
     <Compile Include="IRCMessage.py" />
     <Compile Include="IRCResponse.py" />

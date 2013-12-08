@@ -17,14 +17,14 @@ class Instantiate(Function):
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':
             return
-        
+
         match = re.search('^nick(name)?|name$', message.Command, re.IGNORECASE)
         if not match:
             return
-            
+
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can change my name', message.ReplyTo)
-        
+
         if len(message.ParameterList) > 0:
             return IRCResponse(ResponseType.Raw, 'NICK %s' % (message.ParameterList[0]), '')
         else:
