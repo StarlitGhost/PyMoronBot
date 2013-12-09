@@ -31,6 +31,10 @@ class Instantiate(Function):
 
         output = subprocess.check_output(['git', 'whatchanged', '..origin/master'])
         changes = re.findall('\n\n\s{4}(.+?)\n\n', output)
+        
+        if len(changes) == 0:
+            return IRCResponse(ResponseType.Say, 'The bot is already up to date', message.ReplyTo)
+
         changes = list(reversed(changes))
         response = 'New Commits: ' + ' | '.join(changes)
 
