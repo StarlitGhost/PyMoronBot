@@ -111,16 +111,26 @@ class MoronBot(irc.IRCClient):
         with codecs.open(filePath, 'a+', 'utf-8') as f:
             f.write(data + '\n')
         
-class MoronBotFactory(protocol.ClientFactory):
+class MoronBotFactory(protocol.ReconnectingClientFactory):
 
     protocol = MoronBot
-
+    
+    def startedConnecting(self, connector):
+        print '-#- Started to connect.'
+        
+    def buildProtocol(self, addr):
+        print '-#- Connected.'
+        print '-#- Resetting reconnection delay'
+        self.resetDelay()
+        return MoronBot()
+        
     def clientConnectionLost(self, connector, reason):
-        connector.connect()
+        print '-!- Lost connection.  Reason:', reason
+        ReconnectingClientFactory.clientConnectionLost(self, connector, reason)
 
     def clientConnectionFailed(self, connector, reason):
-        print "connection failed: ", reason
-        reactor.stop()
+        print '-!- Connection failed. Reason:', reason
+        ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
 
 if __name__ == '__main__':
     AutoLoadFunctions()
