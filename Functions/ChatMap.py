@@ -7,7 +7,7 @@ Created on Apr 26, 2013
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from Function import Function
-from GlobalVars import *
+import GlobalVars
 
 import re, json
 
@@ -140,7 +140,7 @@ class Instantiate(Function):
             else:
                 return self.UnrecognizedSubcommand(subCommand)
         else:
-            return 'chatmap ({0}) - where are the people of #DesertBus? Links to a Chat Map using the Google Maps API'.format('/'.join(self.subCommands.keys()))
+            return "{1}chatmap ({0}) - where are the people of #DesertBus? Links to a Chat Map using the Google Maps API. Use '{1}help chatmap <subcommand>' for subcommand help. You can use '{1}gpslookup <address>' via PM to find your lat,lon coords".format('/'.join(self.subCommands.keys()), GlobalVars.CommandChar)
 
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':
