@@ -93,7 +93,6 @@
     <Compile Include="Functions\Log.py" />
     <Compile Include="Functions\LRR.py" />
     <Compile Include="Functions\LRRChecker.py" />
-    <Compile Include="Functions\Magic.py" />
     <Compile Include="Functions\Nick.py" />
     <Compile Include="Functions\PikasMagicalLogWonderland.py" />
     <Compile Include="Functions\responses.py" />
