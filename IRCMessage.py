@@ -29,7 +29,7 @@ class IRCMessage:
     ParameterList = []
 
     def __init__(self, type, user, channel, message):
-        unicodeMessage = message.decode('utf-8')
+        unicodeMessage = message.decode('utf-8', 'ignore')
         self.Type = type
         self.MessageList = unicodeMessage.strip().split(' ')
         self.MessageString = unicodeMessage
