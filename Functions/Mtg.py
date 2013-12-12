@@ -62,7 +62,7 @@ class Instantiate(Function):
             cardText = ''
 
         flavText = soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_FlavorText'})
-        if flavText is not None:
+        if message.COmmand.endswith('f') and flavText is not None:
             flavTexts = flavText.find_all('div', 'cardtextbox')
             texts = []
             for text in flavTexts:
