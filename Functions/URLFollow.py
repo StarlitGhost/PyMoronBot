@@ -130,13 +130,13 @@ class Instantiate(Function):
             data.append(u'Album: {0} Images'.format(imageData['images_count']))
         else:
             if imageData.has_key('is_album') and imageData['is_album']:
-                data.append(u'Album: {0} Images'.format(len(imageData['images'])))
+                data.append(u'Album: {0:,d} Images'.format(len(imageData['images'])))
             else:
                 if imageData[u'animated']:
                     data.append(u'\x032\x02Animated!\x0F')
-                data.append(u'{0}x{1}'.format(imageData['width'], imageData['height']))
-                data.append(u'Size: {0}kb'.format(int(imageData['size'])/1024))
-        data.append(u'Views: {0}'.format(imageData['views']))
+                data.append(u'{0:,d}x{1:,d}'.format(imageData['width'], imageData['height']))
+                data.append(u'Size: {0:,d}kb'.format(int(imageData['size'])/1024))
+        data.append(u'Views: {0:,d}'.format(imageData['views']))
         
         return IRCResponse(ResponseType.Say, u' | '.join(data), message.ReplyTo)
     
