@@ -163,8 +163,8 @@ class Instantiate(Function):
             title = re.sub('<[^<]+?>', '', title)
             title = self.htmlParser.unescape(title)
             
-            if len(title) > 350:
-                title = title[:350] + "..."
+            if len(title) > 300:
+                title = title[:300] + "..."
             
             return title
         
