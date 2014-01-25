@@ -78,6 +78,8 @@ class MoronBot(irc.IRCClient):
             self.sendLine(response.Response.encode('utf-8'))
 
     def handleMessage(self, message):
+        self.responses = [] # in case earlier Function responses caused some weird errors
+
         for (name, func) in GlobalVars.functions.items():
             try:
                 response = func.GetResponse(message)
@@ -94,6 +96,7 @@ class MoronBot(irc.IRCClient):
         
         for response in self.responses:
             self.sendResponse(response)
+
         self.responses = []
         
     def log(self, text, target):

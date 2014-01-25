@@ -8,6 +8,8 @@ from Data import ignores
 import re
 import HTMLParser
 import json
+from bs4 import BeautifulSoup
+from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 class Instantiate(Function):
     Help = 'automatic function that follows urls and grabs information about the resultant webpage'
@@ -32,11 +34,14 @@ class Instantiate(Function):
         
         youtubeMatch = re.search('(www\.youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#]+)', match.group('url'))
         imgurMatch   = re.search('(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', match.group('url'))
+        twitterMatch = re.search('twitter.com/(?P<tweeter>[^/]+)/status/(?P<tweetID>[0-9]+)', match.group('url'))
         
         if youtubeMatch:
             return self.FollowYouTube(youtubeMatch.group('videoID'), message)
         elif imgurMatch:
             return self.FollowImgur(imgurMatch.group('imgurID'), message)
+        elif twitterMatch:
+            return self.FollowTwitter(twitterMatch.group('tweeter'), twitterMatch.group('tweetID'), message)
         elif not re.search('\.(jpe?g|gif|png|bmp)$', match.group('url')):
             return self.FollowStandard(match.group('url'), message)
         
@@ -139,6 +144,22 @@ class Instantiate(Function):
         data.append(u'Views: {0:,d}'.format(imageData['views']))
         
         return IRCResponse(ResponseType.Say, u' | '.join(data), message.ReplyTo)
+
+    def FollowTwitter(self, tweeter, tweetID, message):
+        webPage = WebUtils.FetchURL('https://twitter.com/{0}/status/{1}'.format(tweeter, tweetID))
+
+        soup = BeautifulSoup(webPage.Page)
+
+        tweet = soup.find('div', {'class' : 'permalink-tweet'})
+        
+        user = tweet.find('span', {'class' : 'username'}).text
+
+        graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
+        text = re.sub('[\r\n]+', graySplitter, tweet.find('p', {'class' : 'tweet-text'}).text)
+
+        formatString = unicode(assembleFormattedText(A.normal[A.bold['{0}:'], ' {1}']))
+
+        return IRCResponse(ResponseType.Say, formatString.format(user, text), message.ReplyTo)
     
     def FollowStandard(self, url, message):
         webPage = WebUtils.FetchURL(url)
