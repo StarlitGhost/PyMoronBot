@@ -32,13 +32,16 @@
     <Compile Include="enumType.py" />
     <Compile Include="Function.py" />
     <Compile Include="FunctionHandler.py" />
+    <Compile Include="Functions\db7bingo.py" />
     <Compile Include="Functions\DBCalc.py" />
     <Compile Include="Functions\Dinner.py" />
     <Compile Include="Functions\Gif.py" />
     <Compile Include="Functions\GPSLookup.py" />
     <Compile Include="Functions\Ignore.py" />
+    <Compile Include="Functions\Mtg.py" />
     <Compile Include="Functions\Unignore.py" />
     <Compile Include="Functions\Update.py" />
+    <Compile Include="Functions\Urban.py" />
     <Compile Include="GlobalVars.py" />
     <Compile Include="IRCMessage.py" />
     <Compile Include="IRCResponse.py" />
