@@ -54,137 +54,570 @@ class IConnector(Interface):
         """
 
 
-class IResolverSimple(Interface):
 
+class IResolverSimple(Interface):
     def getHostByName(name, timeout = (1, 3, 11, 45)):
         """
         Resolve the domain name C{name} into an IP address.
 
         @type name: C{str}
-        @type timeout: C{tuple}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
         @rtype: L{twisted.internet.defer.Deferred}
         @return: The callback of the Deferred that is returned will be
-        passed a string that represents the IP address of the specified
-        name, or the errback will be called if the lookup times out.  If
-        multiple types of address records are associated with the name,
-        A6 records will be returned in preference to AAAA records, which
-        will be returned in preference to A records.  If there are multiple
-        records of the type to be returned, one will be selected at random.
+            passed a string that represents the IP address of the
+            specified name, or the errback will be called if the
+            lookup times out.  If multiple types of address records
+            are associated with the name, A6 records will be returned
+            in preference to AAAA records, which will be returned in
+            preference to A records.  If there are multiple records of
+            the type to be returned, one will be selected at random.
 
-        @raise twisted.internet.defer.TimeoutError: Raised (asynchronously)
-        if the name cannot be resolved within the specified timeout period.
+        @raise twisted.internet.defer.TimeoutError: Raised
+            (asynchronously) if the name cannot be resolved within the
+            specified timeout period.
         """
+
+
 
 class IResolver(IResolverSimple):
-    def query(query, timeout = 10):
+    def query(query, timeout=None):
         """
-        Interpret and dispatch a query object to the appropriate
-        lookup* method.
+        Dispatch C{query} to the method which can handle its type.
+
+        @type query: L{twisted.names.dns.Query}
+        @param query: The DNS query being issued, to which a response is to be
+            generated.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupAddress(name, timeout = 10):
+
+    def lookupAddress(name, timeout=None):
         """
-        Lookup the A records associated with C{name}.
+        Perform an A record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupAddress6(name, timeout = 10):
+
+    def lookupAddress6(name, timeout=None):
         """
-        Lookup all the A6 records associated with C{name}.
+        Perform an A6 record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupIPV6Address(name, timeout = 10):
+
+    def lookupIPV6Address(name, timeout=None):
         """
-        Lookup all the AAAA records associated with C{name}.
+        Perform an AAAA record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupMailExchange(name, timeout = 10):
+
+    def lookupMailExchange(name, timeout=None):
         """
-        Lookup the MX records associated with C{name}.
+        Perform an MX record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupNameservers(name, timeout = 10):
+
+    def lookupNameservers(name, timeout=None):
         """
-        Lookup the the NS records associated with C{name}.
+        Perform an NS record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupCanonicalName(name, timeout = 10):
+
+    def lookupCanonicalName(name, timeout=None):
         """
-        Lookup the CNAME records associated with C{name}.
+        Perform a CNAME record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupMailBox(name, timeout = 10):
+
+    def lookupMailBox(name, timeout=None):
         """
-        Lookup the MB records associated with C{name}.
+        Perform an MB record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupMailGroup(name, timeout = 10):
+
+    def lookupMailGroup(name, timeout=None):
         """
-        Lookup the MG records associated with C{name}.
+        Perform an MG record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupMailRename(name, timeout = 10):
+
+    def lookupMailRename(name, timeout=None):
         """
-        Lookup the MR records associated with C{name}.
+        Perform an MR record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupPointer(name, timeout = 10):
+
+    def lookupPointer(name, timeout=None):
         """
-        Lookup the PTR records associated with C{name}.
+        Perform a PTR record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupAuthority(name, timeout = 10):
+
+    def lookupAuthority(name, timeout=None):
         """
-        Lookup the SOA records associated with C{name}.
+        Perform an SOA record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupNull(name, timeout = 10):
+
+    def lookupNull(name, timeout=None):
         """
-        Lookup the NULL records associated with C{name}.
+        Perform a NULL record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupWellKnownServices(name, timeout = 10):
+
+    def lookupWellKnownServices(name, timeout=None):
         """
-        Lookup the WKS records associated with C{name}.
+        Perform a WKS record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupHostInfo(name, timeout = 10):
+
+    def lookupHostInfo(name, timeout=None):
         """
-        Lookup the HINFO records associated with C{name}.
+        Perform a HINFO record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupMailboxInfo(name, timeout = 10):
+
+    def lookupMailboxInfo(name, timeout=None):
         """
-        Lookup the MINFO records associated with C{name}.
+        Perform an MINFO record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupText(name, timeout = 10):
+
+    def lookupText(name, timeout=None):
         """
-        Lookup the TXT records associated with C{name}.
+        Perform a TXT record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupResponsibility(name, timeout = 10):
+
+    def lookupResponsibility(name, timeout=None):
         """
-        Lookup the RP records associated with C{name}.
+        Perform an RP record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupAFSDatabase(name, timeout = 10):
+
+    def lookupAFSDatabase(name, timeout=None):
         """
-        Lookup the AFSDB records associated with C{name}.
+        Perform an AFSDB record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupService(name, timeout = 10):
+
+    def lookupService(name, timeout=None):
         """
-        Lookup the SRV records associated with C{name}.
+        Perform an SRV record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupAllRecords(name, timeout = 10):
+
+    def lookupAllRecords(name, timeout=None):
         """
-        Lookup all records associated with C{name}.
+        Perform an ALL_RECORD lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
-    def lookupZone(name, timeout = 10):
+
+    def lookupSenderPolicy(name, timeout= 10):
         """
-        Perform a zone transfer for the given C{name}.
+        Perform a SPF record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
+        """
+
+
+    def lookupNamingAuthorityPointer(name, timeout=None):
+        """
+        Perform a NAPTR record lookup.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: Sequence of C{int}
+        @param timeout: Number of seconds after which to reissue the query.
+            When the last timeout expires, the query is considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.  The first element of the
+            tuple gives answers.  The second element of the tuple gives
+            authorities.  The third element of the tuple gives additional
+            information.  The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
+        """
+
+
+    def lookupZone(name, timeout=None):
+        """
+        Perform an AXFR record lookup.
+
+        NB This is quite different from other DNS requests. See
+        U{http://cr.yp.to/djbdns/axfr-notes.html} for more
+        information.
+
+        NB Unlike other C{lookup*} methods, the timeout here is not a
+        list of ints, it is a single int.
+
+        @type name: C{str}
+        @param name: DNS name to resolve.
+
+        @type timeout: C{int}
+        @param timeout: When this timeout expires, the query is
+            considered failed.
+
+        @rtype: L{Deferred}
+        @return: A L{Deferred} which fires with a three-tuple of lists of
+            L{twisted.names.dns.RRHeader} instances.
+            The first element of the tuple gives answers.
+            The second and third elements are always empty.
+            The L{Deferred} may instead fail with one of the
+            exceptions defined in L{twisted.names.error} or with
+            C{NotImplementedError}.
         """
 
 
@@ -411,7 +844,21 @@ class IReactorUDP(Interface):
 
     def listenUDP(port, protocol, interface='', maxPacketSize=8192):
         """
-        Connects a given DatagramProtocol to the given numeric UDP port.
+        Connects a given L{DatagramProtocol} to the given numeric UDP port.
+
+        @param port: A port number on which to listen.
+        @type port: C{int}
+
+        @param protocol: A L{DatagramProtocol} instance which will be
+            connected to the given C{port}.
+        @type protocol: L{DatagramProtocol}
+
+        @param interface: The local IPv4 or IPv6 address to which to bind;
+            defaults to '', ie all IPv4 addresses.
+        @type interface: C{str}
+
+        @param maxPacketSize: The maximum packet size to accept.
+        @type maxPacketSize: C{int}
 
         @return: object which provides L{IListeningPort}.
         """
@@ -477,9 +924,8 @@ class IReactorSocket(Interface):
 
     Some plans for extending this interface exist.  See:
 
-        - U{http://twistedmatrix.com/trac/ticket/5570}: established connections
-        - U{http://twistedmatrix.com/trac/ticket/5573}: AF_UNIX ports
-        - U{http://twistedmatrix.com/trac/ticket/5574}: SOCK_DGRAM sockets
+        - U{http://twistedmatrix.com/trac/ticket/5573}: AF_UNIX SOCK_STREAM ports
+        - U{http://twistedmatrix.com/trac/ticket/6594}: AF_UNIX SOCK_DGRAM ports
     """
 
     def adoptStreamPort(fileDescriptor, addressFamily, factory):
@@ -503,13 +949,15 @@ class IReactorSocket(Interface):
 
         @return: An object providing L{IListeningPort}.
 
-        @raise UnsupportedAddressFamily: If the given address family is not
-            supported by this reactor, or not supported with the given socket
-            type.
+        @raise twisted.internet.error.UnsupportedAddressFamily: If the
+            given address family is not supported by this reactor, or
+            not supported with the given socket type.
 
-        @raise UnsupportedSocketType: If the given socket type is not supported
-            by this reactor, or not supported with the given socket type.
+        @raise twisted.internet.error.UnsupportedSocketType: If the
+            given socket type is not supported by this reactor, or not
+            supported with the given socket type.
         """
+
 
     def adoptStreamConnection(fileDescriptor, addressFamily, factory):
         """
@@ -535,6 +983,42 @@ class IReactorSocket(Interface):
             protocol to handle the connection via this socket.
 
         @raise UnsupportedAddressFamily: If the given address family is not
+            supported by this reactor, or not supported with the given socket
+            type.
+
+        @raise UnsupportedSocketType: If the given socket type is not supported
+            by this reactor, or not supported with the given socket type.
+        """
+
+
+    def adoptDatagramPort(fileDescriptor, addressFamily, protocol,
+                          maxPacketSize=8192):
+        """
+        Add an existing listening I{SOCK_DGRAM} socket to the reactor to
+        monitor for read and write readiness.
+
+        @param fileDescriptor: A file descriptor associated with a socket which
+            is already bound to an address and marked as listening.  The socket
+            must be set non-blocking.  Any additional flags (for example,
+            close-on-exec) must also be set by application code.  Application
+            code is responsible for closing the file descriptor, which may be
+            done as soon as C{adoptDatagramPort} returns.
+        @type fileDescriptor: C{int}
+
+        @param addressFamily: The address family (or I{domain}) of the socket.
+            For example, L{socket.AF_INET6}.
+        @type addressFamily: C{int}
+
+        @param protocol: A L{DatagramProtocol} instance to connect to
+            a UDP transport.
+        @type protocol: L{DatagramProtocol}
+
+        @param maxPacketSize: The maximum packet size to accept.
+        @type maxPacketSize: C{int}
+
+        @return: An object providing L{IListeningPort}.
+
+        @raise L{UnsupportedAddressFamily}: If the given address family is not
             supported by this reactor, or not supported with the given socket
             type.
 

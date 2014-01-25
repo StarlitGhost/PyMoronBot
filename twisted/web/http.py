@@ -606,6 +606,46 @@ class Request:
             self.transport = self.channel.transport
 
 
+    def _warnHeaders(self, old, new):
+        """
+        Emit a warning related to use of one of the deprecated C{headers} or
+        C{received_headers} attributes.
+
+        @param old: The name of the deprecated attribute to which the warning
+            pertains.
+
+        @param new: The name of the preferred attribute which replaces the old
+            attribute.
+        """
+        warnings.warn(
+            category=DeprecationWarning,
+            message=(
+                "twisted.web.http.Request.%(old)s was deprecated in "
+                "Twisted 13.2.0: Please use twisted.web.http.Request."
+                "%(new)s instead." % dict(old=old, new=new)),
+            stacklevel=3)
+
+
+    @property
+    def headers(self):
+        """
+        Transform the L{Headers}-style C{responseHeaders} attribute into a
+        deprecated C{dict}-style C{headers} attribute.
+        """
+        self._warnHeaders("headers", "responseHeaders")
+        return _DictHeaders(self.responseHeaders)
+
+
+    @property
+    def received_headers(self):
+        """
+        Transform the L{Headers}-style C{requestHeaders} attribute into a
+        deprecated C{dict}-style C{received_headers} attribute.
+        """
+        self._warnHeaders("received_headers", "requestHeaders")
+        return _DictHeaders(self.requestHeaders)
+
+
     def __setattr__(self, name, value):
         """
         Support assignment of C{dict} instances to C{received_headers} for
@@ -616,16 +656,12 @@ class Request:
             self.requestHeaders = headers = Headers()
             for k, v in value.items():
                 headers.setRawHeaders(k, [v])
-        elif name == 'requestHeaders':
-            self.__dict__[name] = value
-            self.__dict__['received_headers'] = _DictHeaders(value)
+            self._warnHeaders("received_headers", "requestHeaders")
         elif name == 'headers':
             self.responseHeaders = headers = Headers()
             for k, v in value.items():
                 headers.setRawHeaders(k, [v])
-        elif name == 'responseHeaders':
-            self.__dict__[name] = value
-            self.__dict__['headers'] = _DictHeaders(value)
+            self._warnHeaders("headers", "responseHeaders")
         else:
             self.__dict__[name] = value
 
@@ -791,7 +827,20 @@ class Request:
 
 
     def __repr__(self):
-        return '<%s %s %s>'% (self.method, self.uri, self.clientproto)
+        """
+        Return a string description of the request including such information
+        as the request method and request URI.
+
+        @return: A string loosely describing this L{Request} object.
+        @rtype: L{str}
+        """
+        return '<%s at 0x%x method=%s uri=%s clientproto=%s>' % (
+            self.__class__.__name__,
+            id(self),
+            nativeString(self.method),
+            nativeString(self.uri),
+            nativeString(self.clientproto))
+
 
     def process(self):
         """
@@ -829,11 +878,6 @@ class Request:
         if not self.queued:
             self.transport.unregisterProducer()
         self.producer = None
-
-    # private http response methods
-
-    def _sendError(self, code, resp=''):
-        self.transport.write('%s %s %s\r\n\r\n' % (self.clientproto, code, resp))
 
 
     # The following is the public interface that people should be
@@ -1731,19 +1775,17 @@ class HTTPChannel(basic.LineReceiver, policies.TimeoutMixin):
         else:
             tokens = []
 
-        # HTTP 1.0 persistent connection support is currently disabled,
-        # since we need a way to disable pipelining. HTTP 1.0 can't do
-        # pipelining since we can't know in advance if we'll have a
-        # content-length header, if we don't have the header we need to close the
-        # connection. In HTTP 1.1 this is not an issue since we use chunked
-        # encoding if content-length is not available.
+        # Once any HTTP 0.9 or HTTP 1.0 request is received, the connection is
+        # no longer allowed to be persistent.  At this point in processing the
+        # request, we don't yet know if it will be possible to set a
+        # Content-Length in the response.  If it is not, then the connection
+        # will have to be closed to end an HTTP 0.9 or HTTP 1.0 response.
 
-        #if version == "HTTP/1.0":
-        #    if 'keep-alive' in tokens:
-        #        request.setHeader('connection', 'Keep-Alive')
-        #        return 1
-        #    else:
-        #        return 0
+        # If the checkPersistence call happened later, after the Content-Length
+        # has been determined (or determined not to be set), it would probably
+        # be possible to have persistent connections with HTTP 0.9 and HTTP 1.0.
+        # This may not be worth the effort, though.  Just use HTTP 1.1, okay?
+
         if version == b"HTTP/1.1":
             if b'close' in tokens:
                 request.responseHeaders.setRawHeaders(b'connection', [b'close'])

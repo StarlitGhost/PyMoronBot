@@ -12,7 +12,7 @@ import itertools
 
 try:
     from OpenSSL import SSL
-    from OpenSSL.crypto import PKey, X509, X509Req
+    from OpenSSL.crypto import PKey, X509
     from OpenSSL.crypto import TYPE_RSA
     from twisted.internet import _sslverify as sslverify
 except ImportError:
@@ -118,6 +118,58 @@ class WritingProtocol(protocol.Protocol):
         self.factory.onLost.errback(reason)
 
 
+
+class FakeContext(object):
+    """
+    Introspectable fake of an C{OpenSSL.SSL.Context}.
+
+    Saves call arguments for later introspection.
+
+    Necessary because C{Context} offers poor introspection.  cf. this
+    U{pyOpenSSL bug<https://bugs.launchpad.net/pyopenssl/+bug/1173899>}.
+
+    @ivar _method: See C{method} parameter of L{__init__}.
+    @ivar _options: C{int} of C{OR}ed values from calls of L{set_options}.
+    @ivar _certificate: Set by L{use_certificate}.
+    @ivar _privateKey: Set by L{use_privatekey}.
+    @ivar _verify: Set by L{set_verify}.
+    @ivar _verifyDepth: Set by L{set_verify_depth}.
+    @ivar _sessionID: Set by L{set_session_id}.
+    @ivar _extraCertChain: Accumulated C{list} of all extra certificates added
+        by L{add_extra_chain_cert}.
+    """
+    _options = 0
+
+    def __init__(self, method):
+        self._method = method
+        self._extraCertChain = []
+
+    def set_options(self, options):
+        self._options |= options
+
+    def use_certificate(self, certificate):
+        self._certificate = certificate
+
+    def use_privatekey(self, privateKey):
+        self._privateKey = privateKey
+
+    def check_privatekey(self):
+        return None
+
+    def set_verify(self, flags, callback):
+        self._verify = flags, callback
+
+    def set_verify_depth(self, depth):
+        self._verifyDepth = depth
+
+    def set_session_id(self, sessionID):
+        self._sessionID = sessionID
+
+    def add_extra_chain_cert(self, cert):
+        self._extraCertChain.append(cert)
+
+
+
 class OpenSSLOptions(unittest.TestCase):
     serverPort = clientConn = None
     onServerLost = onClientLost = None
@@ -137,6 +189,15 @@ class OpenSSLOptions(unittest.TestCase):
         self.cKey, self.cCert = makeCertificate(
             O=b"Client Test Certificate",
             CN=b"client")
+        self.caCert1 = makeCertificate(
+            O=b"CA Test Certificate 1",
+            CN=b"ca1")[1]
+        self.caCert2 = makeCertificate(
+            O=b"CA Test Certificate",
+            CN=b"ca2")[1]
+        self.caCerts = [self.caCert1, self.caCert2]
+        self.extraCertChain = self.caCerts
+
 
     def tearDown(self):
         if self.serverPort is not None:
@@ -173,6 +234,142 @@ class OpenSSLOptions(unittest.TestCase):
         self.serverPort = reactor.listenSSL(0, serverFactory, serverCertOpts)
         self.clientConn = reactor.connectSSL('127.0.0.1',
                 self.serverPort.getHost().port, clientFactory, clientCertOpts)
+
+
+    def test_constructorWithOnlyPrivateKey(self):
+        """
+        C{privateKey} and C{certificate} make only sense if both are set.
+        """
+        self.assertRaises(
+            ValueError,
+            sslverify.OpenSSLCertificateOptions, privateKey=self.sKey
+        )
+
+
+    def test_constructorWithOnlyCertificate(self):
+        """
+        C{privateKey} and C{certificate} make only sense if both are set.
+        """
+        self.assertRaises(
+            ValueError,
+            sslverify.OpenSSLCertificateOptions, certificate=self.sCert
+        )
+
+
+    def test_constructorWithCertificateAndPrivateKey(self):
+        """
+        Specifying C{privateKey} and C{certificate} initializes correctly.
+        """
+        opts = sslverify.OpenSSLCertificateOptions(privateKey=self.sKey,
+                                                   certificate=self.sCert)
+        self.assertEqual(opts.privateKey, self.sKey)
+        self.assertEqual(opts.certificate, self.sCert)
+        self.assertEqual(opts.extraCertChain, [])
+
+
+    def test_constructorDoesNotAllowVerifyWithoutCACerts(self):
+        """
+        C{verify} must not be C{True} without specifying C{caCerts}.
+        """
+        self.assertRaises(
+            ValueError,
+            sslverify.OpenSSLCertificateOptions,
+            privateKey=self.sKey, certificate=self.sCert, verify=True
+        )
+
+
+    def test_constructorAllowsCACertsWithoutVerify(self):
+        """
+        It's currently a NOP, but valid.
+        """
+        opts = sslverify.OpenSSLCertificateOptions(privateKey=self.sKey,
+                                                   certificate=self.sCert,
+                                                   caCerts=self.caCerts)
+        self.assertFalse(opts.verify)
+        self.assertEqual(self.caCerts, opts.caCerts)
+
+
+    def test_constructorWithVerifyAndCACerts(self):
+        """
+        Specifying C{verify} and C{caCerts} initializes correctly.
+        """
+        opts = sslverify.OpenSSLCertificateOptions(privateKey=self.sKey,
+                                                   certificate=self.sCert,
+                                                   verify=True,
+                                                   caCerts=self.caCerts)
+        self.assertTrue(opts.verify)
+        self.assertEqual(self.caCerts, opts.caCerts)
+
+
+    def test_constructorSetsExtraChain(self):
+        """
+        Setting C{extraCertChain} works if C{certificate} and C{privateKey} are
+        set along with it.
+        """
+        opts = sslverify.OpenSSLCertificateOptions(
+            privateKey=self.sKey,
+            certificate=self.sCert,
+            extraCertChain=self.extraCertChain,
+        )
+        self.assertEqual(self.extraCertChain, opts.extraCertChain)
+
+
+    def test_constructorDoesNotAllowExtraChainWithoutPrivateKey(self):
+        """
+        A C{extraCertChain} without C{privateKey} doesn't make sense and is
+        thus rejected.
+        """
+        self.assertRaises(
+            ValueError,
+            sslverify.OpenSSLCertificateOptions,
+            certificate=self.sCert,
+            extraCertChain=self.extraCertChain,
+        )
+
+
+    def test_constructorDoesNotAllowExtraChainWithOutPrivateKey(self):
+        """
+        A C{extraCertChain} without C{certificate} doesn't make sense and is
+        thus rejected.
+        """
+        self.assertRaises(
+            ValueError,
+            sslverify.OpenSSLCertificateOptions,
+            privateKey=self.sKey,
+            extraCertChain=self.extraCertChain,
+        )
+
+
+    def test_extraChainFilesAreAddedIfSupplied(self):
+        """
+        If C{extraCertChain} is set and all prerequisites are met, the
+        specified chain certificates are added to C{Context}s that get
+        created.
+        """
+        opts = sslverify.OpenSSLCertificateOptions(
+            privateKey=self.sKey,
+            certificate=self.sCert,
+            extraCertChain=self.extraCertChain,
+        )
+        opts._contextFactory = FakeContext
+        ctx = opts.getContext()
+        self.assertEqual(self.sKey, ctx._privateKey)
+        self.assertEqual(self.sCert, ctx._certificate)
+        self.assertEqual(self.extraCertChain, ctx._extraCertChain)
+
+
+    def test_extraChainDoesNotBreakPyOpenSSL(self):
+        """
+        C{extraCertChain} doesn't break C{OpenSSL.SSL.Context} creation.
+        """
+        opts = sslverify.OpenSSLCertificateOptions(
+            privateKey=self.sKey,
+            certificate=self.sCert,
+            extraCertChain=self.extraCertChain,
+        )
+        ctx = opts.getContext()
+        self.assertIsInstance(ctx, SSL.Context)
+
 
     def test_abbreviatingDistinguishedNames(self):
         """
@@ -464,6 +661,17 @@ class OpenSSLOptions(unittest.TestCase):
 
         return onData.addCallback(
                 lambda result: self.assertEqual(result, WritingProtocol.byte))
+
+
+    def test_SSLv2IsDisabledForSSLv23(self):
+        """
+        SSLv2 is insecure and should be disabled so when users use
+        SSLv23_METHOD, they get at least SSLV3.  It does nothing if
+        SSLv2_METHOD chosen explicitly.
+        """
+        opts = sslverify.OpenSSLCertificateOptions()
+        ctx = opts.getContext()
+        self.assertEqual(SSL.OP_NO_SSLv2, ctx.set_options(0) & SSL.OP_NO_SSLv2)
 
 
 

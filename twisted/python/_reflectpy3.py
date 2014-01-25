@@ -9,30 +9,58 @@ Reflection APIs which have been ported to Python 3.
 from __future__ import division, absolute_import
 
 import types, sys, os, traceback
-from twisted.python.compat import reraise, nativeString, NativeStringIO
 
-from twisted.python._utilpy3 import unsignedID
+from twisted.python.compat import reraise, nativeString, NativeStringIO
 
 
 def prefixedMethodNames(classObj, prefix):
     """
-    A list of method names with a given prefix in a given class.
+    Given a class object C{classObj}, returns a list of method names that match
+    the string C{prefix}.
+
+    @param classObj: A class object from which to collect method names.
+
+    @param prefix: A native string giving a prefix.  Each method with a name
+        which begins with this prefix will be returned.
+    @type prefix: L{str}
+
+    @return: A list of the names of matching methods of C{classObj} (and base
+        classes of C{classObj}).
+    @rtype: L{list} of L{str}
     """
     dct = {}
     addMethodNamesToDict(classObj, dct, prefix)
     return list(dct.keys())
 
 
+
 def addMethodNamesToDict(classObj, dict, prefix, baseClass=None):
     """
-    addMethodNamesToDict(classObj, dict, prefix, baseClass=None) -> dict
-    this goes through 'classObj' (and its bases) and puts method names
+    This goes through C{classObj} (and its bases) and puts method names
     starting with 'prefix' in 'dict' with a value of 1. if baseClass isn't
     None, methods will only be added if classObj is-a baseClass
 
     If the class in question has the methods 'prefix_methodname' and
     'prefix_methodname2', the resulting dict should look something like:
     {"methodname": 1, "methodname2": 1}.
+
+    @param classObj: A class object from which to collect method names.
+
+    @param dict: A L{dict} which will be updated with the results of the
+        accumulation.  Items are added to this dictionary, with method names as
+        keys and C{1} as values.
+    @type dict: L{dict}
+
+    @param prefix: A native string giving a prefix.  Each method of C{classObj}
+        (and base classes of C{classObj}) with a name which begins with this
+        prefix will be returned.
+    @type prefix: L{str}
+
+    @param baseClass: A class object at which to stop searching upwards for new
+        methods.  To collect all method names, do not pass a value for this
+        parameter.
+
+    @return: C{None}
     """
     for base in classObj.__bases__:
         addMethodNamesToDict(base, dict, prefix, baseClass)
@@ -46,21 +74,47 @@ def addMethodNamesToDict(classObj, dict, prefix, baseClass=None):
                 dict[optName] = 1
 
 
+
 def prefixedMethods(obj, prefix=''):
     """
-    A list of methods with a given prefix on a given instance.
+    Given an object C{obj}, returns a list of method objects that match the
+    string C{prefix}.
+
+    @param obj: An arbitrary object from which to collect methods.
+
+    @param prefix: A native string giving a prefix.  Each method of C{obj} with
+        a name which begins with this prefix will be returned.
+    @type prefix: L{str}
+
+    @return: A list of the matching method objects.
+    @rtype: L{list}
     """
     dct = {}
     accumulateMethods(obj, dct, prefix)
     return list(dct.values())
 
 
+
 def accumulateMethods(obj, dict, prefix='', curClass=None):
     """
-    accumulateMethods(instance, dict, prefix)
-    I recurse through the bases of instance.__class__, and add methods
-    beginning with 'prefix' to 'dict', in the form of
-    {'methodname':*instance*method_object}.
+    Given an object C{obj}, add all methods that begin with C{prefix}.
+
+    @param obj: An arbitrary object to collect methods from.
+
+    @param dict: A L{dict} which will be updated with the results of the
+        accumulation.  Items are added to this dictionary, with method names as
+        keys and corresponding instance method objects as values.
+    @type dict: L{dict}
+
+    @param prefix: A native string giving a prefix.  Each method of C{obj} with
+        a name which begins with this prefix will be returned.
+    @type prefix: L{str}
+
+    @param curClass: The class in the inheritance hierarchy at which to start
+        collecting methods.  Collection proceeds up.  To collect all methods
+        from C{obj}, do not pass a value for this parameter.
+
+    @return: C{None}
     """
     if not curClass:
         curClass = obj.__class__
@@ -75,6 +129,7 @@ def accumulateMethods(obj, dict, prefix='', curClass=None):
             dict[optName] = getattr(obj, name)
 
 
+
 def namedModule(name):
     """
     Return a module given its name.
@@ -85,6 +140,7 @@ def namedModule(name):
     for p in packages:
         m = getattr(m, p)
     return m
+
 
 
 def namedObject(name):
@@ -105,10 +161,12 @@ class _NoModuleFound(Exception):
     """
 
 
+
 class InvalidName(ValueError):
     """
     The given name is not a dot-separated list of Python objects.
     """
+
 
 
 class ModuleNotFound(InvalidName):
@@ -118,11 +176,13 @@ class ModuleNotFound(InvalidName):
     """
 
 
+
 class ObjectNotFound(InvalidName):
     """
     The object associated with the given name doesn't exist and it can't be
     imported.
     """
+
 
 
 def _importAndCheckStack(importName):
@@ -134,27 +194,25 @@ def _importAndCheckStack(importName):
     administrative error (entering the wrong module name), from programmer
     error (writing buggy code in a module that fails to import).
 
+    @param importName: The name of the module to import.
+    @type importName: C{str}
     @raise Exception: if something bad happens.  This can be any type of
-    exception, since nobody knows what loading some arbitrary code might do.
-
+        exception, since nobody knows what loading some arbitrary code might
+        do.
     @raise _NoModuleFound: if no module was found.
     """
     try:
-        try:
-            return __import__(importName)
-        except ImportError:
-            excType, excValue, excTraceback = sys.exc_info()
-            while excTraceback:
-                execName = excTraceback.tb_frame.f_globals["__name__"]
-                if (execName is None or # python 2.4+, post-cleanup
-                    execName == importName): # python 2.3, no cleanup
-                    reraise(excValue, excTraceback)
-                excTraceback = excTraceback.tb_next
-            raise _NoModuleFound()
-    except:
-        # Necessary for cleaning up modules in 2.3.
-        sys.modules.pop(importName, None)
-        raise
+        return __import__(importName)
+    except ImportError:
+        excType, excValue, excTraceback = sys.exc_info()
+        while excTraceback:
+            execName = excTraceback.tb_frame.f_globals["__name__"]
+            # in Python 2 execName is None when an ImportError is encountered,
+            # where in Python 3 execName is equal to the importName.
+            if execName is None or execName == importName:
+                reraise(excValue, excTraceback)
+            excTraceback = excTraceback.tb_next
+        raise _NoModuleFound()
 
 
 
@@ -275,6 +333,7 @@ def _determineClass(x):
         return type(x)
 
 
+
 def _determineClassName(x):
     c = _determineClass(x)
     try:
@@ -283,7 +342,8 @@ def _determineClassName(x):
         try:
             return str(c)
         except:
-            return '<BROKEN CLASS AT 0x%x>' % unsignedID(c)
+            return '<BROKEN CLASS AT 0x%x>' % id(c)
+
 
 
 def _safeFormat(formatter, o):
@@ -298,7 +358,8 @@ def _safeFormat(formatter, o):
         className = _determineClassName(o)
         tbValue = io.getvalue()
         return "<%s instance at 0x%x with %s error:\n %s>" % (
-            className, unsignedID(o), formatter.__name__, tbValue)
+            className, id(o), formatter.__name__, tbValue)
+
 
 
 def safe_repr(o):
@@ -311,6 +372,7 @@ def safe_repr(o):
     @rtype: C{str}
     """
     return _safeFormat(repr, o)
+
 
 
 def safe_str(o):

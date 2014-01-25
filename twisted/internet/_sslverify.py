@@ -11,7 +11,7 @@ from hashlib import md5
 from OpenSSL import SSL, crypto
 
 from twisted.python.compat import nativeString, networkString
-from twisted.python import _reflectpy3 as reflect, _utilpy3 as util
+from twisted.python import _reflectpy3 as reflect, util
 from twisted.internet.defer import Deferred
 from twisted.internet.error import VerifyError, CertificateError
 
@@ -601,7 +601,6 @@ class KeyPair(PublicKey):
         Sign a CertificateRequest instance, returning a Certificate instance.
         """
         req = requestObject.original
-        dn = requestObject.getSubject()
         cert = crypto.X509()
         issuerDistinguishedName._copyInto(cert.get_issuer())
         cert.set_subject(req.get_subject())
@@ -626,6 +625,8 @@ class OpenSSLCertificateOptions(object):
     A factory for SSL context objects for both SSL servers and clients.
     """
 
+    # Factory for creating contexts.  Configurable for testability.
+    _contextFactory = SSL.Context
     _context = None
     # Older versions of PyOpenSSL didn't provide OP_ALL.  Fudge it here, just in case.
     _OP_ALL = getattr(SSL, 'OP_ALL', 0x0000FFFF)
@@ -646,7 +647,8 @@ class OpenSSLCertificateOptions(object):
                  enableSingleUseKeys=True,
                  enableSessions=True,
                  fixBrokenPeers=False,
-                 enableSessionTickets=False):
+                 enableSessionTickets=False,
+                 extraCertChain=None):
         """
         Create an OpenSSL context SSL connection context factory.
 
@@ -657,15 +659,15 @@ class OpenSSLCertificateOptions(object):
         @param method: The SSL protocol to use, one of SSLv23_METHOD,
         SSLv2_METHOD, SSLv3_METHOD, TLSv1_METHOD.  Defaults to TLSv1_METHOD.
 
-        @param verify: If True, verify certificates received from the peer and
-        fail the handshake if verification fails.  Otherwise, allow anonymous
-        sessions and sessions with certificates which fail validation.  By
-        default this is False.
+        @param verify: If C{True}, verify certificates received from the peer
+            and fail the handshake if verification fails.  Otherwise, allow
+            anonymous sessions and sessions with certificates which fail
+            validation.  By default this is C{False}.
 
         @param caCerts: List of certificate authority certificate objects to
             use to verify the peer's certificate.  Only used if verify is
-            C{True}, and if verify is C{True}, this must be specified.  Since
-            verify is C{False} by default, this is C{None} by default.
+            C{True} and will be ignored otherwise.  Since verify is C{False} by
+            default, this is C{None} by default.
 
         @type caCerts: C{list} of L{OpenSSL.crypto.X509}
 
@@ -694,17 +696,34 @@ class OpenSSLCertificateOptions(object):
         controlling session tickets. This option is off by default, as some
         server implementations don't correctly process incoming empty session
         ticket extensions in the hello.
+
+        @param extraCertChain: List of certificates that I{complete} your
+            verification chain if the certificate authority that signed your
+            C{certificate} isn't widely supported.  Do I{not} add
+            C{certificate} to it.
+
+        @type extraCertChain: C{list} of L{OpenSSL.crypto.X509}
         """
 
-        assert (privateKey is None) == (certificate is None), "Specify neither or both of privateKey and certificate"
+        if (privateKey is None) != (certificate is None):
+            raise ValueError(
+                "Specify neither or both of privateKey and certificate")
         self.privateKey = privateKey
         self.certificate = certificate
         if method is not None:
             self.method = method
 
+        if verify and not caCerts:
+            raise ValueError("Specify client CA certificate information if and"
+                             " only if enabling certificate verification")
         self.verify = verify
-        assert ((verify and caCerts) or
-                (not verify)), "Specify client CA certificate information if and only if enabling certificate verification"
+        if extraCertChain is not None and None in (privateKey, certificate):
+            raise ValueError("A private key and a certificate are required "
+                             "when adding a supplemental certificate chain.")
+        if extraCertChain is not None:
+            self.extraCertChain = extraCertChain
+        else:
+            self.extraCertChain = []
 
         self.caCerts = caCerts
         self.verifyDepth = verifyDepth
@@ -738,11 +757,15 @@ class OpenSSLCertificateOptions(object):
 
 
     def _makeContext(self):
-        ctx = SSL.Context(self.method)
+        ctx = self._contextFactory(self.method)
+        # Disallow insecure SSLv2. Applies only for SSLv23_METHOD.
+        ctx.set_options(SSL.OP_NO_SSLv2)
 
         if self.certificate is not None and self.privateKey is not None:
             ctx.use_certificate(self.certificate)
             ctx.use_privatekey(self.privateKey)
+            for extraCert in self.extraCertChain:
+                ctx.add_extra_chain_cert(extraCert)
             # Sanity check
             ctx.check_privatekey()
 

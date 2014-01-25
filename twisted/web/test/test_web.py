@@ -184,35 +184,6 @@ class SessionTest(unittest.TestCase):
         self.assertNotIn(self.uid, self.site.sessions)
 
 
-    def test_startCheckingExpirationParameterDeprecated(self):
-        """
-        L{server.Session.startCheckingExpiration} emits a deprecation warning
-        if it is invoked with a parameter.
-        """
-        self.session.startCheckingExpiration(123)
-        warnings = self.flushWarnings([
-                self.test_startCheckingExpirationParameterDeprecated])
-        self.assertEqual(len(warnings), 1)
-        self.assertEqual(warnings[0]['category'], DeprecationWarning)
-        self.assertEqual(
-            warnings[0]['message'],
-            "The lifetime parameter to startCheckingExpiration is deprecated "
-            "since Twisted 9.0.  See Session.sessionTimeout instead.")
-
-
-    def test_checkExpiredDeprecated(self):
-        """
-        L{server.Session.checkExpired} is deprecated.
-        """
-        self.session.checkExpired()
-        warnings = self.flushWarnings([self.test_checkExpiredDeprecated])
-        self.assertEqual(warnings[0]['category'], DeprecationWarning)
-        self.assertEqual(
-            warnings[0]['message'],
-            "Session.checkExpired is deprecated since Twisted 9.0; sessions "
-            "check themselves now, you don't need to.")
-        self.assertEqual(len(warnings), 1)
-
 
 # Conditional requests:
 # If-None-Match, If-Modified-Since
@@ -943,7 +914,7 @@ class ServerAttributesTestCase(unittest.TestCase):
         twisted.web.server.date_time_string should not be used; instead use
         twisted.web.http.datetimeToString directly
         """
-        deprecated_func = server.date_time_string
+        server.date_time_string
         warnings = self.flushWarnings(
             offendingFunctions=[self.test_deprecatedAttributeDateTimeString])
 
@@ -960,7 +931,7 @@ class ServerAttributesTestCase(unittest.TestCase):
         twisted.web.server.string_date_time should not be used; instead use
         twisted.web.http.stringToDatetime directly
         """
-        deprecated_func = server.string_date_time
+        server.string_date_time
         warnings = self.flushWarnings(
             offendingFunctions=[self.test_deprecatedAttributeStringDateTime])
 

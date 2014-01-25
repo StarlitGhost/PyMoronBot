@@ -40,9 +40,10 @@ class IRequest(Interface):
         "'quux': ['spam']}}.")
 
     received_headers = Attribute(
-        "Backwards-compatibility access to C{requestHeaders}.  Use "
-        "C{requestHeaders} instead.  C{received_headers} behaves mostly "
-        "like a C{dict} and does not provide access to all header values.")
+        "Backwards-compatibility access to C{requestHeaders}, deprecated in "
+        "Twisted 13.2.0.  Use C{requestHeaders} instead.  C{received_headers} "
+        "behaves mostly like a C{dict} and does not provide access to all "
+        "header values.")
 
     requestHeaders = Attribute(
         "A L{http_headers.Headers} instance giving all received HTTP request "
@@ -54,10 +55,10 @@ class IRequest(Interface):
         "to decide on a per-request basis.")
 
     headers = Attribute(
-        "Backwards-compatibility access to C{responseHeaders}.  Use"
-        "C{responseHeaders} instead.  C{headers} behaves mostly like a "
-        "C{dict} and does not provide access to all header values nor "
-        "does it allow multiple values for one header to be set.")
+        "Backwards-compatibility access to C{responseHeaders}, deprecated in "
+        "Twisted 13.2.0.  Use C{responseHeaders} instead.  C{headers} behaves "
+        "mostly like a C{dict} and does not provide access to all header "
+        "values nor does it allow multiple values for one header to be set.")
 
     responseHeaders = Attribute(
         "A L{http_headers.Headers} instance holding all HTTP response "
@@ -511,6 +512,16 @@ class IResponse(Interface):
         "available in C{headers}.")
 
 
+    request = Attribute(
+        "The L{IClientRequest} that resulted in this response.")
+
+
+    previousResponse = Attribute(
+        "The previous L{IResponse} from a redirect, or C{None} if there was no "
+        "previous response. This can be used to walk the response or request "
+        "history for redirections.")
+
+
     def deliverBody(protocol):
         """
         Register an L{IProtocol<twisted.internet.interfaces.IProtocol>} provider
@@ -531,6 +542,15 @@ class IResponse(Interface):
             - ResponseFailed, which indicates that some bytes from the response
               were lost.  The C{reasons} attribute of the exception may provide
               more specific indications as to why.
+        """
+
+
+    def setPreviousResponse(response):
+        """
+        Set the reference to the previous L{IResponse}.
+
+        The value of the previous response can be read via
+        L{IResponse.previousResponse}.
         """
 
 
@@ -581,11 +601,108 @@ class _IRequestEncoderFactory(Interface):
 
 
 
+class IClientRequest(Interface):
+    """
+    An object representing an HTTP request to make to an HTTP server.
+
+    @since: 13.1
+    """
+    method = Attribute(
+        "The HTTP method for this request, as L{bytes}. For example: "
+        "C{b'GET'}, C{b'HEAD'}, C{b'POST'}, etc.")
+
+
+    absoluteURI = Attribute(
+        "The absolute URI of the requested resource, as L{bytes}; or C{None} "
+        "if the absolute URI cannot be determined.")
+
+
+    headers = Attribute(
+        "Headers to be sent to the server, as "
+        "a L{twisted.web.http_headers.Headers} instance.")
+
+
+
+class IAgent(Interface):
+    """
+    An agent makes HTTP requests.
+
+    The way in which requests are issued is left up to each implementation.
+    Some may issue them directly to the server indicated by the net location
+    portion of the request URL.  Others may use a proxy specified by system
+    configuration.
+
+    Processing of responses is also left very widely specified.  An
+    implementation may perform no special handling of responses, or it may
+    implement redirect following or content negotiation, it may implement a
+    cookie store or automatically respond to authentication challenges.  It may
+    implement many other unforeseen behaviors as well.
+
+    It is also intended that L{IAgent} implementations be composable.  An
+    implementation which provides cookie handling features should re-use an
+    implementation that provides connection pooling and this combination could
+    be used by an implementation which adds content negotiation functionality.
+    Some implementations will be completely self-contained, such as those which
+    actually perform the network operations to send and receive requests, but
+    most or all other implementations should implement a small number of new
+    features (perhaps one new feature) and delegate the rest of the
+    request/response machinery to another implementation.
+
+    This allows for great flexibility in the behavior an L{IAgent} will
+    provide.  For example, an L{IAgent} with web browser-like behavior could be
+    obtained by combining a number of (hypothetical) implementations::
+
+        baseAgent = Agent(reactor)
+        redirect = BrowserLikeRedirectAgent(baseAgent, limit=10)
+        authenticate = AuthenticateAgent(
+            redirect, [diskStore.credentials, GtkAuthInterface()])
+        cookie = CookieAgent(authenticate, diskStore.cookie)
+        decode = ContentDecoderAgent(cookie, [(b"gzip", GzipDecoder())])
+        cache = CacheAgent(decode, diskStore.cache)
+
+        doSomeRequests(cache)
+    """
+    def request(method, uri, headers=None, bodyProducer=None):
+        """
+        Request the resource at the given location.
+
+        @param method: The request method to use, such as C{"GET"}, C{"HEAD"},
+            C{"PUT"}, C{"POST"}, etc.
+        @type method: L{bytes}
+
+        @param uri: The location of the resource to request.  This should be an
+            absolute URI but some implementations may support relative URIs
+            (with absolute or relative paths).  I{HTTP} and I{HTTPS} are the
+            schemes most likely to be supported but others may be as well.
+        @type uri: L{bytes}
+
+        @param headers: The headers to send with the request (or C{None} to
+            send no extra headers).  An implementation may add its own headers
+            to this (for example for client identification or content
+            negotiation).
+        @type headers: L{Headers} or L{NoneType}
+
+        @param bodyProducer: An object which can generate bytes to make up the
+            body of this request (for example, the properly encoded contents of
+            a file for a file upload).  Or, C{None} if the request is to have
+            no body.
+        @type bodyProducer: L{IBodyProducer} provider
+
+        @return: A L{Deferred} that fires with an L{IResponse} provider when
+            the header of the response has been received (regardless of the
+            response status code) or with a L{Failure} if there is any problem
+            which prevents that response from being received (including
+            problems that prevent the request from being sent).
+        @rtype: L{Deferred}
+        """
+
+
+
 UNKNOWN_LENGTH = u"twisted.web.iweb.UNKNOWN_LENGTH"
 
 __all__ = [
     "IUsernameDigestHash", "ICredentialFactory", "IRequest",
     "IBodyProducer", "IRenderable", "IResponse", "_IRequestEncoder",
-    "_IRequestEncoderFactory",
+    "_IRequestEncoderFactory", "IClientRequest",
 
     "UNKNOWN_LENGTH"]

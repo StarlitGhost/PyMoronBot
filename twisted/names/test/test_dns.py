@@ -12,6 +12,8 @@ from io import BytesIO
 
 import struct
 
+from zope.interface.verify import verifyClass
+
 from twisted.python.failure import Failure
 from twisted.internet import address, task
 from twisted.internet.error import CannotListenError, ConnectionDone
@@ -19,6 +21,7 @@ from twisted.trial import unittest
 from twisted.names import dns
 
 from twisted.test import proto_helpers
+from twisted.test.testutils import ComparisonTestsMixin
 
 RECORD_TYPES = [
     dns.Record_NS, dns.Record_MD, dns.Record_MF, dns.Record_CNAME,
@@ -125,7 +128,16 @@ class NameTests(unittest.TestCase):
         self.assertRaises(TypeError, dns.Name, 123)
         self.assertRaises(TypeError, dns.Name, object())
         self.assertRaises(TypeError, dns.Name, [])
-        self.assertRaises(TypeError, dns.Name, u"text")
+
+
+    def test_unicodeName(self):
+        """
+        L{dns.Name} automatically encodes unicode domain name using C{idna}
+        encoding.
+        """
+        name = dns.Name(u'\u00e9chec.example.org')
+        self.assertIsInstance(name.name, bytes)
+        self.assertEqual(b'xn--chec-9oa.example.org', name.name)
 
 
     def test_decode(self):
@@ -188,8 +200,8 @@ class NameTests(unittest.TestCase):
             b'\x01\x00' # Message ID
             b'\x00' # answer bit, opCode nibble, auth bit, trunc bit, recursive
                     # bit
-            b'\x00' # recursion bit, empty bit, empty bit, empty bit, response
-                    # code nibble
+            b'\x00' # recursion bit, empty bit, authenticData bit,
+                    # checkingDisabled bit, response code nibble
             b'\x00\x01' # number of queries
             b'\x00\x01' # number of answers
             b'\x00\x00' # number of authorities
@@ -559,10 +571,109 @@ class RoundtripDNSTestCase(unittest.TestCase):
 
 
 
+MESSAGE_AUTHENTIC_DATA_BYTES = (
+    b'\x00\x00' # ID
+    b'\x00' #
+    b'\x20' # RA, Z, AD=1, CD, RCODE
+    b'\x00\x00' # Query count
+    b'\x00\x00' # Answer count
+    b'\x00\x00' # Authority count
+    b'\x00\x00' # Additional count
+)
+
+
+
+MESSAGE_CHECKING_DISABLED_BYTES = (
+    b'\x00\x00' # ID
+    b'\x00' #
+    b'\x10' # RA, Z, AD, CD=1, RCODE
+    b'\x00\x00' # Query count
+    b'\x00\x00' # Answer count
+    b'\x00\x00' # Authority count
+    b'\x00\x00' # Additional count
+)
+
+
+
 class MessageTestCase(unittest.SynchronousTestCase):
     """
     Tests for L{twisted.names.dns.Message}.
     """
+
+    def test_authenticDataDefault(self):
+        """
+        L{dns.Message.authenticData} has default value 0.
+        """
+        self.assertEqual(dns.Message().authenticData, 0)
+
+
+    def test_authenticDataOverride(self):
+        """
+        L{dns.Message.__init__} accepts a C{authenticData} argument which
+        is assigned to L{dns.Message.authenticData}.
+        """
+        self.assertEqual(dns.Message(authenticData=1).authenticData, 1)
+
+
+    def test_authenticDataEncode(self):
+        """
+        L{dns.Message.toStr} encodes L{dns.Message.authenticData} into
+        byte4 of the byte string.
+        """
+        self.assertEqual(
+            dns.Message(authenticData=1).toStr(),
+            MESSAGE_AUTHENTIC_DATA_BYTES
+        )
+
+
+    def test_authenticDataDecode(self):
+        """
+        L{dns.Message.fromStr} decodes byte4 and assigns bit3 to
+        L{dns.Message.authenticData}.
+        """
+        m = dns.Message()
+        m.fromStr(MESSAGE_AUTHENTIC_DATA_BYTES)
+
+        self.assertEqual(m.authenticData, 1)
+
+
+    def test_checkingDisabledDefault(self):
+        """
+        L{dns.Message.checkingDisabled} has default value 0.
+        """
+        self.assertEqual(dns.Message().checkingDisabled, 0)
+
+
+    def test_checkingDisabledOverride(self):
+        """
+        L{dns.Message.__init__} accepts a C{checkingDisabled} argument which
+        is assigned to L{dns.Message.checkingDisabled}.
+        """
+        self.assertEqual(
+            dns.Message(checkingDisabled=1).checkingDisabled, 1)
+
+
+    def test_checkingDisabledEncode(self):
+        """
+        L{dns.Message.toStr} encodes L{dns.Message.checkingDisabled} into
+        byte4 of the byte string.
+        """
+        self.assertEqual(
+            dns.Message(checkingDisabled=1).toStr(),
+            MESSAGE_CHECKING_DISABLED_BYTES
+        )
+
+
+    def test_checkingDisabledDecode(self):
+        """
+        L{dns.Message.fromStr} decodes byte4 and assigns bit4 to
+        L{dns.Message.checkingDisabled}.
+        """
+        m = dns.Message()
+        m.fromStr(MESSAGE_CHECKING_DISABLED_BYTES)
+
+        self.assertEqual(m.checkingDisabled, 1)
+
 
     def testEmptyMessage(self):
         """
@@ -582,7 +693,8 @@ class MessageTestCase(unittest.SynchronousTestCase):
         msg.fromStr(
             b'\x01\x00' # Message ID
             b'\x00' # answer bit, opCode nibble, auth bit, trunc bit, recursive bit
-            b'\x00' # recursion bit, empty bit, empty bit, empty bit, response code nibble
+            b'\x00' # recursion bit, empty bit, authenticData bit,
+                    # checkingDisabled bit, response code nibble
             b'\x00\x00' # number of queries
             b'\x00\x00' # number of answers
             b'\x00\x00' # number of authorities
@@ -645,8 +757,8 @@ class MessageTestCase(unittest.SynchronousTestCase):
             b'\x01\x00' # Message ID
             # answer bit, opCode nibble, auth bit, trunc bit, recursive bit
             b'\x00'
-            # recursion bit, empty bit, empty bit, empty bit, response code
-            # nibble
+            # recursion bit, empty bit, authenticData bit,
+            # checkingDisabled bit, response code nibble
             b'\x00'
             b'\x00\x00' # number of queries
             b'\x00\x01' # number of answers
@@ -671,8 +783,8 @@ class MessageTestCase(unittest.SynchronousTestCase):
             b'\x01\x00' # Message ID
             # answer bit, opCode nibble, auth bit, trunc bit, recursive bit
             b'\x04'
-            # recursion bit, empty bit, empty bit, empty bit, response code
-            # nibble
+            # recursion bit, empty bit, authenticData bit,
+            # checkingDisabled bit, response code nibble
             b'\x00'
             b'\x00\x00' # number of queries
             b'\x00\x01' # number of answers
@@ -701,7 +813,7 @@ class TestController(object):
         self.messages = []
 
 
-    def messageReceived(self, msg, proto, addr):
+    def messageReceived(self, msg, proto, addr=None):
         """
         Save the message so that it can be checked during the tests.
         """
@@ -792,6 +904,21 @@ class DatagramProtocolTestCase(unittest.TestCase):
 
         d = self.proto.query(('127.0.0.1', 21345), [dns.Query(b'foo')])
         return self.assertFailure(d, CannotListenError)
+
+
+    def test_receiveMessageNotInLiveMessages(self):
+        """
+        When receiving a message whose id is not in
+        L{DNSDatagramProtocol.liveMessages} or L{DNSDatagramProtocol.resends},
+        the message will be received by L{DNSDatagramProtocol.controller}.
+        """
+        message = dns.Message()
+        message.id = 1
+        message.answers = [dns.RRHeader(
+            payload=dns.Record_A(address='1.2.3.4'))]
+        self.proto.datagramReceived(message.toStr(), ('127.0.0.1', 21345))
+        self.assertEqual(self.controller.messages[-1][0].toStr(),
+                         message.toStr())
 
 
 
@@ -887,6 +1014,22 @@ class DNSProtocolTestCase(unittest.TestCase):
 
         d = self.proto.query([dns.Query(b'foo')])
         return self.assertFailure(d, RuntimeError)
+
+
+    def test_receiveMessageNotInLiveMessages(self):
+        """
+        When receiving a message whose id is not in L{DNSProtocol.liveMessages}
+        the message will be received by L{DNSProtocol.controller}.
+        """
+        message = dns.Message()
+        message.id = 1
+        message.answers = [dns.RRHeader(
+            payload=dns.Record_A(address='1.2.3.4'))]
+        string = message.toStr()
+        string = struct.pack('!H', len(string)) + string
+        self.proto.dataReceived(string)
+        self.assertEqual(self.controller.messages[-1][0].toStr(),
+                         message.toStr())
 
 
 
@@ -1159,58 +1302,13 @@ class ReprTests(unittest.TestCase):
 
 
 
-class _Equal(object):
-    """
-    A class the instances of which are equal to anything and everything.
-    """
-    def __eq__(self, other):
-        return True
-
-
-    def __ne__(self, other):
-        return False
-
-
-
-class _NotEqual(object):
-    """
-    A class the instances of which are equal to nothing.
-    """
-    def __eq__(self, other):
-        return False
-
-
-    def __ne__(self, other):
-        return True
-
-
-
-class EqualityTests(unittest.TestCase):
+class EqualityTests(ComparisonTestsMixin, unittest.TestCase):
     """
     Tests for the equality and non-equality behavior of record classes.
     """
     def _equalityTest(self, firstValueOne, secondValueOne, valueTwo):
-        """
-        Assert that C{firstValueOne} is equal to C{secondValueOne} but not
-        equal to C{valueOne} and that it defines equality cooperatively with
-        other types it doesn't know about.
-        """
-        # This doesn't use assertEqual and assertNotEqual because the exact
-        # operator those functions use is not very well defined.  The point
-        # of these assertions is to check the results of the use of specific
-        # operators (precisely to ensure that using different permutations
-        # (eg "x == y" or "not (x != y)") which should yield the same results
-        # actually does yield the same result). -exarkun
-        self.assertTrue(firstValueOne == firstValueOne)
-        self.assertTrue(firstValueOne == secondValueOne)
-        self.assertFalse(firstValueOne == valueTwo)
-        self.assertFalse(firstValueOne != firstValueOne)
-        self.assertFalse(firstValueOne != secondValueOne)
-        self.assertTrue(firstValueOne != valueTwo)
-        self.assertTrue(firstValueOne == _Equal())
-        self.assertFalse(firstValueOne != _Equal())
-        self.assertFalse(firstValueOne == _NotEqual())
-        self.assertTrue(firstValueOne != _NotEqual())
+        return self.assertNormalEqualityImplementation(
+            firstValueOne, secondValueOne, valueTwo)
 
 
     def test_charstr(self):
@@ -1788,3 +1886,736 @@ class RRHeaderTests(unittest.TestCase):
         self.assertRaises(
             ValueError, dns.RRHeader, "example.com", dns.A,
             dns.IN, -1, dns.Record_A("127.0.0.1"))
+
+
+
+class NameToLabelsTests(unittest.SynchronousTestCase):
+    """
+    Tests for L{twisted.names.dns._nameToLabels}.
+    """
+
+    def test_empty(self):
+        """
+        L{dns._nameToLabels} returns a list containing a single
+        empty label for an empty name.
+        """
+        self.assertEqual(dns._nameToLabels(b''), [b''])
+
+
+    def test_onlyDot(self):
+        """
+        L{dns._nameToLabels} returns a list containing a single
+        empty label for a name containing only a dot.
+        """
+        self.assertEqual(dns._nameToLabels(b'.'), [b''])
+
+
+    def test_withoutTrailingDot(self):
+        """
+        L{dns._nameToLabels} returns a list ending with an empty
+        label for a name without a trailing dot.
+        """
+        self.assertEqual(dns._nameToLabels(b'com'), [b'com', b''])
+
+
+    def test_withTrailingDot(self):
+        """
+        L{dns._nameToLabels} returns a list ending with an empty
+        label for a name with a trailing dot.
+        """
+        self.assertEqual(dns._nameToLabels(b'com.'), [b'com', b''])
+
+
+    def test_subdomain(self):
+        """
+        L{dns._nameToLabels} returns a list containing entries
+        for all labels in a subdomain name.
+        """
+        self.assertEqual(
+            dns._nameToLabels(b'foo.bar.baz.example.com.'),
+            [b'foo', b'bar', b'baz', b'example', b'com', b''])
+
+
+    def test_casePreservation(self):
+        """
+        L{dns._nameToLabels} preserves the case of ascii
+        characters in labels.
+        """
+        self.assertEqual(
+            dns._nameToLabels(b'EXAMPLE.COM'),
+            [b'EXAMPLE', b'COM', b''])
+
+
+
+def assertIsSubdomainOf(testCase, descendant, ancestor):
+    """
+    Assert that C{descendant} *is* a subdomain of C{ancestor}.
+
+    @type testCase: L{unittest.SynchronousTestCase}
+    @param testCase: The test case on which to run the assertions.
+
+    @type descendant: C{str}
+    @param descendant: The subdomain name to test.
+
+    @type ancestor: C{str}
+    @param ancestor: The superdomain name to test.
+    """
+    testCase.assertTrue(
+        dns._isSubdomainOf(descendant, ancestor),
+        '%r is not a subdomain of %r' % (descendant, ancestor))
+
+
+
+def assertIsNotSubdomainOf(testCase, descendant, ancestor):
+    """
+    Assert that C{descendant} *is not* a subdomain of C{ancestor}.
+
+    @type testCase: L{unittest.SynchronousTestCase}
+    @param testCase: The test case on which to run the assertions.
+
+    @type descendant: C{str}
+    @param descendant: The subdomain name to test.
+
+    @type ancestor: C{str}
+    @param ancestor: The superdomain name to test.
+    """
+    testCase.assertFalse(
+        dns._isSubdomainOf(descendant, ancestor),
+        '%r is a subdomain of %r' % (descendant, ancestor))
+
+
+
+class IsSubdomainOfTests(unittest.SynchronousTestCase):
+    """
+    Tests for L{twisted.names.dns._isSubdomainOf}.
+    """
+
+    def test_identical(self):
+        """
+        L{dns._isSubdomainOf} returns C{True} for identical
+        domain names.
+        """
+        assertIsSubdomainOf(self, b'example.com', b'example.com')
+
+
+    def test_parent(self):
+        """
+        L{dns._isSubdomainOf} returns C{True} when the first
+        name is an immediate descendant of the second name.
+        """
+        assertIsSubdomainOf(self, b'foo.example.com', b'example.com')
+
+
+    def test_distantAncestor(self):
+        """
+        L{dns._isSubdomainOf} returns C{True} when the first
+        name is a distant descendant of the second name.
+        """
+        assertIsSubdomainOf(self, b'foo.bar.baz.example.com', b'com')
+
+
+    def test_superdomain(self):
+        """
+        L{dns._isSubdomainOf} returns C{False} when the first
+        name is an ancestor of the second name.
+        """
+        assertIsNotSubdomainOf(self, b'example.com', b'foo.example.com')
+
+
+    def test_sibling(self):
+        """
+        L{dns._isSubdomainOf} returns C{False} if the first name
+        is a sibling of the second name.
+        """
+        assertIsNotSubdomainOf(self, b'foo.example.com', b'bar.example.com')
+
+
+    def test_unrelatedCommonSuffix(self):
+        """
+        L{dns._isSubdomainOf} returns C{False} even when domain
+        names happen to share a common suffix.
+        """
+        assertIsNotSubdomainOf(self, b'foo.myexample.com', b'example.com')
+
+
+    def test_subdomainWithTrailingDot(self):
+        """
+        L{dns._isSubdomainOf} returns C{True} if the first name
+        is a subdomain of the second name but the first name has a
+        trailing ".".
+        """
+        assertIsSubdomainOf(self, b'foo.example.com.', b'example.com')
+
+
+    def test_superdomainWithTrailingDot(self):
+        """
+        L{dns._isSubdomainOf} returns C{True} if the first name
+        is a subdomain of the second name but the second name has a
+        trailing ".".
+        """
+        assertIsSubdomainOf(self, b'foo.example.com', b'example.com.')
+
+
+    def test_bothWithTrailingDot(self):
+        """
+        L{dns._isSubdomainOf} returns C{True} if the first name
+        is a subdomain of the second name and both names have a
+        trailing ".".
+        """
+        assertIsSubdomainOf(self, b'foo.example.com.', b'example.com.')
+
+
+    def test_emptySubdomain(self):
+        """
+        L{dns._isSubdomainOf} returns C{False} if the first name
+        is empty and the second name is not.
+        """
+        assertIsNotSubdomainOf(self, b'', b'example.com')
+
+
+    def test_emptySuperdomain(self):
+        """
+        L{dns._isSubdomainOf} returns C{True} if the second name
+        is empty and the first name is not.
+        """
+        assertIsSubdomainOf(self, b'foo.example.com', b'')
+
+
+    def test_caseInsensitiveComparison(self):
+        """
+        L{dns._isSubdomainOf} does case-insensitive comparison
+        of name labels.
+        """
+        assertIsSubdomainOf(self, b'foo.example.com', b'EXAMPLE.COM')
+
+        assertIsSubdomainOf(self, b'FOO.EXAMPLE.COM', b'example.com')
+
+
+
+class OPTNonStandardAttributes(object):
+    """
+    Generate byte and instance representations of an L{dns._OPTHeader}
+    where all attributes are set to non-default values.
+
+    For testing whether attributes have really been read from the byte
+    string during decoding.
+    """
+    @classmethod
+    def bytes(cls, excludeName=False, excludeOptions=False):
+        """
+        Return L{bytes} representing an encoded OPT record.
+
+        @param excludeName: A flag that controls whether to exclude
+            the name field. This allows a non-standard name to be
+            prepended during the test.
+        @type excludeName: L{bool}
+
+        @param excludeOptions: A flag that controls whether to exclude
+            the RDLEN field. This allows encoded variable options to be
+            appended during the test.
+        @type excludeOptions: L{bool}
+
+        @return: L{bytes} representing the encoded OPT record returned
+            by L{object}.
+        """
+        rdlen = b'\x00\x00' # RDLEN 0
+        if excludeOptions:
+            rdlen = b''
+
+        return (
+            b'\x00' # 0 root zone
+            b'\x00\x29' # type 41
+            b'\x02\x00' # udpPayloadsize 512
+            b'\x03' # extendedRCODE 3
+            b'\x04' # version 4
+            b'\x80\x00' # DNSSEC OK 1 + Z
+            ) + rdlen
+
+
+    @classmethod
+    def object(cls):
+        """
+        Return a new L{dns._OPTHeader} instance.
+
+        @return: A L{dns._OPTHeader} instance with attributes that
+            match the encoded record returned by L{bytes}.
+        """
+        return dns._OPTHeader(
+            udpPayloadSize=512,
+            extendedRCODE=3,
+            version=4,
+            dnssecOK=1)
+
+
+
+class OPTHeaderTests(ComparisonTestsMixin, unittest.TestCase):
+    """
+    Tests for L{twisted.names.dns._OPTHeader}.
+    """
+    def test_interface(self):
+        """
+        L{dns._OPTHeader} implements L{dns.IEncodable}.
+        """
+        verifyClass(dns.IEncodable, dns._OPTHeader)
+
+
+    def test_name(self):
+        """
+        L{dns._OPTHeader.name} is a instance attribute whose value is
+        fixed as the root domain
+        """
+        self.assertEqual(dns._OPTHeader().name, dns.Name(b''))
+
+
+    def test_nameReadonly(self):
+        """
+        L{dns._OPTHeader.name} is readonly.
+        """
+        h = dns._OPTHeader()
+        self.assertRaises(
+            AttributeError, setattr, h, 'name', dns.Name(b'example.com'))
+
+
+    def test_type(self):
+        """
+        L{dns._OPTHeader.type} is an instance attribute with fixed value
+        41.
+        """
+        self.assertEqual(dns._OPTHeader().type, 41)
+
+
+    def test_typeReadonly(self):
+        """
+        L{dns._OPTHeader.type} is readonly.
+        """
+        h = dns._OPTHeader()
+        self.assertRaises(
+            AttributeError, setattr, h, 'type', dns.A)
+
+
+    def test_udpPayloadSize(self):
+        """
+        L{dns._OPTHeader.udpPayloadSize} defaults to 4096 as
+        recommended in rfc6891 section-6.2.5.
+        """
+        self.assertEqual(dns._OPTHeader().udpPayloadSize, 4096)
+
+
+    def test_udpPayloadSizeOverride(self):
+        """
+        L{dns._OPTHeader.udpPayloadSize} can be overridden in the
+        constructor.
+        """
+        self.assertEqual(dns._OPTHeader(udpPayloadSize=512).udpPayloadSize, 512)
+
+
+    def test_extendedRCODE(self):
+        """
+        L{dns._OPTHeader.extendedRCODE} defaults to 0.
+        """
+        self.assertEqual(dns._OPTHeader().extendedRCODE, 0)
+
+
+    def test_extendedRCODEOverride(self):
+        """
+        L{dns._OPTHeader.extendedRCODE} can be overridden in the
+        constructor.
+        """
+        self.assertEqual(dns._OPTHeader(extendedRCODE=1).extendedRCODE, 1)
+
+
+    def test_version(self):
+        """
+        L{dns._OPTHeader.version} defaults to 0.
+        """
+        self.assertEqual(dns._OPTHeader().version, 0)
+
+
+    def test_versionOverride(self):
+        """
+        L{dns._OPTHeader.version} can be overridden in the
+        constructor.
+        """
+        self.assertEqual(dns._OPTHeader(version=1).version, 1)
+
+
+    def test_dnssecOK(self):
+        """
+        L{dns._OPTHeader.dnssecOK} defaults to False.
+        """
+        self.assertEqual(dns._OPTHeader().dnssecOK, False)
+
+
+    def test_dnssecOKOverride(self):
+        """
+        L{dns._OPTHeader.dnssecOK} can be overridden in the
+        constructor.
+        """
+        self.assertEqual(dns._OPTHeader(dnssecOK=True).dnssecOK, True)
+
+
+    def test_options(self):
+        """
+        L{dns._OPTHeader.options} defaults to empty list.
+        """
+        self.assertEqual(dns._OPTHeader().options, [])
+
+
+    def test_optionsOverride(self):
+        """
+        L{dns._OPTHeader.options} can be overridden in the
+        constructor.
+        """
+        h = dns._OPTHeader(options=[(1, 1, b'\x00')])
+        self.assertEqual(h.options, [(1, 1, b'\x00')])
+
+
+    def test_encode(self):
+        """
+        L{dns._OPTHeader.encode} packs the header fields and writes
+        them to a file like object passed in as an argument.
+        """
+        b = BytesIO()
+
+        OPTNonStandardAttributes.object().encode(b)
+        self.assertEqual(
+            b.getvalue(),
+            OPTNonStandardAttributes.bytes()
+            )
+
+
+    def test_encodeWithOptions(self):
+        """
+        L{dns._OPTHeader.options} is a list of L{dns._OPTVariableOption}
+        instances which are packed into the rdata area of the header.
+        """
+        h = OPTNonStandardAttributes.object()
+        h.options = [
+            dns._OPTVariableOption(1, b'foobarbaz'),
+            dns._OPTVariableOption(2, b'qux'),
+            ]
+        b = BytesIO()
+
+        h.encode(b)
+        self.assertEqual(
+            b.getvalue(),
+
+            OPTNonStandardAttributes.bytes(excludeOptions=True) + (
+                b'\x00\x14' # RDLEN 20
+
+                b'\x00\x01' # OPTION-CODE
+                b'\x00\x09' # OPTION-LENGTH
+                b'foobarbaz' # OPTION-DATA
+
+                b'\x00\x02' # OPTION-CODE
+                b'\x00\x03' # OPTION-LENGTH
+                b'qux' # OPTION-DATA
+                ))
+
+
+    def test_decode(self):
+        """
+        L{dns._OPTHeader.decode} unpacks the header fields from a file
+        like object and populates the attributes of an existing
+        L{dns._OPTHeader} instance.
+        """
+        decodedHeader = dns._OPTHeader()
+        decodedHeader.decode(BytesIO(OPTNonStandardAttributes.bytes()))
+
+        self.assertEqual(
+            decodedHeader,
+            OPTNonStandardAttributes.object())
+
+
+    def test_decodeAllExpectedBytes(self):
+        """
+        L{dns._OPTHeader.decode} reads all the bytes of the record
+        that is being decoded.
+        """
+        # Check that all the input data has been consumed.
+        b = BytesIO(OPTNonStandardAttributes.bytes())
+
+        decodedHeader = dns._OPTHeader()
+        decodedHeader.decode(b)
+
+        self.assertEqual(b.tell(), len(b.getvalue()))
+
+
+    def test_decodeOnlyExpectedBytes(self):
+        """
+        L{dns._OPTHeader.decode} reads only the bytes from the current
+        file position to the end of the record that is being
+        decoded. Trailing bytes are not consumed.
+        """
+        b = BytesIO(OPTNonStandardAttributes.bytes()
+                    + b'xxxx') # Trailing bytes
+
+        decodedHeader = dns._OPTHeader()
+        decodedHeader.decode(b)
+
+        self.assertEqual(b.tell(), len(b.getvalue())-len(b'xxxx'))
+
+
+    def test_decodeDiscardsName(self):
+        """
+        L{dns._OPTHeader.decode} discards the name which is encoded in
+        the supplied bytes. The name attribute of the resulting
+        L{dns._OPTHeader} instance will always be L{dns.Name(b'')}.
+        """
+        b = BytesIO(OPTNonStandardAttributes.bytes(excludeName=True)
+                    + b'\x07example\x03com\x00')
+
+        h = dns._OPTHeader()
+        h.decode(b)
+        self.assertEqual(h.name, dns.Name(b''))
+
+
+    def test_decodeRdlengthTooShort(self):
+        """
+        L{dns._OPTHeader.decode} raises an exception if the supplied
+        RDLEN is too short.
+        """
+        b = BytesIO(
+            OPTNonStandardAttributes.bytes(excludeOptions=True) + (
+                b'\x00\x05' # RDLEN 5 Too short - should be 6
+
+                b'\x00\x01' # OPTION-CODE
+                b'\x00\x02' # OPTION-LENGTH
+                b'\x00\x00' # OPTION-DATA
+                ))
+        h = dns._OPTHeader()
+        self.assertRaises(EOFError, h.decode, b)
+
+
+    def test_decodeRdlengthTooLong(self):
+        """
+        L{dns._OPTHeader.decode} raises an exception if the supplied
+        RDLEN is too long.
+        """
+        b = BytesIO(
+            OPTNonStandardAttributes.bytes(excludeOptions=True) + (
+
+                b'\x00\x07' # RDLEN 7 Too long - should be 6
+
+                b'\x00\x01' # OPTION-CODE
+                b'\x00\x02' # OPTION-LENGTH
+                b'\x00\x00' # OPTION-DATA
+                ))
+        h = dns._OPTHeader()
+        self.assertRaises(EOFError, h.decode, b)
+
+
+    def test_decodeWithOptions(self):
+        """
+        If the OPT bytes contain variable options,
+        L{dns._OPTHeader.decode} will populate a list
+        L{dns._OPTHeader.options} with L{dns._OPTVariableOption}
+        instances.
+        """
+
+        b = BytesIO(
+            OPTNonStandardAttributes.bytes(excludeOptions=True) + (
+
+                b'\x00\x14' # RDLEN 20
+
+                b'\x00\x01' # OPTION-CODE
+                b'\x00\x09' # OPTION-LENGTH
+                b'foobarbaz' # OPTION-DATA
+
+                b'\x00\x02' # OPTION-CODE
+                b'\x00\x03' # OPTION-LENGTH
+                b'qux' # OPTION-DATA
+                ))
+
+        h = dns._OPTHeader()
+        h.decode(b)
+        self.assertEqual(
+            h.options,
+            [dns._OPTVariableOption(1, b'foobarbaz'),
+             dns._OPTVariableOption(2, b'qux'),]
+            )
+
+
+    def test_fromRRHeader(self):
+        """
+        L{_OPTHeader.fromRRHeader} accepts an L{RRHeader} instance and
+        returns an L{_OPTHeader} instance whose attribute values have
+        been derived from the C{cls}, C{ttl} and C{payload} attributes
+        of the original header.
+        """
+        genericHeader = dns.RRHeader(
+            b'example.com',
+            type=dns.OPT,
+            cls=0xffff,
+            ttl=(0xfe << 24
+                 | 0xfd << 16
+                 | True << 15),
+            payload=dns.UnknownRecord(b'\xff\xff\x00\x03abc'))
+
+        decodedOptHeader = dns._OPTHeader.fromRRHeader(genericHeader)
+
+        expectedOptHeader = dns._OPTHeader(
+            udpPayloadSize=0xffff,
+            extendedRCODE=0xfe,
+            version=0xfd,
+            dnssecOK=1,
+            options=[dns._OPTVariableOption(code=0xffff, data=b'abc')])
+
+        self.assertEqual(decodedOptHeader, expectedOptHeader)
+
+
+    def test_repr(self):
+        """
+        L{dns._OPTHeader.__repr__} displays the name and type and all
+        the fixed and extended header values of the OPT record.
+        """
+        self.assertEqual(
+            repr(dns._OPTHeader()),
+            '<_OPTHeader '
+            'name= '
+            'type=41 '
+            'udpPayloadSize=4096 '
+            'extendedRCODE=0 '
+            'version=0 '
+            'dnssecOK=False '
+            'options=[]>')
+
+
+    def test_equalityUdpPayloadSize(self):
+        """
+        Two L{OPTHeader} instances compare equal if they have the same
+        udpPayloadSize.
+        """
+        self.assertNormalEqualityImplementation(
+            dns._OPTHeader(udpPayloadSize=512),
+            dns._OPTHeader(udpPayloadSize=512),
+            dns._OPTHeader(udpPayloadSize=4096))
+
+
+    def test_equalityExtendedRCODE(self):
+        """
+        Two L{OPTHeader} instances compare equal if they have the same
+        extendedRCODE.
+        """
+        self.assertNormalEqualityImplementation(
+            dns._OPTHeader(extendedRCODE=1),
+            dns._OPTHeader(extendedRCODE=1),
+            dns._OPTHeader(extendedRCODE=2))
+
+
+    def test_equalityVersion(self):
+        """
+        Two L{OPTHeader} instances compare equal if they have the same
+        version.
+        """
+        self.assertNormalEqualityImplementation(
+            dns._OPTHeader(version=1),
+            dns._OPTHeader(version=1),
+            dns._OPTHeader(version=2))
+
+
+    def test_equalityDnssecOK(self):
+        """
+        Two L{OPTHeader} instances compare equal if they have the same
+        dnssecOK flags.
+        """
+        self.assertNormalEqualityImplementation(
+            dns._OPTHeader(dnssecOK=1),
+            dns._OPTHeader(dnssecOK=1),
+            dns._OPTHeader(dnssecOK=0))
+
+
+    def test_equalityOptions(self):
+        """
+        Two L{OPTHeader} instances compare equal if they have the same
+        options.
+        """
+        self.assertNormalEqualityImplementation(
+            dns._OPTHeader(options=[dns._OPTVariableOption(1, b'x')]),
+            dns._OPTHeader(options=[dns._OPTVariableOption(1, b'x')]),
+            dns._OPTHeader(options=[dns._OPTVariableOption(2, b'y')]))
+
+
+
+class OPTVariableOptionTests(ComparisonTestsMixin, unittest.TestCase):
+    """
+    Tests for L{dns._OPTVariableOption}.
+    """
+    def test_interface(self):
+        """
+        L{dns._OPTVariableOption} implements L{dns.IEncodable}.
+        """
+        verifyClass(dns.IEncodable, dns._OPTVariableOption)
+
+
+    def test_constructorArguments(self):
+        """
+        L{dns._OPTVariableOption.__init__} requires code and data
+        arguments which are saved as public instance attributes.
+        """
+        h = dns._OPTVariableOption(1, b'x')
+        self.assertEqual(h.code, 1)
+        self.assertEqual(h.data, b'x')
+
+
+    def test_repr(self):
+        """
+        L{dns._OPTVariableOption.__repr__} displays the code and data
+        of the option.
+        """
+        self.assertEqual(
+            repr(dns._OPTVariableOption(1, b'x')),
+            '<_OPTVariableOption '
+            'code=1 '
+            "data=x"
+            '>')
+
+
+    def test_equality(self):
+        """
+        Two OPTVariableOption instances compare equal if they have the same
+        code and data values.
+        """
+        self.assertNormalEqualityImplementation(
+            dns._OPTVariableOption(1, b'x'),
+            dns._OPTVariableOption(1, b'x'),
+            dns._OPTVariableOption(2, b'x'))
+
+        self.assertNormalEqualityImplementation(
+            dns._OPTVariableOption(1, b'x'),
+            dns._OPTVariableOption(1, b'x'),
+            dns._OPTVariableOption(1, b'y'))
+
+
+    def test_encode(self):
+        """
+        L{dns._OPTVariableOption.encode} encodes the code and data
+        instance attributes to a byte string which also includes the
+        data length.
+        """
+        o = dns._OPTVariableOption(1, b'foobar')
+        b = BytesIO()
+        o.encode(b)
+        self.assertEqual(
+            b.getvalue(),
+            b'\x00\x01' # OPTION-CODE 1
+            b'\x00\x06' # OPTION-LENGTH 6
+            b'foobar' # OPTION-DATA
+            )
+
+
+    def test_decode(self):
+        """
+        L{dns._OPTVariableOption.decode} is a classmethod that decodes
+        a byte string and returns a L{dns._OPTVariableOption} instance.
+        """
+        b = BytesIO(
+            b'\x00\x01' # OPTION-CODE 1
+            b'\x00\x06' # OPTION-LENGTH 6
+            b'foobar' # OPTION-DATA
+            )
+
+        o = dns._OPTVariableOption()
+        o.decode(b)
+        self.assertEqual(o.code, 1)
+        self.assertEqual(o.data, b'foobar')
