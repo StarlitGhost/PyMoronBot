@@ -21,7 +21,7 @@ class Instantiate(Function):
         self.imgurClientID = load_key(u'imgur Client ID')
     
     def GetResponse(self, message):
-        if message.Type != 'PRIVMSG':
+        if message.Type not in ['PRIVMSG', 'ACTION']:
             return
         
         if ignores.ignoreList is not None:
