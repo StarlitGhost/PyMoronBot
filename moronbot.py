@@ -150,7 +150,6 @@ class MoronBotFactory(protocol.ReconnectingClientFactory):
         print '-!- Lost connection.  Reason:', reason
         if restarting:
             python = sys.executable
-            print python
             os.execl(python, python, *sys.argv)
             #nothing beyond here will be executed if the bot is restarting, as the process itself is replaced
 
