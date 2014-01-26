@@ -36,6 +36,9 @@ class MoronBot(irc.IRCClient):
     def signedOn(self):
         for channel in cmdArgs.channels:
             self.join(channel)
+
+        global startTime
+        startTime = datetime.datetime.utcnow()
     
     def privmsg(self, user, channel, msg):
         message = IRCMessage('PRIVMSG', user, channel, msg)
@@ -90,7 +93,8 @@ class MoronBot(irc.IRCClient):
         self.responses = [] # in case earlier Function responses caused some weird errors
 
         # restart command, can't restart within 1 minute of starting (avoids chanhistory triggering another restart)
-        if message.Command == 'restart' and datetime.datetime.utcnow() > startTime + datetime.timedelta(minutes=1):
+        if message.Command == 'restart' and datetime.datetime.utcnow() > startTime + datetime.timedelta(seconds=10):
+            global restarting
             restarting = True
             self.quit(message = 'restarting')
             return
@@ -146,6 +150,7 @@ class MoronBotFactory(protocol.ReconnectingClientFactory):
         print '-!- Lost connection.  Reason:', reason
         if restarting:
             python = sys.executable
+            print python
             os.execl(python, python, *sys.argv)
             #nothing beyond here will be executed if the bot is restarting, as the process itself is replaced
 
