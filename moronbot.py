@@ -14,6 +14,7 @@ parser.add_argument('-c', '--channels', help='channels to join after connecting 
 cmdArgs = parser.parse_args()
 
 restarting = False
+startTime = datetime.datetime.utcnow()
 
 class MoronBot(irc.IRCClient):
 
@@ -88,7 +89,8 @@ class MoronBot(irc.IRCClient):
     def handleMessage(self, message):
         self.responses = [] # in case earlier Function responses caused some weird errors
 
-        if message.Command == 'restart':
+        # restart command, can't restart within 1 minute of starting (avoids chanhistory triggering another restart)
+        if message.Command == 'restart' and datetime.datetime.utcnow() > startTime + datetime.timedelta(minutes=1):
             restarting = True
             self.quit(message = 'restarting')
             return
