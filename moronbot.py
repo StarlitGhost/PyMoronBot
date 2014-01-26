@@ -1,4 +1,4 @@
-import sys, platform, os, traceback, datetime, codecs
+import sys, platform, os, traceback, datetime, codecs, argparse
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 
@@ -6,6 +6,12 @@ from IRCResponse import IRCResponse, ResponseType
 from IRCMessage import IRCMessage
 from FunctionHandler import AutoLoadFunctions
 import GlobalVars
+
+parser = argparse.ArgumentParser(description='An IRC bot written in Python.')
+parser.add_argument('-s', '--server', help='the IRC server to connect to (required)', type=str, required=True)
+parser.add_argument('-p', '--port', help='the port on the server to connect to (default 6667)', type=int, default=6667)
+parser.add_argument('-c', '--channels', help='channels to join after connecting (default none)', type=str, nargs='+', default=[])
+cmdArgs = parser.parse_args()
 
 class MoronBot(irc.IRCClient):
 
@@ -25,7 +31,7 @@ class MoronBot(irc.IRCClient):
     responses = []
 
     def signedOn(self):
-        for channel in GlobalVars.channels:
+        for channel in cmdArgs.channels:
             self.join(channel)
     
     def privmsg(self, user, channel, msg):
@@ -138,5 +144,5 @@ class MoronBotFactory(protocol.ReconnectingClientFactory):
 if __name__ == '__main__':
     AutoLoadFunctions()
     moronbot = MoronBotFactory()
-    reactor.connectTCP(GlobalVars.server, GlobalVars.port, moronbot)
+    reactor.connectTCP(cmdArgs.server, cmdArgs.port, moronbot)
     reactor.run()
