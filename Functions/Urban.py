@@ -33,7 +33,7 @@ class Instantiate(Function):
         box = soup.find('div', {'class' : 'box'})
 
         if not box:
-            return IRCResponse(ResponseType.Say, "No entry found for '{0}'".format(word), message.ReplyTo)
+            return IRCResponse(ResponseType.Say, "No entry found for '{0}'".format(search), message.ReplyTo)
 
         graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
