@@ -24,6 +24,10 @@ class Instantiate(Function):
             root = ET.fromstring(feedPage.Page)
             item = root.find('channel/item')
             
+            if item is None:
+                #TODO: log an error here that the feed likely no longer exists!
+                continue
+
             title = DataStore.LRRChecker[feedName]['lastTitle'] = item.find('title').text
             link = DataStore.LRRChecker[feedName]['lastLink'] = WebUtils.ShortenGoogl(item.find('link').text)
             newestDate = dparser.parse(item.find('pubDate').text, fuzzy=True, ignoretz=True)

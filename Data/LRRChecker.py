@@ -28,14 +28,6 @@ LRRChecker = {
         'lastCheck': tenMinsAgo,
         'aliases': ["feed", "dump", "fdump", "fd", "f", 'fump', 'frump', 'feeddump'],
         'suppress': True },
-    'CheckPoint': {
-        'url': 'http://penny-arcade.com/feed/show/checkpoint',
-        'lastUpdate': aYearAgo,
-        'lastTitle': '',
-        'lastLink': '',
-        'lastCheck': tenMinsAgo,
-        'aliases': ["check", "point", "cp", "c"],
-        'suppress': True },
     'LRRCast': {
         'url': 'http://feeds.feedburner.com/lrrcast',
         'lastUpdate': aYearAgo,
