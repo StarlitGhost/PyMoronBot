@@ -177,7 +177,7 @@ class Instantiate(Function):
 
         graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
         details = soup.find('div', {'class' : 'details_block'})
-        genres = ', '.join([link.text for link in details.select('a[href*="/genre/"]')])
+        genres = 'Genres: ' + ', '.join([link.text for link in details.select('a[href*="/genre/"]')])
         releaseDate = re.findall(u'Release Date\: .+', details.text, re.MULTILINE | re.IGNORECASE)[0]
 
         return IRCResponse(ResponseType.Say, graySplitter.join([title, genres, releaseDate, description]), message.ReplyTo)
