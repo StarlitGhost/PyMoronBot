@@ -7,7 +7,7 @@ CurrentNick = 'PyMoronBot'
 admins = ['Tyranic-Moron', 'T-M|Work', 'Tyranic_Moron', 'T-M|Asleep', 'LordCustardSmingleigh', 'HappyHAL9k', 'XelaReko', 'XelaReco', 'dave_random', 'ElementalAlchemist', 'Homoglyph']
 
 finger = 'GET YOUR FINGER OUT OF THERE'
-version = '0.0.2'
+version = '0.0.3' # arbitrarily decided!
 source = 'https://github.com/MatthewCox/PyMoronBot/'
 
 CommandChar = '\\'

@@ -11,12 +11,15 @@ parser = argparse.ArgumentParser(description='An IRC bot written in Python.')
 parser.add_argument('-s', '--server', help='the IRC server to connect to (required)', type=str, required=True)
 parser.add_argument('-p', '--port', help='the port on the server to connect to (default 6667)', type=int, default=6667)
 parser.add_argument('-c', '--channels', help='channels to join after connecting (default none)', type=str, nargs='+', default=[])
+parser.add_argument('-n', '--nick', help='the nick the bot should use (default PyMoronBot)', type=str, default='PyMoronBot')
 cmdArgs = parser.parse_args()
 
 restarting = False
 startTime = datetime.datetime.utcnow()
 
 class MoronBot(irc.IRCClient):
+
+    GlobalVars.CurrentNick = cmdArgs.nick
 
     nickname = GlobalVars.CurrentNick
     
