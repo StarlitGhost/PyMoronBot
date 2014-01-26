@@ -13,6 +13,8 @@ parser.add_argument('-p', '--port', help='the port on the server to connect to (
 parser.add_argument('-c', '--channels', help='channels to join after connecting (default none)', type=str, nargs='+', default=[])
 cmdArgs = parser.parse_args()
 
+restarting = False
+
 class MoronBot(irc.IRCClient):
 
     nickname = GlobalVars.CurrentNick
@@ -86,6 +88,11 @@ class MoronBot(irc.IRCClient):
     def handleMessage(self, message):
         self.responses = [] # in case earlier Function responses caused some weird errors
 
+        if message.Command == 'restart':
+            restarting = True
+            self.quit(message = 'restarting')
+            return
+
         for (name, func) in GlobalVars.functions.items():
             try:
                 response = func.GetResponse(message)
@@ -112,7 +119,7 @@ class MoronBot(irc.IRCClient):
         print target, data
         
         fileName = "{0}{1}.txt".format(target, now.strftime("-%Y%m%d"))
-        fileDirs = os.path.join(GlobalVars.logPath, GlobalVars.server)
+        fileDirs = os.path.join(GlobalVars.logPath, cmdArgs.server)
         if not os.path.exists(fileDirs):
             os.makedirs(fileDirs)
         filePath = os.path.join(fileDirs, fileName)
@@ -135,6 +142,11 @@ class MoronBotFactory(protocol.ReconnectingClientFactory):
         
     def clientConnectionLost(self, connector, reason):
         print '-!- Lost connection.  Reason:', reason
+        if restarting:
+            python = sys.executable
+            os.execl(python, python, *sys.argv)
+            #nothing beyond here will be executed if the bot is restarting, as the process itself is replaced
+
         protocol.ReconnectingClientFactory.clientConnectionLost(self, connector, reason)
 
     def clientConnectionFailed(self, connector, reason):

@@ -1,3 +1,9 @@
+'''
+Created on Jan 24, 2014
+
+@author: Tyranic-Moron
+'''
+
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from Function import Function
