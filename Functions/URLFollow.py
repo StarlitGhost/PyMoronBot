@@ -35,6 +35,7 @@ class Instantiate(Function):
         youtubeMatch = re.search('(www\.youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#]+)', match.group('url'))
         imgurMatch   = re.search('(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', match.group('url'))
         twitterMatch = re.search('twitter.com/(?P<tweeter>[^/]+)/status/(?P<tweetID>[0-9]+)', match.group('url'))
+        steamMatch   = re.search('store.steampowered.com/app/(?P<steamAppID>[0-9]+)', match.group('url'))
         
         if youtubeMatch:
             return self.FollowYouTube(youtubeMatch.group('videoID'), message)
@@ -42,6 +43,8 @@ class Instantiate(Function):
             return self.FollowImgur(imgurMatch.group('imgurID'), message)
         elif twitterMatch:
             return self.FollowTwitter(twitterMatch.group('tweeter'), twitterMatch.group('tweetID'), message)
+        elif steamMatch:
+            return self.FollowSteam(steamMatch.group('steamAppID'), message)
         elif not re.search('\.(jpe?g|gif|png|bmp)$', match.group('url')):
             return self.FollowStandard(match.group('url'), message)
         
@@ -160,6 +163,24 @@ class Instantiate(Function):
         formatString = unicode(assembleFormattedText(A.normal[A.bold['{0}:'], ' {1}']))
 
         return IRCResponse(ResponseType.Say, formatString.format(user, text), message.ReplyTo)
+
+    def FollowSteam(self, steamAppId, message):
+        webPage = WebUtils.FetchURL('http://store.steampowered.com/app/{0}/'.format(steamAppId))
+
+        soup = BeautifulSoup(webPage.Page)
+
+        title = soup.find('div', {'class' : 'apphub_AppName'}).text.strip()
+        description = soup.find('div', {'class' : 'game_description_snippet'}).text.strip()
+        limit = 200
+        if len(description) > limit:
+            description = '{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
+
+        graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
+        details = soup.find('div', {'class' : 'details_block'})
+        genres = ', '.join([link.text for link in details.select('a[href*="/genre/"]')])
+        releaseDate = re.findall(u'Release Date\: .+', details.text, re.MULTILINE | re.IGNORECASE)[0]
+
+        return IRCResponse(ResponseType.Say, graySplitter.join([title, genres, releaseDate, description]), message.ReplyTo)
     
     def FollowStandard(self, url, message):
         webPage = WebUtils.FetchURL(url)
