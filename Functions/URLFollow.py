@@ -15,6 +15,8 @@ class Instantiate(Function):
     Help = 'automatic function that follows urls and grabs information about the resultant webpage'
     
     htmlParser = HTMLParser.HTMLParser()
+    
+    graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
     def __init__(self):
         self.youtubeKey = load_key(u'YouTube')
@@ -72,15 +74,18 @@ class Instantiate(Function):
                 length = u'{0:02d}:{1:02d}:{2:02d}'.format(h,m,s)
             else:
                 length = u'{0:02d}:{1:02d}'.format(m,s)
-            description = descMatch.group('desc')
-            description = re.sub('<[^<]+?>', '', description)
-            description = self.htmlParser.unescape(description)
-            description = re.sub('\n+', ' ', description)
-            description = re.sub('\s+', ' ', description)
-            if len(description) > 200:
-                description = description[:197] + u'...'
+
+            description = u'<no description available>'
+            if descMatch:
+                description = descMatch.group('desc')
+                description = re.sub('<[^<]+?>', '', description)
+                description = self.htmlParser.unescape(description)
+                description = re.sub('\n+', ' ', description)
+                description = re.sub('\s+', ' ', description)
+                if len(description) > 200:
+                    description = description[:197] + u'...'
                 
-            return IRCResponse(ResponseType.Say, u'{0} | {1} | {2}'.format(title, length, description), message.ReplyTo)
+            return IRCResponse(ResponseType.Say, self.graySplitter.join([title, length, description]), message.ReplyTo)
         
         return
     
@@ -146,7 +151,7 @@ class Instantiate(Function):
                 data.append(u'Size: {0:,d}kb'.format(int(imageData['size'])/1024))
         data.append(u'Views: {0:,d}'.format(imageData['views']))
         
-        return IRCResponse(ResponseType.Say, u' | '.join(data), message.ReplyTo)
+        return IRCResponse(ResponseType.Say, self.graySplitter.join(data), message.ReplyTo)
 
     def FollowTwitter(self, tweeter, tweetID, message):
         webPage = WebUtils.FetchURL('https://twitter.com/{0}/status/{1}'.format(tweeter, tweetID))
@@ -157,8 +162,7 @@ class Instantiate(Function):
         
         user = tweet.find('span', {'class' : 'username'}).text
 
-        graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
-        text = re.sub('[\r\n]+', graySplitter, tweet.find('p', {'class' : 'tweet-text'}).text)
+        text = re.sub('[\r\n]+', self.graySplitter, tweet.find('p', {'class' : 'tweet-text'}).text)
 
         formatString = unicode(assembleFormattedText(A.normal[A.bold['{0}:'], ' {1}']))
 
@@ -175,12 +179,11 @@ class Instantiate(Function):
         if len(description) > limit:
             description = '{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
 
-        graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
         details = soup.find('div', {'class' : 'details_block'})
         genres = 'Genres: ' + ', '.join([link.text for link in details.select('a[href*="/genre/"]')])
         releaseDate = re.findall(u'Release Date\: .+', details.text, re.MULTILINE | re.IGNORECASE)[0]
 
-        return IRCResponse(ResponseType.Say, graySplitter.join([title, genres, releaseDate, description]), message.ReplyTo)
+        return IRCResponse(ResponseType.Say, self.graySplitter.join([title, genres, releaseDate, description]), message.ReplyTo)
     
     def FollowStandard(self, url, message):
         webPage = WebUtils.FetchURL(url)

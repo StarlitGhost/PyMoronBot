@@ -44,7 +44,8 @@ class Instantiate(Function):
         graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
         word = box.find('div', {'class' : 'word'}).text.strip()
-        definition = graySplitter.join(box.find('div', {'class' : 'definition'}).stripped_strings)
+        # 2014-01-28 really, urban dictionary? 'definition' to 'meaning'? what an important change!
+        definition = graySplitter.join(box.find('div', {'class' : 'meaning'}).stripped_strings)
         example = graySplitter.join(box.find('div', {'class' : 'example'}).stripped_strings)
         author = box.find('div', {'class' : 'contributor'}).text.strip().replace('\n', ' ')
         counts = box.find('div', {'class' : 'thumbs-counts'}).find_all('span', {'class' : 'count'})
