@@ -82,8 +82,8 @@ class Instantiate(Function):
                 description = self.htmlParser.unescape(description)
                 description = re.sub('\n+', ' ', description)
                 description = re.sub('\s+', ' ', description)
-                if len(description) > 200:
-                    description = description[:197] + u'...'
+                if len(description) > 150:
+                    description = description[:147] + u'...'
                 
             return IRCResponse(ResponseType.Say, self.graySplitter.join([title, length, description]), message.ReplyTo)
         
