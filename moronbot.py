@@ -96,7 +96,7 @@ class MoronBot(irc.IRCClient):
         self.responses = [] # in case earlier Function responses caused some weird errors
 
         # restart command, can't restart within 1 minute of starting (avoids chanhistory triggering another restart)
-        if message.Command == 'restart' and datetime.datetime.utcnow() > startTime + datetime.timedelta(seconds=10):
+        if message.Command == 'restart' and datetime.datetime.utcnow() > startTime + datetime.timedelta(seconds=10) and message.User.Name in GlobalVars.admins::
             global restarting
             restarting = True
             self.quit(message = 'restarting')
