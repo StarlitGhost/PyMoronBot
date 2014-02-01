@@ -162,7 +162,17 @@ class Instantiate(Function):
         
         user = tweet.find('span', {'class' : 'username'}).text
 
-        text = re.sub('[\r\n]+', self.graySplitter, tweet.find('p', {'class' : 'tweet-text'}).text)
+        tweetText = tweet.find('p', {'class' : 'tweet-text'})
+
+        links = tweetText.find_all('a', {'data-expanded-url' : True})
+        for link in links:
+            link.string = link['data-expanded-url']
+
+        embeddedLinks = tweetText.find_all('a', {'data-pre-embedded' : 'true'})
+        for link in embeddedLinks:
+            link.string = link['href']
+
+        text = re.sub('[\r\n]+', self.graySplitter, tweetText.text)
 
         formatString = unicode(assembleFormattedText(A.normal[A.bold['{0}:'], ' {1}']))
 
