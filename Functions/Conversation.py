@@ -12,7 +12,7 @@ class Instantiate(Function):
         if message.Type != 'PRIVMSG':
             return
             
-        match = re.search("^(?P<greeting>(wa+s+|')?so?u+p|hi(ya)?|hey|hello|'?lo|(good |g'?)?((mornin|evenin)[g']?|ni(ght|ni))|greetings|bonjour|salut|howdy|'?yo|o?hai|mojn|hej|dongs|ahoy( hoy)?|salutations|g'?day|hola|bye|herrow)( there)?,?[ ]%s([^a-zA-Z0-9_\|`\[\]\^-]|$)" % CurrentNick,
+        match = re.search("^(?P<greeting>(wa+s+|')?so?u+p|hi(ya)?|hey|hello|'?lo|(good |g'?)?((mornin|evenin)[g']?|ni(ght|ni)|afternoon)|greetings|bonjour|salut|howdy|'?yo|o?hai|mojn|hej|dongs|ahoy( hoy)?|salutations|g'?day|hola|bye|herrow)( there)?,?[ ]%s([^a-zA-Z0-9_\|`\[\]\^-]|$)" % CurrentNick,
                           message.MessageString,
                           re.IGNORECASE)
         if match:
