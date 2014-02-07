@@ -183,17 +183,26 @@ class Instantiate(Function):
 
         soup = BeautifulSoup(webPage.Page)
 
-        title = soup.find('div', {'class' : 'apphub_AppName'}).text.strip()
-        description = soup.find('div', {'class' : 'game_description_snippet'}).text.strip()
-        limit = 200
-        if len(description) > limit:
-            description = '{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
+        data = []
+        title = soup.find('div', {'class' : 'apphub_AppName'})
+        if title is not None:
+            data.append(title.text.strip())
+        description = soup.find('div', {'class' : 'game_description_snippet'})
+        if description is not None:
+            limit = 200
+            description = description.text.strip()
+            if len(description) > limit:
+                description = '{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
+            data.append(description)
 
         details = soup.find('div', {'class' : 'details_block'})
-        genres = 'Genres: ' + ', '.join([link.text for link in details.select('a[href*="/genre/"]')])
-        releaseDate = re.findall(u'Release Date\: .+', details.text, re.MULTILINE | re.IGNORECASE)[0]
+        if details is not None:
+            genres = 'Genres: ' + ', '.join([link.text for link in details.select('a[href*="/genre/"]')])
+            data.append(genres)
+            releaseDate = re.findall(u'Release Date\: .+', details.text, re.MULTILINE | re.IGNORECASE)[0]
+            data.append(releaseDate)
 
-        return IRCResponse(ResponseType.Say, self.graySplitter.join([title, genres, releaseDate, description]), message.ReplyTo)
+        return IRCResponse(ResponseType.Say, self.graySplitter.join(data), message.ReplyTo)
     
     def FollowStandard(self, url, message):
         webPage = WebUtils.FetchURL(url)
