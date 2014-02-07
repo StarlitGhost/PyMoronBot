@@ -187,13 +187,6 @@ class Instantiate(Function):
         title = soup.find('div', {'class' : 'apphub_AppName'})
         if title is not None:
             data.append(title.text.strip())
-        description = soup.find('div', {'class' : 'game_description_snippet'})
-        if description is not None:
-            limit = 200
-            description = description.text.strip()
-            if len(description) > limit:
-                description = '{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
-            data.append(description)
 
         details = soup.find('div', {'class' : 'details_block'})
         if details is not None:
@@ -201,6 +194,14 @@ class Instantiate(Function):
             data.append(genres)
             releaseDate = re.findall(u'Release Date\: .+', details.text, re.MULTILINE | re.IGNORECASE)[0]
             data.append(releaseDate)
+            
+        description = soup.find('div', {'class' : 'game_description_snippet'})
+        if description is not None:
+            limit = 200
+            description = description.text.strip()
+            if len(description) > limit:
+                description = '{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
+            data.append(description)
 
         return IRCResponse(ResponseType.Say, self.graySplitter.join(data), message.ReplyTo)
     
