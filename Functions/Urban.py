@@ -42,8 +42,6 @@ class Instantiate(Function):
 
         if not box:
             return IRCResponse(ResponseType.Say, "No entry found for '{0}'".format(search), message.ReplyTo)
-        
-        print box.find('div', {'class' : 'meaning'}).text
 
         graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
