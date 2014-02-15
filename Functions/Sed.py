@@ -23,7 +23,7 @@ class Instantiate(Function):
     unmodifiedMessages = []
 
     def GetResponse(self, message):
-        if message.Type != 'PRIVMSG':
+        if message.Type != 'PRIVMSG' and message.Type != 'ACTION':
             return
         
         match = sedRegex.match(message.MessageString)
@@ -38,10 +38,14 @@ class Instantiate(Function):
             response = self.substitute(search, replace, flags)
 
             if response is not None:
-                return IRCResponse(ResponseType.Say, response, message.ReplyTo)
+                responseType = ResponseType.Say
+                if response.Type == 'ACTION':
+                    responseType = ResponseType.Do
+
+                return IRCResponse(responseType, response.MessageString, message.ReplyTo)
 
         else:
-            self.storeMessage(message.MessageString)
+            self.storeMessage(message)
 
     def substitute(self, search, replace, flags):
         messages = self.unmodifiedMessages if 'o' in flags else self.messages
@@ -52,11 +56,15 @@ class Instantiate(Function):
             else:
                 count = 1
 
-            new = re.sub(search, replace, message, count)
+            new = re.sub(search, replace, message.MessageString, count)
 
-            if new != message:
-                self.storeMessage(new, False)
-                return new
+            if new != message.MessageString:
+                newMessage = message
+                newMessage.MessageString = new
+                self.storeMessage(newMessage, False)
+                return newMessage
+
+        return None
 
     def storeMessage(self, message, unmodified=True):
         self.messages.append(message)
