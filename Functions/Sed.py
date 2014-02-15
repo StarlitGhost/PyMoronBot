@@ -58,6 +58,8 @@ class Instantiate(Function):
 
             new = re.sub(search, replace, message.MessageString, count)
 
+            new = new[:300]
+
             if new != message.MessageString:
                 newMessage = message
                 newMessage.MessageString = new
