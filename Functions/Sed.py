@@ -16,7 +16,7 @@ import re
 sedRegex = r"s/(?P<search>(\\\\|(\\[^\\])|[^\\/])+)/(?P<replace>(\\\\|(\\[^\\])|[^\\/])*)((/(?P<flags>.*))?)"
 
 class Instantiate(Function):
-    Help = 'matches sed-like regex replacement patterns and attempts to execute them on the latest matching line from the last 10\n'
+    Help = 'matches sed-like regex replacement patterns and attempts to execute them on the latest matching line from the last 10\n'\
             'eg: s/some/all/'
 
     def GetResponse(self, message):
