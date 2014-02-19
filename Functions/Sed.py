@@ -58,7 +58,7 @@ class Instantiate(Function):
             
             if 'i' in flags:
                 subFlags = re.IGNORECASE
-            else
+            else:
                 subFlags = 0
 
             new = re.sub(search, replace, message.MessageString, count, subFlags)
