@@ -17,7 +17,8 @@ sedRegex = re.compile(r"s/(?P<search>(\\\\|(\\[^\\])|[^\\/])+)/(?P<replace>(\\\\
 
 class Instantiate(Function):
     Help = 's/search/replacement/flags - matches sed-like regex replacement patterns and attempts to execute them on the latest matching line from the last 10\n'\
-            'flags are g (global), i (case-insensitive), o (only user messages). Example usage: "I\'d eat some tacos" -> s/some/all the/ -> "I\'d eat all the tacos"'
+            'flags are g (global), i (case-insensitive), o (only user messages), v (verbose, ignores whitespace)'\
+            'Example usage: "I\'d eat some tacos" -> s/some/all the/ -> "I\'d eat all the tacos"'
 
     messages = []
     unmodifiedMessages = []
@@ -56,10 +57,11 @@ class Instantiate(Function):
             else:
                 count = 1
             
+            subFlags = 0
             if 'i' in flags:
-                subFlags = re.IGNORECASE
-            else:
-                subFlags = 0
+                subFlags |= re.IGNORECASE
+            if 'v' in flags:
+                subFlags |= re.VERBOSE
 
             new = re.sub(search, replace, message.MessageString, count, subFlags)
 
