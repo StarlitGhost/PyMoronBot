@@ -13,7 +13,7 @@ import re
 
 # matches a sed-style regex pattern (taken from https://github.com/mossblaser/BeardBot/blob/master/modules/sed.py)
 # I stripped the unnecessary escapes by using a raw string instead
-sedRegex = re.compile(r"s/(?P<search>(\\\\|(\\[^\\])|[^\\/])+)/(?P<replace>(\\\\|(\\[^\\])|[^\\/])*)((/(?P<flags>.*))?)")
+sedRegex = re.compile(r"[sS]/(?P<search>(\\\\|(\\[^\\])|[^\\/])+)/(?P<replace>(\\\\|(\\[^\\])|[^\\/])*)((/(?P<flags>.*))?)")
 
 class Instantiate(Function):
     Help = 's/search/replacement/flags - matches sed-like regex replacement patterns and attempts to execute them on the latest matching line from the last 10\n'\
