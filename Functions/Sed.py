@@ -9,7 +9,7 @@ from IRCResponse import IRCResponse, ResponseType
 from Function import Function
 from GlobalVars import *
 
-import re
+import re, copy
 
 # matches a sed-style regex pattern (taken from https://github.com/mossblaser/BeardBot/blob/master/modules/sed.py)
 # I stripped the unnecessary escapes by using a raw string instead
@@ -68,7 +68,7 @@ class Instantiate(Function):
             new = new[:300]
 
             if new != message.MessageString:
-                newMessage = message
+                newMessage = copy.deepcopy(message)
                 newMessage.MessageString = new
                 self.storeMessage(newMessage, False)
                 return newMessage
