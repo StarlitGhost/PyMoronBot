@@ -151,6 +151,8 @@ class Instantiate(Function):
                         "http://goo.gl/9FTseh",             # Fluttershy & Pinkie Pie boop
                         "http://i.imgur.com/yexMjOl.gif",   # Archer boop
                         "http://goo.gl/l3lwH9",             # Cat boops a butt
+                        "http://i.imgur.com/zOZvmTW.gif",   # Bunny bumper cars
+                        "http://i.imgur.com/P0a8dU2.gif",   # Kitten beach boop loop
                         ]
                 return [IRCResponse(ResponseType.Say,
                            'Boop! %s' % random.choice(boops),
