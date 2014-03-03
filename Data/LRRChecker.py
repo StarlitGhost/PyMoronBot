@@ -35,14 +35,6 @@ LRRChecker = {
         'lastLink': '',
         'lastCheck': tenMinsAgo,
         'aliases': ["podcast", "cast", "lrrc", "llrc", "lcast", "lc", 'chat'],
-        'suppress': True },
-    'Strip Search': {
-        'url': 'http://www.penny-arcade.com/feed/show/strip-search',
-        'lastUpdate': aYearAgo,
-        'lastTitle': '',
-        'lastLink': '',
-        'lastCheck': tenMinsAgo,
-        'aliases': ['strip', 'ss', 's', 'stripsearch', 'search'],
         'suppress': True }
     }
 
