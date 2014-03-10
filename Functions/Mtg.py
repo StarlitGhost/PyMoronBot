@@ -28,7 +28,13 @@ class Instantiate(Function):
 
         name = soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_nameRow'})
         if name is None:
-            return IRCResponse(ResponseType.Say, 'Multiple or no cards found: ' + searchTerm, message.ReplyTo)
+            searchResults = soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_searchResultsContainer'})
+            if searchResults is None:
+                return IRCResponse(ResponseType.Say, 'No cards found: ' + searchTerm, message.ReplyTo)
+            else:
+                cardItems = searchResults.find_all(class_ = 'cardItem')
+                # potentially return first item here
+                return IRCResponse(ResponseType.Say, '{0} cards found: {1}'.format(len(cardItems), searchTerm), message.ReplyTo)
 
         name = name.find('div', 'value').text.strip()
         types = ' | T: ' + soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_typeRow'}).find('div', 'value').text.strip()
