@@ -38,6 +38,7 @@ class Instantiate(Function):
         imgurMatch   = re.search('(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', match.group('url'))
         twitterMatch = re.search('twitter.com/(?P<tweeter>[^/]+)/status/(?P<tweetID>[0-9]+)', match.group('url'))
         steamMatch   = re.search('store.steampowered.com/app/(?P<steamAppID>[0-9]+)', match.group('url'))
+        ksMatch      = re.search('kickstarter.com/projects/(?P<ksID>[0-9]+/[^/]+)', match.group('url'))
         
         if youtubeMatch:
             return self.FollowYouTube(youtubeMatch.group('videoID'), message)
