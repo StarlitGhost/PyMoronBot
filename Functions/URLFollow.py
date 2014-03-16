@@ -8,6 +8,7 @@ from Data import ignores
 import re
 import HTMLParser
 import json
+import math
 from bs4 import BeautifulSoup
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
@@ -38,7 +39,7 @@ class Instantiate(Function):
         imgurMatch   = re.search('(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', match.group('url'))
         twitterMatch = re.search('twitter.com/(?P<tweeter>[^/]+)/status/(?P<tweetID>[0-9]+)', match.group('url'))
         steamMatch   = re.search('store.steampowered.com/app/(?P<steamAppID>[0-9]+)', match.group('url'))
-        ksMatch      = re.search('kickstarter.com/projects/(?P<ksID>[0-9]+/[^/]+)', match.group('url'))
+        ksMatch      = re.search('kickstarter.com/projects/(?P<ksID>[^/]+/[^/]+)', match.group('url'))
         
         if youtubeMatch:
             return self.FollowYouTube(youtubeMatch.group('videoID'), message)
@@ -48,6 +49,8 @@ class Instantiate(Function):
             return self.FollowTwitter(twitterMatch.group('tweeter'), twitterMatch.group('tweetID'), message)
         elif steamMatch:
             return self.FollowSteam(steamMatch.group('steamAppID'), message)
+        elif ksMatch:
+            return self.FollowKickstarter(ksMatch.group('ksID'), message)
         elif not re.search('\.(jpe?g|gif|png|bmp)$', match.group('url')):
             return self.FollowStandard(match.group('url'), message)
         
@@ -159,11 +162,11 @@ class Instantiate(Function):
 
         soup = BeautifulSoup(webPage.Page)
 
-        tweet = soup.find('div', {'class' : 'permalink-tweet'})
+        tweet = soup.find(class_='permalink-tweet')
         
-        user = tweet.find('span', {'class' : 'username'}).text
+        user = tweet.find(class_='username').text
 
-        tweetText = tweet.find('p', {'class' : 'tweet-text'})
+        tweetText = tweet.find(class_='tweet-text')
 
         links = tweetText.find_all('a', {'data-expanded-url' : True})
         for link in links:
@@ -185,24 +188,75 @@ class Instantiate(Function):
         soup = BeautifulSoup(webPage.Page)
 
         data = []
-        title = soup.find('div', {'class' : 'apphub_AppName'})
+        title = soup.find(class_='apphub_AppName')
         if title is not None:
             data.append(title.text.strip())
 
-        details = soup.find('div', {'class' : 'details_block'})
+        details = soup.find(class_='details_block')
         if details is not None:
             genres = 'Genres: ' + ', '.join([link.text for link in details.select('a[href*="/genre/"]')])
             data.append(genres)
             releaseDate = re.findall(u'Release Date\: .+', details.text, re.MULTILINE | re.IGNORECASE)[0]
             data.append(releaseDate)
             
-        description = soup.find('div', {'class' : 'game_description_snippet'})
+        description = soup.find(class_='game_description_snippet')
         if description is not None:
             limit = 200
             description = description.text.strip()
             if len(description) > limit:
                 description = '{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
             data.append(description)
+
+        return IRCResponse(ResponseType.Say, self.graySplitter.join(data), message.ReplyTo)
+
+    def FollowKickstarter(self, ksID, message):
+        webPage = WebUtils.FetchURL('https://www.kickstarter.com/projects/{0}/'.format(ksID))
+
+        soup = BeautifulSoup(webPage.Page)
+
+        data = []
+
+        title = soup.find(id='title')
+        if title is not None:
+            creator = soup.find(id='name')
+            if creator is not None:
+                data.append(assembleFormattedText(A.normal['{0}', A.fg.gray[' by '], '{1}']).format(title.text.strip(), creator.text.strip()))
+            else:
+                data.append(title.text.strip())
+
+        stats = soup.find(id='stats')
+
+        backerCount = stats.find(id='backers_count')
+        if backerCount is not None:
+            data.append('Backers: {0:,}'.format(int(backerCount['data-backers-count'])))
+
+        pledged = stats.find(id='pledged')
+        if pledged is not None:
+            pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}',A.fg.gray['/'],'{1:,.0f} {2} ({3:,.0f}% funded)'])
+            data.append(pledgedString.format(float(pledged['data-pledged']),
+                                             float(pledged['data-goal']),
+                                             pledged.data['data-currency'],
+                                             float(pledged['data-percent-raised']) * 100))
+
+        findState = soup.find(id='main_content')
+        if 'Project-state-canceled' in findState['class']:
+            data.append(assembleFormattedText(A.normal[A.fg.red['Cancelled']]))
+            
+        elif 'Project-state-failed' in findState['class']:
+            data.append(assembleFormattedText(A.normal[A.fg.red['Failed']]))
+
+        elif 'Project-state-successful' in findState['class']:
+                data.append(assembleFormattedText(A.normal[A.fg.green['Successful']]))
+
+        elif 'Project-state-live' in findState['class']:
+            duration = stats.find(id='project_duration_data')
+
+            if duration is not None:
+                remaining = float(duration['data-hours-remaining'])
+                days = math.floor(remaining/24)
+                hours = remaining/24 - days
+
+                data.append('Duration: {0:.0f} days {1:.1f} hours to go'.format(days, hours))
 
         return IRCResponse(ResponseType.Say, self.graySplitter.join(data), message.ReplyTo)
     
