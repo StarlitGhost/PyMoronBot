@@ -47,16 +47,16 @@ class Instantiate(Function):
             return IRCResponse(ResponseType.Say, response, message.ReplyTo)
         
         
-        match = re.search('google\.com/hangouts/_/(?P<code>[^\?\s]+)',
+        match = re.search(r'google\.com/hangouts/_/(?P<code>[^\?\s]+)',
                           message.MessageString,
                           re.IGNORECASE)
         
         if not match:
             return
         
-        self.hangoutDict[message.ReplyTo] = data()
-        
-        if match.group('code') == self.hangoutDict[message.ReplyTo].lastCode:
+        if message.ReplyTo not in self.hangoutDict:
+            self.hangoutDict[message.ReplyTo] = data()
+        elif match.group('code') == self.hangoutDict[message.ReplyTo].lastCode:
             return
         
         self.hangoutDict[message.ReplyTo].lastCode = match.group('code')
