@@ -35,11 +35,11 @@ class Instantiate(Function):
         if not match:
             return
         
-        youtubeMatch = re.search(r'(www\.youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#]+)', match.group('url'))
+        youtubeMatch = re.search(r'(www\.youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#\?]+)', match.group('url'))
         imgurMatch   = re.search(r'(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', match.group('url'))
         twitterMatch = re.search(r'twitter.com/(?P<tweeter>[^/]+)/status/(?P<tweetID>[0-9]+)', match.group('url'))
         steamMatch   = re.search(r'store.steampowered.com/app/(?P<steamAppID>[0-9]+)', match.group('url'))
-        ksMatch      = re.search(r'kickstarter.com/projects/(?P<ksID>[^/]+/[^/\?\#\&]+)', match.group('url'))
+        ksMatch      = re.search(r'kickstarter.com/projects/(?P<ksID>[^/]+/[^/&#\?]+)', match.group('url'))
         
         if youtubeMatch:
             return self.FollowYouTube(youtubeMatch.group('videoID'), message)
