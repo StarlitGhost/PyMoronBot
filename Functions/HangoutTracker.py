@@ -39,7 +39,7 @@ class Instantiate(Function):
             hangout = self.hangoutDict[message.ReplyTo]
             
             timeDiff = datetime.datetime.utcnow() - hangout.lastDate
-            url = 'https://talkgadget.google.com/hangouts/{0}'.format(hangout.lastCode)
+            url = 'https://talkgadget.google.com/hangouts/_/{0}'.format(hangout.lastCode)
             byLine = 'first posted {0} ago by {1}'.format(self.strfdelta(timeDiff, '{days} day(s) {hours} hour(s) {minutes} minute(s)'), hangout.lastUser)
             
             response = 'Last hangout posted: {0} ({1})'.format(url, byLine)
@@ -47,7 +47,7 @@ class Instantiate(Function):
             return IRCResponse(ResponseType.Say, response, message.ReplyTo)
         
         
-        match = re.search('(https?\://)?(talkgadget|plus)\.google\.com/hangouts/(?P<code>(extras/talk\.google\.com/)?[^\?\s]+)',
+        match = re.search('google\.com/hangouts/_/(?P<code>[^\?\s]+)',
                           message.MessageString,
                           re.IGNORECASE)
         
