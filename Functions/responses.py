@@ -86,6 +86,11 @@ class Instantiate(Function):
                                 ResponseType.Say,
                                 False))
             
+            '''Responds to EVERYTHING being FINE'''
+            self.responses.add(MobroResponse(   'everythingfine',
+                                "IT'S FINE, EVERYTHING IS FINE",
+                                "([^a-zA-Z]|^)(it|everything)('?s| is) fine([^a-zA-Z]|$)"))
+            
             
             #This one needs to mess with the object to work right.
             '''Responds to DuctTape being a dick in minecraft'''
