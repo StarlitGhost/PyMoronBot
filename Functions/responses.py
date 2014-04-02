@@ -89,7 +89,7 @@ class Instantiate(Function):
             '''Responds to EVERYTHING being FINE'''
             self.responses.add(MobroResponse(   'everythingfine',
                                 "IT'S FINE, EVERYTHING IS FINE",
-                                "([^a-zA-Z]|^)(it|everything)('?s| is) fine([^a-zA-Z]|$)"))
+                                "([^a-zA-Z]|^)everything('?s| is) fine([^a-zA-Z]|$)"))
             
             
             #This one needs to mess with the object to work right.
