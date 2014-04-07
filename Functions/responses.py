@@ -126,7 +126,7 @@ class Instantiate(Function):
                         "http://bit.ly/z79CJv",             # colonel goggie in the hallway with the nose boop
                         "http://bit.ly/yODbYA",             # You may go, but first I must boop your nose
                         "http://bit.ly/AdX2cw",             # boop, gotchur nose
-                        "http://bit.ly/x9WGoy",             # fluttershy & rainbow dash
+                        "http://goo.gl/1Xu0LK",             # fluttershy & rainbow dash
                         "http://i.imgur.com/vC5gy.jpg",     # dog in car boop
                         "http://i.imgur.com/xmzLY.gif",     # cat lap booping dog
                         "http://i.imgur.com/NSAKo.jpg",     # orange cat perma-booping dog on bed
