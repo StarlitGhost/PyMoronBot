@@ -37,7 +37,7 @@ class Instantiate(Function):
         
         youtubeMatch = re.search(r'(youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#\?]+)', match.group('url'))
         imgurMatch   = re.search(r'(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', match.group('url'))
-        twitterMatch = re.search(r'twitter.com/(?P<tweeter>[^/]+)/status/(?P<tweetID>[0-9]+)', match.group('url'))
+        twitterMatch = re.search(r'twitter.com/(?P<tweeter>[^/]+)/status(es)?/(?P<tweetID>[0-9]+)', match.group('url'))
         steamMatch   = re.search(r'store.steampowered.com/app/(?P<steamAppID>[0-9]+)', match.group('url'))
         ksMatch      = re.search(r'kickstarter.com/projects/(?P<ksID>[^/]+/[^/&#\?]+)', match.group('url'))
         
