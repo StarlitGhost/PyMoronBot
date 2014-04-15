@@ -163,6 +163,7 @@ class Instantiate(Function):
                         "http://i.imgur.com/MGKpBSE.gif",   # Guillermo Del Toro pats Mana on the head, and they bow to each other
                         "http://i.imgur.com/lFhgLP8.gif",   # Dolphin nose-boops a cat, who paws at it vaguely
                         "http://i.imgur.com/yEKxpSc.jpg",   # 2 Red Pandas nose-booping
+                        "http://goo.gl/7YUnJF",             # pony gift boop?
                         ]
                 return [IRCResponse(ResponseType.Say,
                            'Boop! %s' % random.choice(boops),
