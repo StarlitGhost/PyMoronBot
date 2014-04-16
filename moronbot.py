@@ -27,7 +27,7 @@ class MoronBot(irc.IRCClient):
     username = GlobalVars.CurrentNick
     
     channels = {}
-    userModes = []
+    userModes = {}
 
     fingerReply = GlobalVars.finger
     
