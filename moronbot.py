@@ -149,7 +149,6 @@ class MoronBot(irc.IRCClient):
         user = IRCUser('{0}!{1}@{2}'.format(params[5], params[2], params[3]))
         channel = self.channels[params[1]]
         channel.Users[user.Name] = user
-        print channel.Users
 
     def irc_RPL_MYINFO(self, prefix, params):
         self.serverInfo.UserModes = params[3]
