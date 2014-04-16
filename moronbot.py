@@ -4,6 +4,7 @@ from twisted.internet import reactor, protocol
 
 from IRCResponse import IRCResponse, ResponseType
 from IRCMessage import IRCMessage, IRCChannel
+from ServerInfo import ServerInfo
 from FunctionHandler import AutoLoadFunctions
 import GlobalVars
 
@@ -28,6 +29,7 @@ class MoronBot(irc.IRCClient):
     
     channels = {}
     userModes = {}
+    serverInfo = ServerInfo()
 
     fingerReply = GlobalVars.finger
     
