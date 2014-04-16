@@ -1,11 +1,13 @@
 class ServerInfo:
 
     # I have used the defaults specified by RFC1459 here
-    SupportedUserModes = 'iosw'
-    SupportedChannelListModes = 'b'
-    SupportedChannelSetArgsModes = 'l'
-    SupportedChannelSetUnsetArgsModes = 'k'
-    SupportedChannelNormalModes = 'imnpst'
+    UserModes = 'iosw'
+    ChannelListModes = 'b'
+    ChannelSetArgsModes = 'l'
+    ChannelSetUnsetArgsModes = 'k'
+    ChannelNormalModes = 'imnpst'
 
-    SupportedStatuses = {'o': '@', 'v': '+'}
-    SupportedStatusesReverse = {'@': 'o', '+': 'v'}
+    Statuses = {'o': '@', 'v': '+'}
+    StatusesReverse = {'@': 'o', '+': 'v'}
+
+    ChanTypes = '#'
