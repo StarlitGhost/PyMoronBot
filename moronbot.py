@@ -85,7 +85,11 @@ class MoronBot(irc.IRCClient):
         GlobalVars.CurrentNick = nick
     
     def irc_JOIN(self, prefix, params):
-        channel = IRCChannel(params[0])
+        if params[0] in self.channels:
+            channel = self.channels[params[0]]
+        else:
+            channel = IRCChannel(params[0])
+
         message = IRCMessage('JOIN', prefix, channel, '')
 
         if message.User.Name == GlobalVars.CurrentNick:
@@ -94,6 +98,7 @@ class MoronBot(irc.IRCClient):
             self.sendLine('MODE ' + message.ReplyTo)
         else:
             channel.Users[message.User.Name] = message.User
+
         self.log(u' >> {0} ({1}@{2}) joined {3}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo), message.ReplyTo)
     
     def irc_PART(self, prefix, params):
@@ -110,10 +115,24 @@ class MoronBot(irc.IRCClient):
 
         self.log(u' << {0} ({1}@{2}) left {3}{4}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo, partMessage), message.ReplyTo)
 
+    def irc_QUIT(self, prefix, params):
+        quitMessage = u''
+        if len(params) > 1:
+            quitMessage = u', message: '+u' '.join(params[1:])
+
+        message = IRCMessage('QUIT', prefix, None, quitMessage)
+        
+        for key in self.channels:
+            channel = self.channels[key]
+            if message.User.Name in channel.Users:
+                del channel.Users[message.User.Name]
+                self.log(u' << {0} ({1}@{2}) quit IRC{3}'.format(message.User.Name, message.User.User, message.User.Hostmask, quitMessage), channel.Name)
+
     def irc_RPL_WHOREPLY(self, prefix, params):
         user = IRCUser('{0}!{1}@{2}'.format(params[5], params[2], params[3]))
         channel = self.channels[params[1]]
         channel.Users[user.Name] = user
+        print channel.Users
 
     def irc_RPL_MYINFO(self, prefix, params):
         self.serverInfo.UserModes = params[3]
@@ -139,6 +158,7 @@ class MoronBot(irc.IRCClient):
                         self.serverInfo.StatusesReverse[statusSymbols[i]] = statusChars[i]
 
     def getChannel(self, name):
+        print name
         if name in self.channels:
             return self.channels[name]
         else:
