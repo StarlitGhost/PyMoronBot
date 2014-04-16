@@ -73,7 +73,6 @@ class MoronBot(irc.IRCClient):
 
         for key in self.channels:
             channel = self.channels[key]
-            print channel.Name, channel.Users
             for userKey in channel.Users:
                 user = channel.Users[userKey]
                 if userKey == oldnick:
@@ -119,9 +118,6 @@ class MoronBot(irc.IRCClient):
         user = IRCUser('{0}!{1}@{2}'.format(params[5], params[2], params[3]))
         channel = self.channels[params[1]]
         channel.Users[user.Name] = user
-
-    def irc_RPL_ENDOFWHO(self, prefix, params):
-        print self.getChannel(params[1]).Users
 
     def irc_RPL_MYINFO(self, prefix, params):
         self.serverInfo.UserModes = params[3]
