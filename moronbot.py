@@ -3,7 +3,7 @@ from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 
 from IRCResponse import IRCResponse, ResponseType
-from IRCMessage import IRCMessage, IRCChannel
+from IRCMessage import IRCMessage, IRCChannel, IRCUser
 from ServerInfo import ServerInfo
 from FunctionHandler import AutoLoadFunctions
 import GlobalVars
@@ -95,6 +95,11 @@ class MoronBot(irc.IRCClient):
             del channel.Users[message.User.Name]
 
         self.log(u' << {0} ({1}@{2}) left {3}{4}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo, partMessage), message.ReplyTo)
+
+    def irc_RPL_WHOREPLY(self, prefix, params):
+        user = IRCUser('{0}!{1}@{2}'.format(params[5], params[2], params[3]))
+        channel = self.channels[params[1]]
+        channel.Users[params[5]] = user
 
     def sendResponse(self, response):
         if (response == None or response.Response == None):
