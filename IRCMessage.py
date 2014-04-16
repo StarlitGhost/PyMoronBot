@@ -31,6 +31,7 @@ class IRCMessage(object):
     ReplyTo = None
     MessageList = []
     MessageString = None
+    Channel = None
     
     Command = ''
     Parameters = ''
@@ -42,15 +43,14 @@ class IRCMessage(object):
         self.MessageList = unicodeMessage.strip().split(' ')
         self.MessageString = unicodeMessage
         self.User = IRCUser(user)
-        if channel == GlobalVars.CurrentNick:
+        if channel == None:
             self.ReplyTo = self.User.Name
-        else:
-            self.ReplyTo = channel
-        if (channel.startswith('#')):
-            self.TargetType = TargetTypes.CHANNEL
-        else:
             self.TargetType = TargetTypes.USER
-        
+        else:
+            self.Channel = channel
+            self.ReplyTo = channel.Name # I would like to set this to the channel object but I would probably break functionality if I did :I
+            self.TargetType = TargetTypes.CHANNEL
+
         if self.MessageList[0].startswith(GlobalVars.CommandChar):
             self.Command = self.MessageList[0][1:]
             self.Parameters = unicodeMessage[len(self.Command)+2:]

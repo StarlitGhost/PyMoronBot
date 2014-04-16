@@ -49,17 +49,20 @@ class MoronBot(irc.IRCClient):
         startTime = datetime.datetime.utcnow()
     
     def privmsg(self, user, channel, msg):
-        message = IRCMessage('PRIVMSG', user, channel, msg)
+        chan = self.getChannel(channel)
+        message = IRCMessage('PRIVMSG', user, chan, msg)
         self.log(u'<{0}> {1}'.format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
 
     def action(self, user, channel, msg):
-        message = IRCMessage('ACTION', user, channel, msg)
+        chan = self.getChannel(channel)
+        message = IRCMessage('ACTION', user, chan, msg)
         self.log(u'*{0} {1}*'.format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
     
     def noticed(self, user, channel, msg):
-        message = IRCMessage('NOTICE', user, channel, msg)
+        chan = self.getChannel(channel)
+        message = IRCMessage('NOTICE', user, chan, msg)
         self.log(u'[{0}] {1}'.format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
     
@@ -71,8 +74,8 @@ class MoronBot(irc.IRCClient):
         GlobalVars.CurrentNick = nick
     
     def irc_JOIN(self, prefix, params):
-        message = IRCMessage('JOIN', prefix, params[0], '')     
-        channel = IRCChannel(message.ReplyTo)
+        channel = IRCChannel(params[0])
+        message = IRCMessage('JOIN', prefix, channel, '')     
 
         if message.User.Name == GlobalVars.CurrentNick:      
             self.channels[message.ReplyTo] = channel
@@ -86,12 +89,12 @@ class MoronBot(irc.IRCClient):
         partMessage = u''
         if len(params) > 1:
             partMessage = u', message: '+u' '.join(params[1:])
-        message = IRCMessage('PART', prefix, params[0], partMessage)
+        channel = self.channels[message.ReplyTo]
+        message = IRCMessage('PART', prefix, channel, partMessage)
         
         if message.User.Name == GlobalVars.CurrentNick:
             del self.channels[message.ReplyTo]
         else:
-            channel = self.channels[message.ReplyTo]
             del channel.Users[message.User.Name]
 
         self.log(u' << {0} ({1}@{2}) left {3}{4}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo, partMessage), message.ReplyTo)
@@ -100,6 +103,13 @@ class MoronBot(irc.IRCClient):
         user = IRCUser('{0}!{1}@{2}'.format(params[5], params[2], params[3]))
         channel = self.channels[params[1]]
         channel.Users[params[5]] = user
+
+    def getChannel(self, name):
+        try:
+            return self.channels[name]
+        except KeyError:
+            #This is a PM
+            return None
 
     def sendResponse(self, response):
         if (response == None or response.Response == None):
