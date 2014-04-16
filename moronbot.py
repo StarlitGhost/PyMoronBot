@@ -115,10 +115,27 @@ class MoronBot(irc.IRCClient):
 
         self.log(u' << {0} ({1}@{2}) left {3}{4}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo, partMessage), message.ReplyTo)
 
+    def irc_KICK(self, prefix, params):
+        kickMessage = u''
+        if len(params) > 2:
+            kickMessage = u', message: '+u' '.join(params[2:])
+        
+        channel = self.channels[params[0]]
+        message = IRCMessage('KICK', prefix, channel, kickMessage)
+        kickee = params[1]
+
+        if kickee == GlobalVars.CurrentNick:
+            del self.channels[message.ReplyTo]
+        else:
+            del channel.Users[kickee]
+
+        self.log(u' << {0} was kicked from {1} by {2}{3}'.format(kickee, channel.Name, message.User.Name, kickMessage), message.ReplyTo)
+
     def irc_QUIT(self, prefix, params):
+        print params
         quitMessage = u''
-        if len(params) > 1:
-            quitMessage = u', message: '+u' '.join(params[1:])
+        if len(params) > 0:
+            quitMessage = u', message: '+u' '.join(params[0:])
 
         message = IRCMessage('QUIT', prefix, None, quitMessage)
         
@@ -158,7 +175,6 @@ class MoronBot(irc.IRCClient):
                         self.serverInfo.StatusesReverse[statusSymbols[i]] = statusChars[i]
 
     def getChannel(self, name):
-        print name
         if name in self.channels:
             return self.channels[name]
         else:
