@@ -10,4 +10,4 @@ class ServerInfo:
     Statuses = {'o': '@', 'v': '+'}
     StatusesReverse = {'@': 'o', '+': 'v'}
 
-    ChanTypes = '#'
+    ChannelTypes = '#'
