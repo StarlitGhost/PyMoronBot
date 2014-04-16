@@ -105,9 +105,9 @@ class MoronBot(irc.IRCClient):
         channel.Users[params[5]] = user
 
     def getChannel(self, name):
-        try:
+        if name in self.channels:
             return self.channels[name]
-        except KeyError:
+        else:
             #This is a PM
             return None
 
