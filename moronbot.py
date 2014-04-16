@@ -78,11 +78,7 @@ class MoronBot(irc.IRCClient):
                 if userKey == oldnick:
                     channel.Users[newnick] = IRCUser('{0}!{1}@{2}'.format(newnick, user.User, user.Hostmask))
                     del channel.Users[oldnick]
-        
-        for key in self.channels:
-            channel = self.channels[key]
-            if newnick in channel.Users:
-                self.log(u'{0} is now known as {1}'.format(oldnick, newnick), channel.Name)
+                    self.log(u'{0} is now known as {1}'.format(oldnick, newnick), channel.Name)
 
     def nickChanged(self, nick):
         self.nickname = nick
@@ -104,7 +100,7 @@ class MoronBot(irc.IRCClient):
         partMessage = u''
         if len(params) > 1:
             partMessage = u', message: '+u' '.join(params[1:])
-        channel = self.channels[message.ReplyTo]
+        channel = self.channels[params[0]]
         message = IRCMessage('PART', prefix, channel, partMessage)
         
         if message.User.Name == GlobalVars.CurrentNick:

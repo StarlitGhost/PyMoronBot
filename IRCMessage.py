@@ -4,12 +4,10 @@ import GlobalVars
 TargetTypes = enum('CHANNEL', 'USER')
 
 class IRCChannel(object):
-    Name = None
-    Users = {}
-    Modes = {}
-
     def __init__(self, name):
         self.Name = name
+        self.Users = {}
+        self.Modes = {}
 
 class IRCUser(object):
     Hostmask = None
