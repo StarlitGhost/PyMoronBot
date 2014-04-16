@@ -66,23 +66,39 @@ class MoronBot(irc.IRCClient):
         self.log(u'[{0}] {1}'.format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
     
-    def userRenamed(self, oldname, newname):
-        self.log(u'{0} is now known as {1}'.format(oldname, newname), '')
-    
+    def irc_NICK(self, prefix, params):
+        userArray = prefix.split('!')
+        oldnick = userArray[0]
+        newnick = params[0]
+
+        for key in self.channels:
+            channel = self.channels[key]
+            print channel.Name, channel.Users
+            for userKey in channel.Users:
+                user = channel.Users[userKey]
+                if userKey == oldnick:
+                    channel.Users[newnick] = IRCUser('{0}!{1}@{2}'.format(newnick, user.User, user.Hostmask))
+                    del channel.Users[oldnick]
+        
+        for key in self.channels:
+            channel = self.channels[key]
+            if newnick in channel.Users:
+                self.log(u'{0} is now known as {1}'.format(oldnick, newnick), channel.Name)
+
     def nickChanged(self, nick):
         self.nickname = nick
         GlobalVars.CurrentNick = nick
     
     def irc_JOIN(self, prefix, params):
         channel = IRCChannel(params[0])
-        message = IRCMessage('JOIN', prefix, channel, '')     
+        message = IRCMessage('JOIN', prefix, channel, '')
 
-        if message.User.Name == GlobalVars.CurrentNick:      
+        if message.User.Name == GlobalVars.CurrentNick:
             self.channels[message.ReplyTo] = channel
             self.sendLine('WHO ' + message.ReplyTo)
             self.sendLine('MODE ' + message.ReplyTo)
         else:
-            channel.Users[message.User] = None
+            channel.Users[message.User.Name] = message.User
         self.log(u' >> {0} ({1}@{2}) joined {3}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo), message.ReplyTo)
     
     def irc_PART(self, prefix, params):
@@ -95,14 +111,17 @@ class MoronBot(irc.IRCClient):
         if message.User.Name == GlobalVars.CurrentNick:
             del self.channels[message.ReplyTo]
         else:
-            del channel.Users[message.User]
+            del channel.Users[message.User.Name]
 
         self.log(u' << {0} ({1}@{2}) left {3}{4}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo, partMessage), message.ReplyTo)
 
     def irc_RPL_WHOREPLY(self, prefix, params):
         user = IRCUser('{0}!{1}@{2}'.format(params[5], params[2], params[3]))
         channel = self.channels[params[1]]
-        channel.Users[user] = None
+        channel.Users[user.Name] = user
+
+    def irc_RPL_ENDOFWHO(self, prefix, params):
+        print self.getChannel(params[1]).Users
 
     def irc_RPL_MYINFO(self, prefix, params):
         self.serverInfo.UserModes = params[3]
