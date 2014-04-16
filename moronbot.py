@@ -3,7 +3,8 @@ from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 
 from IRCResponse import IRCResponse, ResponseType
-from IRCMessage import IRCMessage
+from IRCMessage import IRCMessage, IRCChannel, IRCUser
+from ServerInfo import ServerInfo
 from FunctionHandler import AutoLoadFunctions
 import GlobalVars
 
@@ -26,6 +27,10 @@ class MoronBot(irc.IRCClient):
     realname = GlobalVars.CurrentNick
     username = GlobalVars.CurrentNick
     
+    channels = {}
+    userModes = {}
+    serverInfo = ServerInfo()
+
     fingerReply = GlobalVars.finger
     
     versionName = GlobalVars.CurrentNick
@@ -44,37 +49,136 @@ class MoronBot(irc.IRCClient):
         startTime = datetime.datetime.utcnow()
     
     def privmsg(self, user, channel, msg):
-        message = IRCMessage('PRIVMSG', user, channel, msg)
+        chan = self.getChannel(channel)
+        message = IRCMessage('PRIVMSG', user, chan, msg)
         self.log(u'<{0}> {1}'.format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
 
     def action(self, user, channel, msg):
-        message = IRCMessage('ACTION', user, channel, msg)
+        chan = self.getChannel(channel)
+        message = IRCMessage('ACTION', user, chan, msg)
         self.log(u'*{0} {1}*'.format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
     
     def noticed(self, user, channel, msg):
-        message = IRCMessage('NOTICE', user, channel, msg)
+        chan = self.getChannel(channel)
+        message = IRCMessage('NOTICE', user, chan, msg)
         self.log(u'[{0}] {1}'.format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
     
-    def userRenamed(self, oldname, newname):
-        self.log(u'{0} is now known as {1}'.format(oldname, newname), '')
-    
+    def irc_NICK(self, prefix, params):
+        userArray = prefix.split('!')
+        oldnick = userArray[0]
+        newnick = params[0]
+
+        for key in self.channels:
+            channel = self.channels[key]
+            for userKey in channel.Users:
+                user = channel.Users[userKey]
+                if userKey == oldnick:
+                    channel.Users[newnick] = IRCUser('{0}!{1}@{2}'.format(newnick, user.User, user.Hostmask))
+                    del channel.Users[oldnick]
+                    self.log(u'{0} is now known as {1}'.format(oldnick, newnick), channel.Name)
+
     def nickChanged(self, nick):
         self.nickname = nick
         GlobalVars.CurrentNick = nick
     
     def irc_JOIN(self, prefix, params):
-        message = IRCMessage('JOIN', prefix, params[0], '')
+        if params[0] in self.channels:
+            channel = self.channels[params[0]]
+        else:
+            channel = IRCChannel(params[0])
+
+        message = IRCMessage('JOIN', prefix, channel, '')
+
+        if message.User.Name == GlobalVars.CurrentNick:
+            self.channels[message.ReplyTo] = channel
+            self.sendLine('WHO ' + message.ReplyTo)
+            self.sendLine('MODE ' + message.ReplyTo)
+        else:
+            channel.Users[message.User.Name] = message.User
+
         self.log(u' >> {0} ({1}@{2}) joined {3}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo), message.ReplyTo)
     
     def irc_PART(self, prefix, params):
         partMessage = u''
         if len(params) > 1:
             partMessage = u', message: '+u' '.join(params[1:])
-        message = IRCMessage('PART', prefix, params[0], partMessage)
+        channel = self.channels[params[0]]
+        message = IRCMessage('PART', prefix, channel, partMessage)
+        
+        if message.User.Name == GlobalVars.CurrentNick:
+            del self.channels[message.ReplyTo]
+        else:
+            del channel.Users[message.User.Name]
+
         self.log(u' << {0} ({1}@{2}) left {3}{4}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo, partMessage), message.ReplyTo)
+
+    def irc_KICK(self, prefix, params):
+        kickMessage = u''
+        if len(params) > 2:
+            kickMessage = u', message: '+u' '.join(params[2:])
+        
+        channel = self.channels[params[0]]
+        message = IRCMessage('KICK', prefix, channel, kickMessage)
+        kickee = params[1]
+
+        if kickee == GlobalVars.CurrentNick:
+            del self.channels[message.ReplyTo]
+        else:
+            del channel.Users[kickee]
+
+        self.log(u' << {0} was kicked from {1} by {2}{3}'.format(kickee, channel.Name, message.User.Name, kickMessage), message.ReplyTo)
+
+    def irc_QUIT(self, prefix, params):
+        print params
+        quitMessage = u''
+        if len(params) > 0:
+            quitMessage = u', message: '+u' '.join(params[0:])
+
+        message = IRCMessage('QUIT', prefix, None, quitMessage)
+        
+        for key in self.channels:
+            channel = self.channels[key]
+            if message.User.Name in channel.Users:
+                del channel.Users[message.User.Name]
+                self.log(u' << {0} ({1}@{2}) quit IRC{3}'.format(message.User.Name, message.User.User, message.User.Hostmask, quitMessage), channel.Name)
+
+    def irc_RPL_WHOREPLY(self, prefix, params):
+        user = IRCUser('{0}!{1}@{2}'.format(params[5], params[2], params[3]))
+        channel = self.channels[params[1]]
+        channel.Users[user.Name] = user
+
+    def irc_RPL_MYINFO(self, prefix, params):
+        self.serverInfo.UserModes = params[3]
+
+    def isupport(self, options):
+        for item in options:
+            if '=' in item:
+                option = item.split('=')
+                if option[0] == 'CHANTYPES':
+                    self.serverInfo.ChannelTypes = option[1]
+                elif option[0] == 'CHANMODES':
+                    modes = option[1].split(',')
+                    self.serverInfo.ChannelListModes = modes[0]
+                    self.serverInfo.ChannelSetUnsetArgsModes = modes[1]
+                    self.serverInfo.ChannelSetArgsModes = modes[2]
+                    self.serverInfo.ChannelNormalModes = modes[3]
+                elif option[0] == 'PREFIX':
+                    prefixes = option[1]
+                    statusChars = prefixes[1:prefixes.find(')')]
+                    statusSymbols = prefixes[prefixes.find(')') + 1:]
+                    for i in range(1, len(statusChars)):
+                        self.serverInfo.Statuses[statusChars[i]] = statusSymbols[i]
+                        self.serverInfo.StatusesReverse[statusSymbols[i]] = statusChars[i]
+
+    def getChannel(self, name):
+        if name in self.channels:
+            return self.channels[name]
+        else:
+            #This is a PM
+            return None
 
     def sendResponse(self, response):
         if (response == None or response.Response == None):

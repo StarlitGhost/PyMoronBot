@@ -3,7 +3,13 @@ import GlobalVars
 
 TargetTypes = enum('CHANNEL', 'USER')
 
-class UserStruct:
+class IRCChannel(object):
+    def __init__(self, name):
+        self.Name = name
+        self.Users = {}
+        self.Modes = {}
+
+class IRCUser(object):
     Hostmask = None
     Name = None
     User = None
@@ -16,13 +22,14 @@ class UserStruct:
             self.User = userArray[0]
             self.Hostmask = userArray[1]
 
-class IRCMessage:
+class IRCMessage(object):
     Type = None
     User = None
     TargetType = TargetTypes.CHANNEL
     ReplyTo = None
     MessageList = []
     MessageString = None
+    Channel = None
     
     Command = ''
     Parameters = ''
@@ -33,16 +40,15 @@ class IRCMessage:
         self.Type = type
         self.MessageList = unicodeMessage.strip().split(' ')
         self.MessageString = unicodeMessage
-        self.User = UserStruct(user)
-        if channel == GlobalVars.CurrentNick:
+        self.User = IRCUser(user)
+        if channel == None:
             self.ReplyTo = self.User.Name
-        else:
-            self.ReplyTo = channel
-        if (channel.startswith('#')):
-            self.TargetType = TargetTypes.CHANNEL
-        else:
             self.TargetType = TargetTypes.USER
-        
+        else:
+            self.Channel = channel
+            self.ReplyTo = channel.Name # I would like to set this to the channel object but I would probably break functionality if I did :I
+            self.TargetType = TargetTypes.CHANNEL
+
         if self.MessageList[0].startswith(GlobalVars.CommandChar):
             self.Command = self.MessageList[0][1:]
             self.Parameters = unicodeMessage[len(self.Command)+2:]
