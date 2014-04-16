@@ -82,7 +82,7 @@ class MoronBot(irc.IRCClient):
             self.sendLine('WHO ' + message.ReplyTo)
             self.sendLine('MODE ' + message.ReplyTo)
         else:
-            channel.Users[message.User.Name] = message.User
+            channel.Users[message.User] = None
         self.log(u' >> {0} ({1}@{2}) joined {3}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo), message.ReplyTo)
     
     def irc_PART(self, prefix, params):
@@ -95,14 +95,14 @@ class MoronBot(irc.IRCClient):
         if message.User.Name == GlobalVars.CurrentNick:
             del self.channels[message.ReplyTo]
         else:
-            del channel.Users[message.User.Name]
+            del channel.Users[message.User]
 
         self.log(u' << {0} ({1}@{2}) left {3}{4}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo, partMessage), message.ReplyTo)
 
     def irc_RPL_WHOREPLY(self, prefix, params):
         user = IRCUser('{0}!{1}@{2}'.format(params[5], params[2], params[3]))
         channel = self.channels[params[1]]
-        channel.Users[params[5]] = user
+        channel.Users[user] = None
 
     def irc_RPL_MYINFO(self, prefix, params):
         self.serverInfo.UserModes = params[3]
