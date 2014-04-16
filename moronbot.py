@@ -75,7 +75,7 @@ class MoronBot(irc.IRCClient):
         channel = IRCChannel(message.ReplyTo)
 
         if message.User.Name == GlobalVars.CurrentNick:      
-            channels[message.ReplyTo] = channel
+            self.channels[message.ReplyTo] = channel
             self.sendLine('WHO ' + message.ReplyTo)
             self.sendLine('MODE ' + message.ReplyTo)
         else:
@@ -89,9 +89,9 @@ class MoronBot(irc.IRCClient):
         message = IRCMessage('PART', prefix, params[0], partMessage)
         
         if message.User.Name == GlobalVars.CurrentNick:
-            del channels[message.ReplyTo]
+            del self.channels[message.ReplyTo]
         else:
-            channel = channels[message.ReplyTo]
+            channel = self.channels[message.ReplyTo]
             del channel.Users[message.User.Name]
 
         self.log(u' << {0} ({1}@{2}) left {3}{4}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo, partMessage), message.ReplyTo)
