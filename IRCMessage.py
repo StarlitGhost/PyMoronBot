@@ -5,7 +5,7 @@ TargetTypes = enum('CHANNEL', 'USER')
 
 class IRCChannel:
     Name = None
-    Users = []
+    Users = {}
 
     def __init__(self, name):
         self.Name = name

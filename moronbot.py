@@ -3,7 +3,7 @@ from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 
 from IRCResponse import IRCResponse, ResponseType
-from IRCMessage import IRCMessage
+from IRCMessage import IRCMessage, IRCChannel
 from FunctionHandler import AutoLoadFunctions
 import GlobalVars
 
@@ -26,7 +26,7 @@ class MoronBot(irc.IRCClient):
     realname = GlobalVars.CurrentNick
     username = GlobalVars.CurrentNick
     
-    channels = []
+    channels = {}
 
     fingerReply = GlobalVars.finger
     
@@ -68,7 +68,13 @@ class MoronBot(irc.IRCClient):
         GlobalVars.CurrentNick = nick
     
     def irc_JOIN(self, prefix, params):
-        message = IRCMessage('JOIN', prefix, params[0], '')
+        message = IRCMessage('JOIN', prefix, params[0], '')     
+        channel = IRCChannel(message.ReplyTo)
+
+        if message.User.Name == GlobalVars.CurrentNick:      
+            channels[message.ReplyTo] = channel
+        else:
+            channel.Users[message.User.Name] = message.User
         self.log(u' >> {0} ({1}@{2}) joined {3}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo), message.ReplyTo)
     
     def irc_PART(self, prefix, params):
@@ -76,6 +82,13 @@ class MoronBot(irc.IRCClient):
         if len(params) > 1:
             partMessage = u', message: '+u' '.join(params[1:])
         message = IRCMessage('PART', prefix, params[0], partMessage)
+        
+        if message.User.Name == GlobalVars.CurrentNick:
+            del channels[message.ReplyTo]
+        else:
+            channel = channels[message.ReplyTo]
+            del channel.Users[message.User.Name]
+
         self.log(u' << {0} ({1}@{2}) left {3}{4}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo, partMessage), message.ReplyTo)
 
     def sendResponse(self, response):
