@@ -73,6 +73,8 @@ class MoronBot(irc.IRCClient):
 
         if message.User.Name == GlobalVars.CurrentNick:      
             channels[message.ReplyTo] = channel
+            self.sendLine('WHO ' + message.ReplyTo)
+            self.sendLine('MODE ' + message.ReplyTo)
         else:
             channel.Users[message.User.Name] = message.User
         self.log(u' >> {0} ({1}@{2}) joined {3}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo), message.ReplyTo)
