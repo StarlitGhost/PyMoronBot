@@ -39,3 +39,5 @@ logs
 Data/*.json
 *.suo
 *.user
+.gitattributes
+PyMoronBot.pyproj
