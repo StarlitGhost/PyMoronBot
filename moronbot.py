@@ -26,6 +26,8 @@ class MoronBot(irc.IRCClient):
     realname = GlobalVars.CurrentNick
     username = GlobalVars.CurrentNick
     
+    channels = []
+
     fingerReply = GlobalVars.finger
     
     versionName = GlobalVars.CurrentNick

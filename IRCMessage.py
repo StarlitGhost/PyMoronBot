@@ -3,6 +3,13 @@ import GlobalVars
 
 TargetTypes = enum('CHANNEL', 'USER')
 
+class IRCChannel:
+    Name = None
+    Users = []
+
+    def __init__(self, name):
+        self.Name = name
+
 class UserStruct:
     Hostmask = None
     Name = None
