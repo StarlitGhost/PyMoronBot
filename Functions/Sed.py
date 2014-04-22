@@ -11,9 +11,6 @@ from GlobalVars import *
 
 import re, copy
 
-# matches a sed-style regex pattern (taken from https://github.com/mossblaser/BeardBot/blob/master/modules/sed.py)
-# I stripped the unnecessary escapes by using a raw string instead
-sedRegex = re.compile(r"[sS]/(?P<search>(\\\\|(\\[^\\])|[^\\/])+)/(?P<replace>(\\\\|(\\[^\\])|[^\\/])*)((/(?P<flags>.*))?)")
 
 class Instantiate(Function):
     Help = 's/search/replacement/flags - matches sed-like regex replacement patterns and attempts to execute them on the latest matching line from the last 10\n'\
@@ -27,15 +24,10 @@ class Instantiate(Function):
         if message.Type != 'PRIVMSG' and message.Type != 'ACTION':
             return
         
-        match = sedRegex.match(message.MessageString)
+        match = self.match(message.MessageString)
 
         if match:
-            search = match.group('search')
-            replace = match.group('replace')
-            flags = match.group('flags')
-            if flags is None:
-                flags = ''
-
+            search, replace, flags = match
             response = self.substitute(search, replace, flags)
 
             if response is not None:
@@ -47,6 +39,20 @@ class Instantiate(Function):
 
         else:
             self.storeMessage(message)
+
+    def match(self, message):
+        """Returns (search, replace, flags) if message is a replacement pattern, otherwise None"""
+        if not message.startswith('s/'):
+            return
+        parts = re.split(r'(?<!\\)/', message)
+        if len(parts) not in (3,4):
+            return
+        search, replace = parts[1:3]
+        if len(parts) == 4:
+            flags = parts[3]
+        else:
+            flags = ''
+        return search, replace, flags
 
     def substitute(self, search, replace, flags):
         messages = self.unmodifiedMessages if 'o' in flags else self.messages
