@@ -19,6 +19,8 @@ class Instantiate(Function):
 
     messages = []
     unmodifiedMessages = []
+    
+    historySize = 20
 
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG' and message.Type != 'ACTION':
@@ -83,8 +85,8 @@ class Instantiate(Function):
 
     def storeMessage(self, message, unmodified=True):
         self.messages.append(message)
-        self.messages = self.messages[-10:]
+        self.messages = self.messages[-self.historySize:]
 
         if unmodified:
             self.unmodifiedMessages.append(message)
-            self.unmodifiedMessages = self.unmodifiedMessages[-10:]
+            self.unmodifiedMessages = self.unmodifiedMessages[-self.historySize:]
