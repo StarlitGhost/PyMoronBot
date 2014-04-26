@@ -132,7 +132,6 @@ class MoronBot(irc.IRCClient):
         self.log(u'!<< {0} was kicked by {1}{2}'.format(kickee, message.User.Name, kickMessage), message.ReplyTo)
 
     def irc_QUIT(self, prefix, params):
-        print params
         quitMessage = u''
         if len(params) > 0:
             quitMessage = u', message: '+u' '.join(params[0:])
