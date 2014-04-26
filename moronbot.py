@@ -129,7 +129,7 @@ class MoronBot(irc.IRCClient):
         else:
             del channel.Users[kickee]
 
-        self.log(u' << {0} was kicked from {1} by {2}{3}'.format(kickee, channel.Name, message.User.Name, kickMessage), message.ReplyTo)
+        self.log(u'!<< {0} was kicked by {1}{2}'.format(kickee, message.User.Name, kickMessage), message.ReplyTo)
 
     def irc_QUIT(self, prefix, params):
         print params
@@ -143,7 +143,7 @@ class MoronBot(irc.IRCClient):
             channel = self.channels[key]
             if message.User.Name in channel.Users:
                 del channel.Users[message.User.Name]
-                self.log(u' << {0} ({1}@{2}) quit IRC{3}'.format(message.User.Name, message.User.User, message.User.Hostmask, quitMessage), channel.Name)
+                self.log(u' << {0} ({1}@{2}) quit{3}'.format(message.User.Name, message.User.User, message.User.Hostmask, quitMessage), channel.Name)
 
     def irc_RPL_WHOREPLY(self, prefix, params):
         user = IRCUser('{0}!{1}@{2}'.format(params[5], params[2], params[3]))
