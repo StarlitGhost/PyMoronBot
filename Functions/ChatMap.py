@@ -156,6 +156,9 @@ class Instantiate(Function):
             if subCommand not in self.subCommands:
                 return IRCResponse(ResponseType.Say, self.UnrecognizedSubcommand(subCommand), message.ReplyTo)
             
+            if self.ChatMapDB is None:
+                return IRCResponse(ResponseType.Say, '[Chatmap database details not found]', message.ReplyTo)
+
             response = self.subCommands[subCommand](self, message)
 
             return IRCResponse(ResponseType.Say, response, message.ReplyTo)
