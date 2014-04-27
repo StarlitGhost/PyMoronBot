@@ -36,8 +36,8 @@ class Instantiate(Function):
 
         if len(message.ParameterList) > 0:
             for user in message.ParameterList:
-                if user in ignores.ignoreList:
-                    ignores.ignoreList.remove(user)
+                if user.lower() in ignores.ignoreList:
+                    ignores.ignoreList.remove(user.lower())
 
             ignores.saveList()
                 

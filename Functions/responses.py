@@ -191,7 +191,7 @@ class Instantiate(Function):
             return
         
         if ignores.ignoreList is not None:
-            if message.User.Name in ignores.ignoreList:
+            if message.User.Name.lower() in ignores.ignoreList:
                 return
         
         if message.Command:

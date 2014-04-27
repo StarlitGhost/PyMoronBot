@@ -36,8 +36,8 @@ class Instantiate(Function):
 
         if len(message.ParameterList) > 0:
             for user in message.ParameterList:
-                if user not in ignores.ignoreList:
-                    ignores.ignoreList.append(user)
+                if user.lower() not in ignores.ignoreList:
+                    ignores.ignoreList.append(user.lower())
 
             ignores.saveList()
 

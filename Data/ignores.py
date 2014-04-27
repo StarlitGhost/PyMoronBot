@@ -13,6 +13,8 @@ def loadList():
 
         ignoreList = j
 
+        ignoreList = [i.lower() for i in ignoreList]
+
     except IOError as e:
         j = []
         with open(path, 'w') as f:

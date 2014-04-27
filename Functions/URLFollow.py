@@ -28,7 +28,7 @@ class Instantiate(Function):
             return
         
         if ignores.ignoreList is not None:
-            if message.User.Name in ignores.ignoreList:
+            if message.User.Name.lower() in ignores.ignoreList:
                 return
 
         match = re.search(r'(?P<url>https?://[^\s]+)', message.MessageString, re.IGNORECASE)
