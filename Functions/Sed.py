@@ -39,6 +39,9 @@ class Instantiate(Function):
 
                 return IRCResponse(responseType, response.MessageString, message.ReplyTo)
 
+            else:
+                return IRCResponse(ResponseType.Say, "No text matching '{0}' found in the last {1} messages".format(search, self.historySize), message.ReplyTo)
+
         else:
             self.storeMessage(message)
 
