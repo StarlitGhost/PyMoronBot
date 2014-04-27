@@ -21,7 +21,7 @@ class Instantiate(Function):
         
         if len(message.Parameters.strip()) > 0:
             feed = self.handleAliases(message.Parameters)
-            lowerMap = dict(zip(map(lambda x:x.lower(),DataStore.LRRChecker.iterkeys()),DataStore.LRRChecker.iterkeys()))
+            lowerMap = {key.lower(): key for key in DataStore.LRRChecker.iterkeys()}
             if feed.lower() in lowerMap:
                 feedName = lowerMap[feed.lower()]
                 feedLatest = DataStore.LRRChecker[feedName]['lastTitle']

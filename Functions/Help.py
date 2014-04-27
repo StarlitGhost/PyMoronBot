@@ -18,9 +18,8 @@ class Instantiate(Function):
             return
         
         if len(message.ParameterList) > 0:
-            lowerMap = dict(zip(map(lambda x:x.lower(),GlobalVars.functions.iterkeys()),GlobalVars.functions.iterkeys()))
-            if (message.ParameterList[0].lower() in lowerMap):
-                func = GlobalVars.functions[lowerMap[message.ParameterList[0].lower()]]
+            if message.ParameterList[0].lower() in GlobalVars.functionCaseMapping:
+                func = GlobalVars.functions[GlobalVars.functionCaseMapping[message.ParameterList[0].lower()]]
                 if isinstance(func.Help, basestring):
                     return IRCResponse(ResponseType.Say, func.Help, message.ReplyTo)
                 else:
