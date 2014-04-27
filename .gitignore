@@ -40,5 +40,3 @@ Data/*.json
 *.suo
 *.user
 .gitattributes
-PyMoronBot.pyproj
-PyMoronBot.sln
