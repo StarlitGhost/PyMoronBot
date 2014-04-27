@@ -7,55 +7,92 @@ import sys
 from FunctionHandler import LoadFunction, UnloadFunction, AutoLoadFunctions
 
 class Instantiate(Function):
-    Help = "load <function>, unload <function> - handles loading/unloading/reloading of functions. Use 'all' with load to reload all active functions"
+    Help = "load/reload <function>, unload <function> - handles loading/unloading/reloading of functions. Use 'all' with load/reload to reload all active functions"
 
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':
             return
         
-        notAllowed = "Only my admins can use {0}".format(message.Command)
+        if message.Command.lower() not in ['load', 'reload', 'unload']:
+            return
 
-        if message.Command == "load":
-            if message.User.Name not in GlobalVars.admins:
-                return IRCResponse(ResponseType.Say, notAllowed, message.ReplyTo)
+        if message.User.Name not in GlobalVars.admins:
+            return IRCResponse(ResponseType.Say, "Only my admins can use {0}".format(message.Command), message.ReplyTo)
 
-            if len(message.ParameterList) == 0:
-                return IRCResponse(ResponseType.Say, "You didn't specify a function name! Usage: {0}".format(self.Help), message.ReplyTo)
+        if len(message.ParameterList) == 0:
+            return IRCResponse(ResponseType.Say, "You didn't specify a function name! Usage: {0}".format(self.Help), message.ReplyTo)
+
+        if message.Command.lower() in ['load', 'reload']:
+            successes, failures, exceptions = self.load(message.ParameterList)
             
-            path = message.ParameterList[0]
-            
-            if path == 'FuncLoader':
-                return IRCResponse(ResponseType.Say, "I can't reload myself, sorry!", message.ReplyTo)
-            
-            elif path == 'all':
-                for name, func in GlobalVars.functions.iteritems():
-                    if name != 'FuncLoader':
-                        LoadFunction(name)
-                        LoadFunction(name)
-                return IRCResponse(ResponseType.Say, "All functions reloaded!", message.ReplyTo)
+        elif message.Command.lower() == "unload":
+            successes, failures, exceptions = self.unload(message.ParameterList)
+
+        responses = []
+        if len(successes) > 0:
+            responses.append(IRCResponse(ResponseType.Say, "'{0}' {1}ed successfully".format(', '.join(successes), message.Command.lower()), message.ReplyTo))
+        if len(failures) > 0:
+            responses.append(IRCResponse(ResponseType.Say, "'{0}' failed to {1}, or (they) do not exist".format(', '.join(failures), message.Command.lower()), message.ReplyTo))
+        if len(exceptions) > 0:
+            responses.append(IRCResponse(ResponseType.Say, "'{0}' threw an exception (printed to console)".format(', '.join(exceptions)), message.ReplyTo))
+
+        return responses
+
+    def load(self, funcNames):
+
+        funcNameCaseMap = {f.lower(): f for f in funcNames}
+
+        successes = []
+        failures = []
+        exceptions = []
+
+        if len(funcNames) == 1 and 'all' in funcNameCaseMap:
+            for name, func in GlobalVars.functions.iteritems():
+                if name == 'FuncLoader':
+                    continue
+
+                LoadFunction(name)
+                LoadFunction(name)
+
+            return ['all functions'], [], []
+
+        for funcName in funcNameCaseMap.keys():
+
+            if funcName == 'funcloader':
+                failures.append("FuncLoader (I can't reload myself)")
             
             else:
                 try:
-                    loadType = LoadFunction(path)
-                    LoadFunction(path)
-                    return IRCResponse(ResponseType.Say, "Function '%s' %soaded!" % (path, loadType), message.ReplyTo)
-                except Exception:
-                    return IRCResponse(ResponseType.Say, "Load Error: cannot find function '%s'" % path, message.ReplyTo)
-        
-        elif message.Command == "unload":
-            if message.User.Name not in GlobalVars.admins:
-                return IRCResponse(ResponseType.Say, notAllowed, message.ReplyTo)
+                    success = LoadFunction(funcName)
+                    if success:
+                        LoadFunction(funcName)
+                        successes.append(GlobalVars.functionCaseMapping[funcName])
+                    else:
+                        failures.append(funcNameCaseMap[funcName])
 
-            if len(message.ParameterList) == 0:
-                return IRCResponse(ResponseType.Say, "You didn't specify a function name! Usage: {0}".format(self.Help), message.ReplyTo)
-            
-            path = message.ParameterList[0]
-            
+                except Exception, x:
+                    exceptions.append(funcNameCaseMap[funcName])
+                    print x.args
+
+        return successes, failures, exceptions
+
+    def unload(self, funcNames):
+
+        funcNameCaseMap = {f.lower(): f for f in funcNames}
+
+        successes = []
+        failures = []
+        exceptions = []
+        
+        for funcName in funcNameCaseMap.keys():
             try:
-                success = UnloadFunction(path)
+                success = UnloadFunction(funcName)
                 if success:
-                    return IRCResponse(ResponseType.Say, "Function '%s' unloaded!" % path, message.ReplyTo)
+                    successes.append(funcNameCaseMap[funcName])
                 else:
-                    return IRCResponse(ResponseType.Say, "Function '%s' not found" % path, message.ReplyTo)
-            except Exception:
-                return IRCResponse(ResponseType.Say, "Unload Error: function '%s' not loaded" % path, message.ReplyTo)
+                    failures.append(funcNameCaseMap[funcName])
+            except Exception, x:
+                exceptions.append(funcNameCaseMap[funcName])
+                print x.args
+
+        return successes, failures, exceptions

@@ -1,6 +1,7 @@
 import os
 
 functions = {}
+functionCaseMapping = {}
 
 CurrentNick = 'PyMoronBot'
 
