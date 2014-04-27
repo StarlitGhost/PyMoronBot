@@ -177,11 +177,12 @@ class MoronBot(irc.IRCClient):
         message = IRCMessage('MODE', user, None, '')
         if channel == GlobalVars.CurrentNick:
             #Setting a usermode
-            if set:
-                for i in range(0, len(modes)):
-                    self.userModes[modes[i]] = args[i]
-            else:
-                for mode in modes:
+            for i in range(0, len(modes)):
+                mode = modes[i]
+                arg = args[i]
+                if set:
+                    self.userModes[mode] = arg
+                else:
                     del self.userModes[mode]
         else:
             #Setting a chanmode
