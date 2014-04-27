@@ -4,9 +4,8 @@ from twisted.internet import reactor, protocol
 
 from IRCResponse import IRCResponse, ResponseType
 from IRCMessage import IRCMessage, IRCChannel, IRCUser
-from ServerInfo import ServerInfo
 from FunctionHandler import AutoLoadFunctions
-import GlobalVars
+import GlobalVars, ServerInfo
 
 parser = argparse.ArgumentParser(description='An IRC bot written in Python.')
 parser.add_argument('-s', '--server', help='the IRC server to connect to (required)', type=str, required=True)
@@ -29,7 +28,6 @@ class MoronBot(irc.IRCClient):
     
     channels = {}
     userModes = {}
-    serverInfo = ServerInfo()
 
     fingerReply = GlobalVars.finger
     
@@ -155,37 +153,36 @@ class MoronBot(irc.IRCClient):
         modeparams = params[3:]
 
         for mode in modestring:
-            if mode in self.serverInfo.ChannelSetArgsModes or mode in self.serverInfo.ChannelSetUnsetArgsModes:
+            if mode in ServerInfo.ChannelSetArgsModes or mode in ServerInfo.ChannelSetUnsetArgsModes:
                 # Mode takes an argument
-                print mode
                 channel.Modes[mode] = modeparams[0]
                 del modeparams[0]
             else:
                 channel.Modes[mode] = None
 
     def irc_RPL_MYINFO(self, prefix, params):
-        self.serverInfo.UserModes = params[3]
+        ServerInfo.UserModes = params[3]
 
     def isupport(self, options):
         for item in options:
             if '=' in item:
                 option = item.split('=')
                 if option[0] == 'CHANTYPES':
-                    self.serverInfo.ChannelTypes = option[1]
+                    ServerInfo.ChannelTypes = option[1]
                 elif option[0] == 'CHANMODES':
                     modes = option[1].split(',')
-                    self.serverInfo.ChannelListModes = modes[0]
-                    self.serverInfo.ChannelSetUnsetArgsModes = modes[1]
-                    self.serverInfo.ChannelSetArgsModes = modes[2]
-                    self.serverInfo.ChannelNormalModes = modes[3]
+                    ServerInfo.ChannelListModes = modes[0]
+                    ServerInfo.ChannelSetUnsetArgsModes = modes[1]
+                    ServerInfo.ChannelSetArgsModes = modes[2]
+                    ServerInfo.ChannelNormalModes = modes[3]
                 elif option[0] == 'PREFIX':
                     prefixes = option[1]
                     statusChars = prefixes[1:prefixes.find(')')]
                     statusSymbols = prefixes[prefixes.find(')') + 1:]
-                    self.serverInfo.StatusOrder = statusChars
+                    ServerInfo.StatusOrder = statusChars
                     for i in range(1, len(statusChars)):
-                        self.serverInfo.Statuses[statusChars[i]] = statusSymbols[i]
-                        self.serverInfo.StatusesReverse[statusSymbols[i]] = statusChars[i]
+                        ServerInfo.Statuses[statusChars[i]] = statusSymbols[i]
+                        ServerInfo.StatusesReverse[statusSymbols[i]] = statusChars[i]
 
     def modeChanged(self, user, channel, set, modes, args):
         message = IRCMessage('MODE', user, self.getChannel(channel), '')
@@ -199,7 +196,7 @@ class MoronBot(irc.IRCClient):
         else:
             #Setting a chanmode
             for mode, arg in zip(modes, args):
-                if mode in self.serverInfo.Statuses:
+                if mode in ServerInfo.Statuses:
                     #Setting a status mode
                     if set:
                         if arg not in self.channels[channel].Ranks:

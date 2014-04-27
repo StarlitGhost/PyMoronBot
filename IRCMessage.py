@@ -1,5 +1,5 @@
 from enumType import enum
-import GlobalVars
+import GlobalVars, ServerInfo
 
 TargetTypes = enum('CHANNEL', 'USER')
 
@@ -9,6 +9,16 @@ class IRCChannel(object):
         self.Users = {}
         self.Ranks = {}
         self.Modes = {}
+
+    def getHighestStatusOfUser(self, nickname):
+        if not self.Ranks[nickname]:
+            return None
+
+        for mode in ServerInfo.StatusOrder:
+            if mode in self.Ranks[user]:
+                return mode
+
+        return None
 
 class IRCUser(object):
     Hostmask = None
