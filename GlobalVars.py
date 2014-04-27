@@ -15,7 +15,7 @@ version = '0.6.0' # 4 major features left to implement before I'll consider it 1
 # Function Chaining
 source = 'https://github.com/MatthewCox/PyMoronBot/'
 
-CommandChar = '\\'
+CommandChar = '.'
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
