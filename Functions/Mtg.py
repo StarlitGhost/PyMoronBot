@@ -43,7 +43,7 @@ class Instantiate(Function):
         manaCost = soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_manaRow'})
         if manaCost is not None:
             manaCost = unicode(manaCost.find('div', 'value'))
-            manaCost = ' | MC: ' + re.sub('<img.+?name=([^&"]+).+?>', "\\1", manaCost)
+            manaCost = ' | MC: ' + self.translateManaSymbols(manaCost)
             manaCost = re.sub('<[^>]+?>', '', manaCost)
             manaCost = manaCost.replace('\n', '')
         else:
@@ -60,7 +60,7 @@ class Instantiate(Function):
             cardTexts = cardText.find_all('div', 'cardtextbox')
             texts = []
             for text in cardTexts:
-                text = re.sub('<img.+?name=([^&"]+).+?>', '\\1', unicode(text))
+                text = self.translateManaSymbols(text)
                 text = re.sub('<[^>]+?>', '', text)
                 texts.append(text)
             cardText = ' | CT: ' + ' > '.join(texts)
@@ -86,3 +86,10 @@ class Instantiate(Function):
         reply = name + manaCost + convCost + types + cardText + flavText + powTough + rarity
 
         return IRCResponse(ResponseType.Say, reply, message.ReplyTo)
+
+    def translateManaSymbols(self, manaCost):
+        manaCost = re.sub('<img.+?name=([0-9]+).+?>', '\\1}', manaCost) # numbers
+        manaCost = re.sub('<img.+?name=([^&"])([^&"]).+?>', '{\\1/\\2}', manaCost) # hybrids
+        manaCost = re.sub('<img.+?name=([^&"]+).+?>', "\\1", manaCost) # singles and any 'others' left over
+
+        return manaCost

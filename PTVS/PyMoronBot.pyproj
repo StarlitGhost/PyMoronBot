@@ -55,6 +55,7 @@
     <Compile Include="IRCResponse.py" />
     <Compile Include="MobroResponses.py" />
     <Compile Include="moronbot.py" />
+    <Compile Include="ServerInfo.py" />
     <Compile Include="StringUtils.py" />
     <Compile Include="WebUtils.py" />
     <Compile Include="Functions\8ball.py" />
@@ -93,6 +94,7 @@
     <Content Include=".gitignore" />
     <Content Include="LICENSE.txt" />
     <Content Include="README.md" />
+    <Content Include="requirements.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Functions" />
