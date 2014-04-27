@@ -282,13 +282,17 @@ class Instantiate(Function):
             chanData = json.loads(webPage.Page)
 
         if len(chanData) > 0:
-            channelInfo = u'{0}'.format(chanData['display_name'])
+            if channelOnline:
+                channelInfo = assembleFormattedText(A.fg.green['']) + '{0}'.format(chanData['display_name']) + assembleFormattedText(A.normal[''])
+            else:
+                channelInfo = assembleFormattedText(A.fg.red['']) + '{0}'.format(chanData['display_name']) + assembleFormattedText(A.normal[''])
+            channelInfo += u' "{0}"'.format(chanData['status'])
             if chanData['game'] is not None:
                 channelInfo += assembleFormattedText(A.normal[A.fg.gray[', playing '], '{0}'.format(chanData['game'])])
             if chanData['mature']:
                 channelInfo += assembleFormattedText(A.normal[A.fg.lightRed[' [Mature]']])
             if channelOnline:
-                channelInfo += assembleFormattedText(A.normal[A.fg.green[' (Live!)']])
+                channelInfo += assembleFormattedText(A.normal[A.fg.green[' (Live with {0:,d} viewers)'.format(streamData['stream']['viewers'])]])
             else:
                 channelInfo += assembleFormattedText(A.normal[A.fg.red[' (Offline)']])
 
