@@ -15,7 +15,7 @@ class IRCChannel(object):
             return None
 
         for mode in ServerInfo.StatusOrder:
-            if mode in self.Ranks[user]:
+            if mode in self.Ranks[nickname]:
                 return mode
 
         return None

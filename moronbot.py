@@ -145,7 +145,14 @@ class MoronBot(irc.IRCClient):
     def irc_RPL_WHOREPLY(self, prefix, params):
         user = IRCUser('{0}!{1}@{2}'.format(params[5], params[2], params[3]))
         channel = self.channels[params[1]]
+        flags = params[6][2:] if '*' in params[6] else params[6][1:]
+        
+        statusModes = ''
+        for flag in flags:
+            statusModes = statusModes + ServerInfo.StatusesReverse[flag]
+
         channel.Users[user.Name] = user
+        channel.Ranks[user.Name] = statusModes
 
     def irc_RPL_CHANNELMODEIS(self, prefix, params):
         channel = self.channels[params[1]]
