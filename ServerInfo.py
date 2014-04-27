@@ -1,4 +1,4 @@
-class ServerInfo:
+class ServerInfo(object):
 
     # I have used the defaults specified by RFC1459 here
     UserModes = 'iosw'

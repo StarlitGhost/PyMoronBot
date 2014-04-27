@@ -10,7 +10,7 @@ import re
 
 from Data.api_keys import load_key
 
-class WebPage():
+class WebPage(object):
     Domain = ''
     Page = ''
     Headers = {}

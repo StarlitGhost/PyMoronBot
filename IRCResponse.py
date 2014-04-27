@@ -2,7 +2,7 @@ from enumType import enum
 
 ResponseType = enum('Say','Do','Notice','Raw')
 
-class IRCResponse:
+class IRCResponse(object):
     def __init__(self, messageType, response, target):
         self.Type = messageType
         try:

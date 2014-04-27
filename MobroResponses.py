@@ -6,7 +6,7 @@ import re
 
 import datetime
 
-class MobroResponse:
+class MobroResponse(object):
     lastTriggered = datetime.datetime.min
 
     def __init__(self, name, response, regex, responseType = ResponseType.Say, enabled = True, seconds = 300, regexMustAllMatch = True):
@@ -55,7 +55,7 @@ class MobroResponse:
             return self.talkwords(chatMessage)
 
 
-class MobroResponseDict:
+class MobroResponseDict(object):
     dict = {}
 
     def add(self,mbr):
