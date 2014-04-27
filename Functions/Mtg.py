@@ -88,8 +88,8 @@ class Instantiate(Function):
         return IRCResponse(ResponseType.Say, reply, message.ReplyTo)
 
     def translateManaSymbols(self, manaCost):
-        manaCost = re.sub('<img.+?name=([0-9]{2,}).+?>', '\\1', manaCost) # long numbers
-        manaCost = re.sub('<img.+?name=([^&"])([^&"]).+?>', '{\\1/\\2}', manaCost) # hybrids
-        manaCost = re.sub('<img.+?name=([^&"]+).+?>', '\\1', manaCost) # singles and any 'others' left over
+        manaCost = re.sub('<img.+?name=([0-9]{2,}).+?>', '\\1', str(manaCost)) # long numbers
+        manaCost = re.sub('<img.+?name=([^&"])([^&"]).+?>', '{\\1/\\2}', str(manaCost)) # hybrids
+        manaCost = re.sub('<img.+?name=([^&"]+).+?>', '\\1', str(manaCost)) # singles and any 'others' left over
 
         return manaCost
