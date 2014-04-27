@@ -93,22 +93,11 @@
     <Content Include=".gitignore" />
     <Content Include="LICENSE.txt" />
     <Content Include="README.md" />
-    <Content Include="twisted\lore\test\lore_index_file_out.html" />
-    <Content Include="twisted\lore\test\lore_index_file_out_multiple.html" />
-    <Content Include="twisted\lore\test\lore_index_file_unnumbered_out.html" />
-    <Content Include="twisted\lore\test\lore_numbering_test_out.html" />
-    <Content Include="twisted\lore\test\lore_numbering_test_out2.html" />
-    <Content Include="twisted\lore\test\simple.html" />
-    <Content Include="twisted\lore\test\simple3.html" />
-    <Content Include="twisted\lore\test\simple4.html" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Functions" />
     <Folder Include="Data\" />
     <Folder Include="Obsolete-Functions\" />
-    <Folder Include="twisted\" />
-    <Folder Include="twisted\lore\" />
-    <Folder Include="twisted\lore\test\" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env\">
