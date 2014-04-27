@@ -232,6 +232,12 @@ class MoronBot(irc.IRCClient):
             #This is a PM
             return None
 
+    def topicUpdated(self, user, channel, newTopic):
+        self.channels[channel].Topic = newTopic
+        self.channels[channel].TopicSetBy = user
+
+        self.log(u'# {0} set the topic to: {1}'.format(user, newTopic), channel)
+
     def sendResponse(self, response):
         if (response == None or response.Response == None):
             return False

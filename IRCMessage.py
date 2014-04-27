@@ -6,6 +6,8 @@ TargetTypes = enum('CHANNEL', 'USER')
 class IRCChannel(object):
     def __init__(self, name):
         self.Name = name
+        self.Topic = ''
+        self.TopicSetBy = ''
         self.Users = {}
         self.Ranks = {}
         self.Modes = {}
