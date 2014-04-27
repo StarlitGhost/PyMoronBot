@@ -166,6 +166,7 @@ class MoronBot(irc.IRCClient):
                     self.serverInfo.ChannelNormalModes = modes[3]
                 elif option[0] == 'PREFIX':
                     prefixes = option[1]
+                    self.serverInfo.StatusOrder = statusChars
                     statusChars = prefixes[1:prefixes.find(')')]
                     statusSymbols = prefixes[prefixes.find(')') + 1:]
                     for i in range(1, len(statusChars)):

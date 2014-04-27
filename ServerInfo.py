@@ -9,5 +9,6 @@ class ServerInfo(object):
 
     Statuses = {'o': '@', 'v': '+'}
     StatusesReverse = {'@': 'o', '+': 'v'}
+    StatusOrder = 'ov'
 
     ChannelTypes = '#'
