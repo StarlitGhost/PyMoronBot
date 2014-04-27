@@ -286,7 +286,7 @@ class Instantiate(Function):
                 channelInfo = assembleFormattedText(A.fg.green['']) + '{0}'.format(chanData['display_name']) + assembleFormattedText(A.normal[''])
             else:
                 channelInfo = assembleFormattedText(A.fg.red['']) + '{0}'.format(chanData['display_name']) + assembleFormattedText(A.normal[''])
-            channelInfo += u' "{0}"'.format(chanData['status'])
+            channelInfo += u' "{0}"'.format(re.sub('[\r\n]+', self.graySplitter, chanData['status'].strip()))
             if chanData['game'] is not None:
                 channelInfo += assembleFormattedText(A.normal[A.fg.gray[', playing '], '{0}'.format(chanData['game'])])
             if chanData['mature']:
