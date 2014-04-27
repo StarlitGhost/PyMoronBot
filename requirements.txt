@@ -1,5 +1,5 @@
 Twisted==13.2.0
-beautifulsoup4==4.2.0
+beautifulsoup4==4.3.2
 psutil==2.1.0
 python-dateutil==2.2
 storm==0.20
