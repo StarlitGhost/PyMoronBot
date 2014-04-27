@@ -9,6 +9,7 @@
 dist
 build
 eggs
+env
 parts
 bin
 var
@@ -40,5 +41,3 @@ Data/*.json
 *.suo
 *.user
 .gitattributes
-PyMoronBot.pyproj
-PyMoronBot.sln
