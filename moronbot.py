@@ -173,6 +173,37 @@ class MoronBot(irc.IRCClient):
                         self.serverInfo.Statuses[statusChars[i]] = statusSymbols[i]
                         self.serverInfo.StatusesReverse[statusSymbols[i]] = statusChars[i]
 
+    def modeChanged(self, user, channel, set, modes, args):
+        message = IRCMessage('MODE', user, None, '')
+        if channel == GlobalVars.CurrentNick:
+            #Setting a usermode
+            if set:
+                for i in range(0, len(modes)):
+                    self.userModes[modes[i]] = args[i]
+            else:
+                for mode in modes:
+                    del self.userModes[mode]
+        else:
+            #Setting a chanmode
+            for i in range(0, len(modes)):
+                mode = modes[i]
+                arg = args[i]
+                if mode in self.serverInfo.Statuses:
+                    #Setting a status mode
+                    if set:
+                        if arg not in self.channels[channel].Ranks:
+                            self.channels[channel].Ranks[arg] = mode
+                        else:
+                            self.channels[channel].Ranks[arg] = self.channels[channel].Ranks[arg] + mode
+                    else:
+                        self.channels[channel].Ranks[arg] = self.channels[channel].Rank[arg].replace(mode,'')
+                else:
+                    #Setting a normal chanmode
+                    if set:
+                        self.channels[channel].Modes[mode] = arg
+                    else:
+                        del self.channels[channel].Modes[mode]
+
     def getChannel(self, name):
         if name in self.channels:
             return self.channels[name]
