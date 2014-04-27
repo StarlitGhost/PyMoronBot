@@ -24,8 +24,8 @@ def FetchURL(url, headers=[('User-agent', 'Mozilla/5.0')]):
         response_headers = response.info().dict
         pageType = response_headers['content-type']
         
-        #             |   text|                       rss feeds and xml|            json|
-        if re.match('^(text/.*|application/((rss|atom|rdf)\+)?xml(;.*)?|application/json)$', pageType):
+        #             |   text|                       rss feeds and xml|                       json|
+        if re.match('^(text/.*|application/((rss|atom|rdf)\+)?xml(;.*)?|application/(.*)?json(;.*)?)$', pageType):
             page = WebPage()
             page.Domain = urlparse.urlparse(response.geturl()).hostname
 

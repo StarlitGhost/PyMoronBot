@@ -40,6 +40,7 @@ class Instantiate(Function):
         twitterMatch = re.search(r'twitter.com/(?P<tweeter>[^/]+)/status(es)?/(?P<tweetID>[0-9]+)', match.group('url'))
         steamMatch   = re.search(r'store.steampowered.com/app/(?P<steamAppID>[0-9]+)', match.group('url'))
         ksMatch      = re.search(r'kickstarter.com/projects/(?P<ksID>[^/]+/[^/&#\?]+)', match.group('url'))
+        twitchMatch  = re.search(r'twitch\.tv/(?P<twitchChannel>[^/]+)', match.group('url'))
         
         if youtubeMatch:
             return self.FollowYouTube(youtubeMatch.group('videoID'), message)
@@ -51,6 +52,8 @@ class Instantiate(Function):
             return self.FollowSteam(steamMatch.group('steamAppID'), message)
         elif ksMatch:
             return self.FollowKickstarter(ksMatch.group('ksID'), message)
+        elif twitchMatch:
+            return self.FollowTwitch(twitchMatch.group('twitchChannel'), message)
         elif not re.search('\.(jpe?g|gif|png|bmp)$', match.group('url')):
             return self.FollowStandard(match.group('url'), message)
         
@@ -259,6 +262,37 @@ class Instantiate(Function):
                 data.append('Duration: {0:.0f} days {1:.1f} hours to go'.format(days, hours))
 
         return IRCResponse(ResponseType.Say, self.graySplitter.join(data), message.ReplyTo)
+
+    def FollowTwitch(self, channel, message):
+        # Heavily based on Didero's DideRobot code for the same
+        # https://github.com/Didero/DideRobot/blob/06629fc3c8bddf8f729ce2d27742ff999dfdd1f6/commands/urlTitleFinder.py#L37
+        # TODO: viewer count and other stats?
+        chanData = {}
+        channelOnline = False
+        twitchHeaders = [('Accept', 'application/vnd.twitchtv.v2+json')]
+        webPage = WebUtils.FetchURL(u'https://api.twitch.tv/kraken/streams/{0}'.format(channel), twitchHeaders)
+
+        streamData = json.loads(webPage.Page)
+
+        if 'stream' in streamData and streamData['stream'] is not None:
+            chanData = streamData['stream']['channel']
+            channelOnline = True
+        elif 'error' not in streamData:
+            webPage = WebUtils.FetchURL(u'https://api.twitch.tv/kraken/channels/{0}'.format(channel), twitchHeaders)
+            chanData = json.loads(webPage.Page)
+
+        if len(chanData) > 0:
+            channelInfo = u'{0}'.format(chanData['display_name'])
+            if chanData['game'] is not None:
+                channelInfo += assembleFormattedText(A.normal[A.fg.gray[', playing '], '{0}'.format(chanData['game'])])
+            if chanData['mature']:
+                channelInfo += assembleFormattedText(A.normal[A.fg.lightRed[' [Mature]']])
+            if channelOnline:
+                channelInfo += assembleFormattedText(A.normal[A.fg.green[' (Live!)']])
+            else:
+                channelInfo += assembleFormattedText(A.normal[A.fg.red[' (Offline)']])
+
+            return IRCResponse(ResponseType.Say, channelInfo, message.ReplyTo)
     
     def FollowStandard(self, url, message):
         webPage = WebUtils.FetchURL(url)
