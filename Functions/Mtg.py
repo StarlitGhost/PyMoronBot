@@ -37,23 +37,23 @@ class Instantiate(Function):
                 return IRCResponse(ResponseType.Say, '{0} cards found: {1}'.format(len(cardItems), searchTerm), message.ReplyTo)
 
         name = name.find('div', 'value').text.strip()
-        types = ' | T: ' + soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_typeRow'}).find('div', 'value').text.strip()
-        rarity = ' | R: ' + soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_rarityRow'}).find('div', 'value').text.strip()
+        types = u' | T: ' + soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_typeRow'}).find('div', 'value').text.strip()
+        rarity = u' | R: ' + soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_rarityRow'}).find('div', 'value').text.strip()
 
         manaCost = soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_manaRow'})
         if manaCost is not None:
             manaCost = unicode(manaCost.find('div', 'value'))
-            manaCost = ' | MC: ' + self.translateManaSymbols(manaCost)
+            manaCost = u' | MC: ' + self.translateManaSymbols(manaCost)
             manaCost = re.sub('<[^>]+?>', '', manaCost)
             manaCost = manaCost.replace('\n', '')
         else:
-            manaCost = ''
+            manaCost = u''
 
         convCost = soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_cmcRow'})
         if convCost is not None:
-            convCost = ' | CMC: ' + convCost.find('div', 'value').text.strip()
+            convCost = u' | CMC: ' + convCost.find('div', 'value').text.strip()
         else:
-            convCost = ''
+            convCost = u''
 
         cardText = soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_textRow'})
         if cardText is not None:
@@ -63,9 +63,9 @@ class Instantiate(Function):
                 text = self.translateManaSymbols(text)
                 text = re.sub('<[^>]+?>', '', text)
                 texts.append(text)
-            cardText = ' | CT: ' + ' > '.join(texts)
+            cardText = u' | CT: ' + u' > '.join(texts)
         else:
-            cardText = ''
+            cardText = u''
 
         flavText = soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_FlavorText'})
         if message.Command.endswith('f') and flavText is not None:
@@ -73,23 +73,24 @@ class Instantiate(Function):
             texts = []
             for text in flavTexts:
                 texts.append(unicode(text.text))
-            flavText = ' | FT: ' + ' > '.join(texts)
+            flavText = u' | FT: ' + ' > '.join(texts)
         else:
-            flavText = ''
+            flavText = u''
 
         powTough = soup.find('div', {'id' : 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_ptRow'})
         if powTough is not None:
-            powTough = ' | P/T: ' + powTough.find('div', 'value').text.strip().replace(' ', '')
+            powTough = u' | P/T: ' + powTough.find('div', 'value').text.strip().replace(' ', '')
         else:
-            powTough = ''
+            powTough = u''
 
         reply = name + manaCost + convCost + types + cardText + flavText + powTough + rarity
 
         return IRCResponse(ResponseType.Say, reply, message.ReplyTo)
 
     def translateManaSymbols(self, manaCost):
-        manaCost = re.sub('<img.+?name=([0-9]{2,}).+?>', '\\1', str(manaCost)) # long numbers
-        manaCost = re.sub('<img.+?name=([^&"])([^&"]).+?>', '{\\1/\\2}', str(manaCost)) # hybrids
-        manaCost = re.sub('<img.+?name=([^&"]+).+?>', '\\1', str(manaCost)) # singles and any 'others' left over
+        manaCost = unicode(manaCost)
+        manaCost = re.sub(r'<img.+?name=([0-9]{2,}).+?>', r'\1', manaCost) # long numbers
+        manaCost = re.sub(r'<img.+?name=([^&"])([^&"]).+?>', r'{\1/\2}', manaCost) # hybrids
+        manaCost = re.sub(r'<img.+?name=([^&"]+).+?>', r'\1', manaCost) # singles and any 'others' left over
 
         return manaCost
