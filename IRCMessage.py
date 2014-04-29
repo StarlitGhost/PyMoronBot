@@ -63,8 +63,12 @@ class IRCMessage(object):
             self.TargetType = TargetTypes.CHANNEL
 
         if self.MessageList[0].startswith(GlobalVars.CommandChar):
-            self.Command = self.MessageList[0][1:]
-            self.Parameters = unicodeMessage[len(self.Command)+2:]
+            self.Command = self.MessageList[0][len(GlobalVars.CommandChar):]
+            if self.Command == '':
+                self.Command = self.MessageList[1]
+                self.Parameters = u' '.join(self.MessageList[2:])
+            else:
+                self.Parameters = u' '.join(self.MessageList[1:])
         elif self.MessageList[0].startswith(GlobalVars.CurrentNick) and len(self.MessageList) > 1:
             self.Command = self.MessageList[1]
             self.Parameters = u' '.join(self.MessageList[2:])
