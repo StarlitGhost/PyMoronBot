@@ -6,7 +6,7 @@ from GlobalVars import *
 import re
 
 class Instantiate(Function):
-	Help = 'playapples, stopapples - For when you need a 4th for Apples to Apples'
+	Help = 'playapples, stopapples - For when you need a 4th for Apples to Apples (will always pick 0)'
 	PlayApples = 0
 	def GetResponse(self, message):
 		if message.Type != 'PRIVMSG':
