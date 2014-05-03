@@ -21,6 +21,11 @@ class Instantiate(Function):
             DataStore.LRRChecker[feedName]['lastCheck'] = datetime.datetime.utcnow()
             
             feedPage = WebUtils.FetchURL(feedDeets['url'])
+            
+            if feedPage is None:
+                #TODO: log an error here that the feed likely no longer exists!
+                continue
+            
             root = ET.fromstring(feedPage.Page)
             item = root.find('channel/item')
             

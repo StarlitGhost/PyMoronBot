@@ -54,7 +54,7 @@ class Instantiate(Function):
         if not match:
             return
         
-        if message.ReplyTo not in self.hangoutDict:
+        if message.ReplyTo not in self.hangoutDict or self.hangoutDict[message.ReplyTo] is None:
             self.hangoutDict[message.ReplyTo] = data()
         elif match.group('code') == self.hangoutDict[message.ReplyTo].lastCode:
             return
