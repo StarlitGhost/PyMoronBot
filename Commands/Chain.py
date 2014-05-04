@@ -13,9 +13,9 @@ import re
 
 class Command(CommandInterface):
     triggers = ['chain']
-    help = 'chain <command 1> | <command 2> [| <command n>] - chains multiple commands together, feeding the output of each command into the next'\
-           'syntax: command1 params | command2 %output% | command3 %var%'\
-           '%output% is the output text of the previous command in the chain'\
+    help = 'chain <command 1> | <command 2> [| <command n>] - chains multiple commands together, feeding the output of each command into the next\n'\
+           'syntax: command1 params | command2 %output% | command3 %var%\n'\
+           '%output% is the output text of the previous command in the chain\n'\
            '%var% is any extra var that may have been added to the message by commands earlier in the chain'
 
     def execute(self, message=IRCMessage):
