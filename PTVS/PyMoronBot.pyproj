@@ -35,6 +35,7 @@
     <Compile Include="Commands\Apples.py" />
     <Compile Include="Commands\Chain.py" />
     <Compile Include="Commands\ChatMap.py" />
+    <Compile Include="Commands\Choose.py" />
     <Compile Include="Commands\CommandChar.py" />
     <Compile Include="Commands\Conversation.py" />
     <Compile Include="Commands\DBCalc.py" />
