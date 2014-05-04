@@ -78,7 +78,7 @@ class MoronBot(irc.IRCClient):
                     del channel.Users[oldnick]
                     if oldnick in channel.Ranks:
                         channel.Ranks[newnick] = channel.Ranks[oldnick]
-                        del channel.Ranks[newnick]
+                        del channel.Ranks[oldnick]
                     self.log(u'{0} is now known as {1}'.format(oldnick, newnick), channel.Name)
 
     def nickChanged(self, nick):
