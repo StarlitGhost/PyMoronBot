@@ -17,6 +17,7 @@ class Command(CommandInterface):
            'syntax: command1 params | command2 %output% | command3 %var%\n'\
            '%output% is the output text of the previous command in the chain\n'\
            '%var% is any extra var that may have been added to the message by commands earlier in the chain'
+    runInThread = True
 
     def execute(self, message=IRCMessage):
 

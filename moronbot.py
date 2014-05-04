@@ -279,7 +279,7 @@ class MoronBot(irc.IRCClient):
         for (name, command) in GlobalVars.commands.items():
             try:
                 if command.shouldExecute(message):
-                    if not command.callInThread:
+                    if not command.runInThread:
                         response = command.execute(message)
                         self.sendResponse(response)
                     else:
