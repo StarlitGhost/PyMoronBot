@@ -4,7 +4,7 @@ from twisted.internet import reactor, protocol
 
 from IRCResponse import IRCResponse, ResponseType
 from IRCMessage import IRCMessage, IRCChannel, IRCUser
-from FunctionHandler import AutoLoadFunctions
+from CommandHandler import AutoLoadCommands
 import GlobalVars, ServerInfo
 
 parser = argparse.ArgumentParser(description='An IRC bot written in Python.')
@@ -255,7 +255,7 @@ class MoronBot(irc.IRCClient):
             self.sendLine(response.Response.encode('utf-8'))
 
     def handleMessage(self, message):
-        self.responses = [] # in case earlier Function responses caused some weird errors
+        self.responses = [] # in case earlier command responses caused some weird errors
 
         # restart command, can't restart within 1 minute of starting (avoids chanhistory triggering another restart)
         if message.Command == 'restart' and datetime.datetime.utcnow() > startTime + datetime.timedelta(seconds=10) and message.User.Name in GlobalVars.admins:
@@ -264,16 +264,17 @@ class MoronBot(irc.IRCClient):
             self.quit(message = 'restarting')
             return
 
-        for (name, func) in GlobalVars.functions.items():
+        for (name, command) in GlobalVars.commands.items():
             try:
-                response = func.GetResponse(message)
-                if response is None:
-                    continue
-                if hasattr(response, '__iter__'):
-                    for r in response:
-                        self.responses.append(r)
-                else:
-                    self.responses.append(response)
+                if command.shouldExecute(message):
+                    response = command.execute(message)
+                    if response is None:
+                        continue
+                    if hasattr(response, '__iter__'):
+                        for r in response:
+                            self.responses.append(r)
+                    else:
+                        self.responses.append(response)
             except Exception:
                 print "Python Execution Error in '%s': %s" % (name, str( sys.exc_info() ))
                 traceback.print_tb(sys.exc_info()[2])
@@ -325,7 +326,7 @@ class MoronBotFactory(protocol.ReconnectingClientFactory):
         protocol.ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
 
 if __name__ == '__main__':
-    AutoLoadFunctions()
+    AutoLoadCommands()
     moronbot = MoronBotFactory()
     reactor.connectTCP(cmdArgs.server, cmdArgs.port, moronbot)
     reactor.run()

@@ -1,7 +1,7 @@
 import os
 
-functions = {}
-functionCaseMapping = {}
+commands = {}
+commandCaseMapping = {}
 
 CurrentNick = 'PyMoronBot'
 
@@ -9,9 +9,9 @@ admins = ['Tyranic-Moron', 'T-M|Work', 'Tyranic_Moron', 'T-M|Asleep', 'GarrusVak
 
 finger = 'GET YOUR FINGER OUT OF THERE'
 version = '0.7.0' # 3 major features left to implement before I'll consider it 1.0.0 (listed below)
-# Unified function data storage (may decide not to bother, independent also works and has its own benefits)
-# Function Aliasing
-# Function Chaining
+# Unified command data storage (may decide not to bother, independent also works and has its own benefits)
+# Command Aliasing
+# Command Chaining
 source = 'https://github.com/MatthewCox/PyMoronBot/'
 
 CommandChar = '.'
