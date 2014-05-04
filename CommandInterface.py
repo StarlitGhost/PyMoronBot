@@ -4,6 +4,7 @@ class CommandInterface(object):
     triggers = []
     acceptedTypes = ['PRIVMSG']
     help = '<no help defined (yet)>'
+    runInThread = False
     
     def __init__(self):
         self.onStart()

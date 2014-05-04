@@ -10,6 +10,7 @@ import dateutil.parser as dparser
 
 class Command(CommandInterface):
     help = "Automatic function, scans LRR video RSS feeds and reports new items in the channel."
+    runInThread = True
 
     def shouldExecute(self, message):
         return True

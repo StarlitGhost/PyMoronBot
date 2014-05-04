@@ -15,7 +15,8 @@ from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 class Command(CommandInterface):
     acceptedTypes = ['PRIVMSG','ACTION']
     help = 'automatic function that follows urls and grabs information about the resultant webpage'
-    
+    runInThread = True
+
     htmlParser = HTMLParser.HTMLParser()
     
     graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])

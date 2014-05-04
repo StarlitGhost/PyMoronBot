@@ -1,6 +1,6 @@
 import sys, platform, os, traceback, datetime, codecs, argparse
 from twisted.words.protocols import irc
-from twisted.internet import reactor, protocol
+from twisted.internet import reactor, protocol, threads
 
 from IRCResponse import IRCResponse, ResponseType
 from IRCMessage import IRCMessage, IRCChannel, IRCUser
@@ -239,24 +239,35 @@ class MoronBot(irc.IRCClient):
         self.log(u'# {0} set the topic to: {1}'.format(user, newTopic), channel)
 
     def sendResponse(self, response):
-        if (response == None or response.Response == None):
-            return False
+        responses = []
+
+        if hasattr(response, '__iter__'):
+            for r in response:
+                if r is None or r.Response is None or r.Response == '':
+                    continue
+                responses.append(r)
+
+        elif response is not None and response.Response is not None and response.Response != '':
+            responses.append(response)
         
-        if (response.Type == ResponseType.Say):
-            self.msg(response.Target, response.Response.encode('utf-8'))
-            self.log(u'<{0}> {1}'.format(self.nickname, response.Response), response.Target)
-        elif (response.Type == ResponseType.Do):
-            self.describe(response.Target, response.Response.encode('utf-8'))
-            self.log(u'*{0} {1}*'.format(self.nickname, response.Response), response.Target)
-        elif (response.Type == ResponseType.Notice):
-            self.notice(response.Target, response.Response.encode('utf-8'))
-            self.log(u'[{0}] {1}'.format(self.nickname, response.Response), response.Target)
-        elif (response.Type == ResponseType.Raw):
-            self.sendLine(response.Response.encode('utf-8'))
+        for response in responses:
+            try:
+                if (response.Type == ResponseType.Say):
+                    self.msg(response.Target, response.Response.encode('utf-8'))
+                    self.log(u'<{0}> {1}'.format(self.nickname, response.Response), response.Target)
+                elif (response.Type == ResponseType.Do):
+                    self.describe(response.Target, response.Response.encode('utf-8'))
+                    self.log(u'*{0} {1}*'.format(self.nickname, response.Response), response.Target)
+                elif (response.Type == ResponseType.Notice):
+                    self.notice(response.Target, response.Response.encode('utf-8'))
+                    self.log(u'[{0}] {1}'.format(self.nickname, response.Response), response.Target)
+                elif (response.Type == ResponseType.Raw):
+                    self.sendLine(response.Response.encode('utf-8'))
+            except Exception: # dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
+                print "Python Execution Error sending responses '%s': %s" % (responses, str( sys.exc_info() ))
+                traceback.print_tb(sys.exc_info()[2])
 
     def handleMessage(self, message):
-        self.responses = [] # in case earlier command responses caused some weird errors
-
         # restart command, can't restart within 1 minute of starting (avoids chanhistory triggering another restart)
         if message.Command == 'restart' and datetime.datetime.utcnow() > startTime + datetime.timedelta(seconds=10) and message.User.Name in GlobalVars.admins:
             global restarting
@@ -264,25 +275,19 @@ class MoronBot(irc.IRCClient):
             self.quit(message = 'restarting')
             return
 
+        responses = []
         for (name, command) in GlobalVars.commands.items():
             try:
                 if command.shouldExecute(message):
-                    response = command.execute(message)
-                    if response is None:
-                        continue
-                    if hasattr(response, '__iter__'):
-                        for r in response:
-                            self.responses.append(r)
+                    if not command.callInThread:
+                        response = command.execute(message)
+                        self.sendResponse(response)
                     else:
-                        self.responses.append(response)
-            except Exception:
+                        d = threads.deferToThread(command.execute, message)
+                        d.addCallback(self.sendResponse)
+            except Exception: # dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
                 print "Python Execution Error in '%s': %s" % (name, str( sys.exc_info() ))
                 traceback.print_tb(sys.exc_info()[2])
-        
-        for response in self.responses:
-            self.sendResponse(response)
-
-        self.responses = []
         
     def log(self, text, target):
         now = datetime.datetime.utcnow()
