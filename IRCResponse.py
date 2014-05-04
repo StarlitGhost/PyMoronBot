@@ -3,7 +3,7 @@ from enumType import enum
 ResponseType = enum('Say','Do','Notice','Raw')
 
 class IRCResponse(object):
-    def __init__(self, messageType, response, target):
+    def __init__(self, messageType, response, target, extraVars={}):
         self.Type = messageType
         try:
             self.Response = unicode(response, 'utf-8')
@@ -11,3 +11,4 @@ class IRCResponse(object):
             self.Response = response
         self.Target = target
 
+        self.ExtraVars = extraVars

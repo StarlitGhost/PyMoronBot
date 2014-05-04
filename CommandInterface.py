@@ -1,3 +1,5 @@
+from IRCResponse import IRCResponse, ResponseType
+
 class CommandInterface(object):
     triggers = []
     acceptedTypes = ['PRIVMSG']
@@ -18,4 +20,4 @@ class CommandInterface(object):
         return True
 
     def execute(self, message):
-        pass
+        return IRCResponse(ResponseType.Say, '<command not yet implemented>', message.ReplyTo)

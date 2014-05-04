@@ -37,7 +37,12 @@ class Command(CommandInterface):
 
         for link in chain:
             if response is not None:
-                link = link.replace('%output%', response.Response)
+                link = link.replace('%output%', response.Response) # replace %output% with output of previous command
+            else:
+                # replace %output% with empty string if previous command had no output
+                # (or this is the first command in the chain, but for some reason has %output% as a param)
+                link = link.replace('%output%', '')
+
             input = IRCMessage(message.Type, userString, message.Channel, GlobalVars.CommandChar + link.lstrip())
             input.chained = True
             

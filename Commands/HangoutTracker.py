@@ -18,7 +18,7 @@ class data:
     lastUser = None
 
 class Command(CommandInterface):
-
+    triggers = ['hangout', 'hangoot']
     help = 'hangout - gives you the last posted G+ hangout link'
 
     hangoutDict = {}
