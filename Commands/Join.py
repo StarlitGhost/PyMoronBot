@@ -22,8 +22,8 @@ class Command(CommandInterface):
                 channel = param
                 if not channel.startswith('#'):
                     channel = '#' + channel
-                responses.append(IRCResponse(ResponseType.Raw, 'JOIN %s' % channel, ''))
+                responses.append(IRCResponse(ResponseType.Raw, 'JOIN {0}'.format(channel), ''))
             return responses
         else:
-            return IRCResponse(ResponseType.Raw, "%s, you didn't say where I should join" % message.User.Name, message.ReplyTo)
+            return IRCResponse(ResponseType.Say, "{0}, you didn't say where I should join".format(message.User.Name), message.ReplyTo)
 
