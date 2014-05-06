@@ -226,7 +226,7 @@ class Command(CommandInterface):
         if title is not None:
             creator = soup.find(id='name')
             if creator is not None:
-                data.append(assembleFormattedText(A.normal['{0}', A.fg.gray[' by '], '{1}']).format(title.text.strip(), creator.text.strip()))
+                data.append(assembleFormattedText(A.normal['{0}', A.fg.gray[' by '], '{1}']).format(title.h2.text.strip(), creator.text.strip()))
             else:
                 data.append(title.h2.text.strip())
 
