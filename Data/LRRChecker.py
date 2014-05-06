@@ -35,6 +35,14 @@ LRRChecker = {
         'lastLink': '',
         'lastCheck': tenMinsAgo,
         'aliases': ["podcast", "cast", "lrrc", "llrc", "lcast", "lc", 'chat'],
+        'suppress': True },
+    'LRR Blog': {
+        'url': 'http://loadingreadyrun.com/blog/feed/',
+        'lastUpdate': aYearAgo,
+        'lastTitle': '',
+        'lastLink': '',
+        'lastCheck': tenMinsAgo,
+        'aliases': ['blog'],
         'suppress': True }
     }
 
