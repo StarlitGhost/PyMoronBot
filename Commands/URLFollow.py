@@ -238,7 +238,12 @@ class Command(CommandInterface):
 
         pledged = stats.find(id='pledged')
         if pledged is not None:
-            pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}',A.fg.gray['/'],'{1:,.0f} {2} ({3:,.0f}% funded)'])
+            if float(pledged['data-percent-raised']) >= 1.0:
+                percentageString = A.fg.green['({3:,.0f}% funded)']
+            else:
+                percentageString = A.fg.red['({3:,.0f}% funded)']
+                
+            pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}',A.fg.gray['/'],'{1:,.0f} {2} ',percentageString])
             data.append(pledgedString.format(float(pledged['data-pledged']),
                                              float(pledged['data-goal']),
                                              pledged.data['data-currency'],
