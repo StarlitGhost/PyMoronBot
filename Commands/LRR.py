@@ -22,11 +22,11 @@ class Command(CommandInterface):
                 feedLatest = DataStore.LRRChecker[feedName]['lastTitle']
                 feedLink = DataStore.LRRChecker[feedName]['lastLink']
                 
-                response = 'Latest {0}: {1} | {2}'.format(feedName, feedLatest, feedLink)
+                response = u'Latest {0}: {1} | {2}'.format(feedName, feedLatest, feedLink)
                 
                 return IRCResponse(ResponseType.Say, response, message.ReplyTo)
                 
-            return IRCResponse(ResponseType.Say, "{0} is not one of the LRR series being monitored (leave a tell for Tyranic-Moron if it's a new series or should be an alias!)".format(message.Parameters.strip()), message.ReplyTo)
+            return IRCResponse(ResponseType.Say, u"{0} is not one of the LRR series being monitored (leave a tell for Tyranic-Moron if it's a new series or should be an alias!)".format(message.Parameters.strip()), message.ReplyTo)
         else:
             latestDate = datetime.datetime.utcnow() - datetime.timedelta(days=365*10)
             latestFeed = None
@@ -39,7 +39,7 @@ class Command(CommandInterface):
                     latestTitle = feedDeets['lastTitle']
                     latestLink = feedDeets['lastLink']
                     
-            response = 'Latest {0}: {1} | {2}'.format(latestFeed, latestTitle, latestLink)
+            response = u'Latest {0}: {1} | {2}'.format(latestFeed, latestTitle, latestLink)
             return IRCResponse(ResponseType.Say, response, message.ReplyTo)
 
     def handleAliases(self, series):
