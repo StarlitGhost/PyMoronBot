@@ -228,7 +228,7 @@ class Command(CommandInterface):
             if creator is not None:
                 data.append(assembleFormattedText(A.normal['{0}', A.fg.gray[' by '], '{1}']).format(title.text.strip(), creator.text.strip()))
             else:
-                data.append(title.text.strip())
+                data.append(title.h2.text.strip())
 
         stats = soup.find(id='stats')
 
