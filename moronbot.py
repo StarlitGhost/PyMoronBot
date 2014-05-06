@@ -113,6 +113,8 @@ class MoronBot(irc.IRCClient):
             del self.channels[message.ReplyTo]
         else:
             del channel.Users[message.User.Name]
+            if message.User.Name in channel.Ranks:
+                del channel.Ranks[message.User.Name]
 
         self.log(u' << {0} ({1}@{2}) left {3}{4}'.format(message.User.Name, message.User.User, message.User.Hostmask, message.ReplyTo, partMessage), message.ReplyTo)
 
@@ -129,6 +131,8 @@ class MoronBot(irc.IRCClient):
             del self.channels[message.ReplyTo]
         else:
             del channel.Users[kickee]
+            if kickee in channel.Ranks:
+                del channel.Ranks[kickee]
 
         self.log(u'!<< {0} was kicked by {1}{2}'.format(kickee, message.User.Name, kickMessage), message.ReplyTo)
 
@@ -143,6 +147,8 @@ class MoronBot(irc.IRCClient):
             channel = self.channels[key]
             if message.User.Name in channel.Users:
                 del channel.Users[message.User.Name]
+                if message.User.Name in channel.Ranks:
+                    del channel.Ranks[message.User.Name]
                 self.log(u' << {0} ({1}@{2}) quit{3}'.format(message.User.Name, message.User.User, message.User.Hostmask, quitMessage), channel.Name)
 
     def irc_RPL_WHOREPLY(self, prefix, params):
