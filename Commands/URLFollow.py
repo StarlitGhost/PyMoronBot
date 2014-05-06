@@ -222,7 +222,7 @@ class Command(CommandInterface):
 
         data = []
 
-        title = soup.find(id='title')
+        title = soup.find(class_='title')
         if title is not None:
             creator = soup.find(id='name')
             if creator is not None:
