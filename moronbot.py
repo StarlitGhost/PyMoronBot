@@ -241,7 +241,7 @@ class MoronBot(irc.IRCClient):
 
         self.log(u'# {0} set the topic to: {1}'.format(user, newTopic), channel)
 
-    def sendResponse(self, response):
+    def sendResponse(self, response, channel):
         responses = []
 
         if hasattr(response, '__iter__'):
@@ -255,6 +255,11 @@ class MoronBot(irc.IRCClient):
         
         for response in responses:
             try:
+                if channel is not None:
+                    # strip formatting if colours are blocked on the channel
+                    if 'c' in channel.Modes:
+                        response.Response = irc.stripFormatting(response.Response)
+                
                 if (response.Type == ResponseType.Say):
                     self.msg(response.Target, response.Response.encode('utf-8'))
                     self.log(u'<{0}> {1}'.format(self.nickname, response.Response), response.Target)
@@ -284,10 +289,10 @@ class MoronBot(irc.IRCClient):
                 if command.shouldExecute(message):
                     if not command.runInThread:
                         response = command.execute(message)
-                        self.sendResponse(response)
+                        self.sendResponse(response, message.Channel)
                     else:
                         d = threads.deferToThread(command.execute, message)
-                        d.addCallback(self.sendResponse)
+                        d.addCallback(self.sendResponse, message.Channel)
             except Exception: # dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
                 print "Python Execution Error in '%s': %s" % (name, str( sys.exc_info() ))
                 traceback.print_tb(sys.exc_info()[2])
