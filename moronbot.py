@@ -5,6 +5,7 @@ from twisted.internet import reactor, protocol, threads
 from IRCResponse import IRCResponse, ResponseType
 from IRCMessage import IRCMessage, IRCChannel, IRCUser
 from CommandHandler import AutoLoadCommands
+import StringUtils
 import GlobalVars, ServerInfo
 
 parser = argparse.ArgumentParser(description='An IRC bot written in Python.')
@@ -264,7 +265,7 @@ class MoronBot(irc.IRCClient):
                 if channel is not None:
                     # strip formatting if colours are blocked on the channel
                     if 'c' in channel.Modes:
-                        response.Response = irc.stripFormatting(response.Response)
+                        response.Response = StringUtils.strip_colours(response.Response)
                 
                 if (response.Type == ResponseType.Say):
                     self.msg(response.Target, response.Response.encode('utf-8'))
