@@ -9,6 +9,8 @@ from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
 import GlobalVars
 
+import StringUtils
+
 import re
 
 class Command(CommandInterface):
@@ -21,14 +23,17 @@ class Command(CommandInterface):
 
     def execute(self, message=IRCMessage):
 
-        # maybe do this in the command handler?
+        # TODO: maybe do this in the command handler?
+        # map triggers to commands so we can call them via dict lookup
         mappedTriggers = {}
         for command in GlobalVars.commands.values():
             for trigger in command.triggers:
                 mappedTriggers[trigger] = command
 
+        # split on unescaped |
         chain = re.split(r'(?<!\\)\|', message.Parameters)
 
+        # rebuild the user string... TODO: this should probably be part of the User class
         if message.User.User is not None:
             userString = '{0}!{1}@{2}'.format(message.User.Name, message.User.User, message.User.Hostmask)
         else:
@@ -44,12 +49,17 @@ class Command(CommandInterface):
                 # (or this is the first command in the chain, but for some reason has %output% as a param)
                 link = link.replace('%output%', '')
 
+            # build a new message out of this 'link' in the chain
             input = IRCMessage(message.Type, userString, message.Channel, GlobalVars.CommandChar + link.lstrip())
-            input.chained = True
+            input.chained = True # might be used at some point to tell commands they're being called from Chain
             
             if input.Command.lower() in mappedTriggers:
                 response = mappedTriggers[input.Command.lower()].execute(input)
             else:
                 return IRCResponse(ResponseType.Say, "'{0}' is not a recognized command trigger".format(input.Command), message.ReplyTo)
 
+        if response.Response is not None:
+            # limit response length (chains can get pretty large)
+            # yes this is a nested mess
+            response.Response = unicode(list(StringUtils.split_utf8(response.Response.encode('utf-8'), 700))[0], 'utf-8')
         return response
