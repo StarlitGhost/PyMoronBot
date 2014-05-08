@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
@@ -189,31 +191,75 @@ class Command(CommandInterface):
         return IRCResponse(ResponseType.Say, formatString.format(user, text), message.ReplyTo)
 
     def FollowSteam(self, steamAppId, message):
-        webPage = WebUtils.FetchURL('http://store.steampowered.com/app/{0}/'.format(steamAppId))
+        webPage = WebUtils.FetchURL('http://store.steampowered.com/api/appdetails/?appids={0}&cc=US&l=english&v=1'.format(steamAppId))
 
-        soup = BeautifulSoup(webPage.Page)
+        response = json.loads(webPage.Page)
+        if not response[steamAppId]['success']:
+            return #failure
+
+        appData = response[steamAppId]['data']
 
         data = []
-        title = soup.find(class_='apphub_AppName')
-        if title is not None:
-            data.append(title.text.strip())
 
-        details = soup.find(class_='details_block')
-        if details is not None:
-            genres = 'Genres: ' + ', '.join([link.text for link in details.select('a[href*="/genre/"]')])
-            data.append(genres)
-            releaseDate = re.findall(u'Release Date\: .+', details.text, re.MULTILINE | re.IGNORECASE)[0]
-            data.append(releaseDate)
-            
-        description = soup.find(class_='game_description_snippet')
+        # name
+        data.append(appData['name'].strip())
+
+        # genres
+        data.append(u'Genres: ' + ', '.join([genre['description'] for genre in appData['genres']]))
+
+        # release date
+        if not appData['release_date']['coming_soon']:
+            data.append(u'Release Date: {0}'.format(appData['release_date']['date']))
+        else:
+            data.append(u'Release Date: Coming Soon')
+
+        # metacritic
+        metaScore = appData['metacritic']['score']
+        if metaScore < 40:
+            metacritic = assembleFormattedText(A.normal[A.fg.red[str(metaScore)]])
+        elif metaScore < 60:
+            metacritic = assembleFormattedText(A.normal[A.fg.yellow[str(metaScore)]])
+        else:
+            metacritic = assembleFormattedText(A.normal[A.fg.green[str(metaScore)]])
+        data.append(u'Metacritic: {0}'.format(metacritic))
+        
+        # description
+        description = appData['about_the_game']
         if description is not None:
             limit = 200
-            description = description.text.strip()
+            description = re.sub(r'(<[^>]+>|[\r\n\t])+',assembleFormattedText(A.normal[' ',A.fg.gray['>'],' ']),description)
             if len(description) > limit:
-                description = '{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
+                description = u'{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
             data.append(description)
 
+        # prices
+        prices = {'USD': appData['price_overview']}
+        prices['GBP'] = self.getSteamPrice(steamAppId, 'GB')
+        prices['EUR'] = self.getSteamPrice(steamAppId, 'FR')
+        prices['AUD'] = self.getSteamPrice(steamAppId, 'AU')
+
+        currencies = {'USD': u'$',
+                      'GBP': u'\xa3',
+                      'EUR': u'\x80',
+                      'AUD': u'AU$'}
+
+        if prices['AUD']['final'] == prices['USD']['final']:
+            del prices['AUD']
+
+        priceString = u'/'.join([currencies[val['currency']] + unicode(val['final'] / 100.0) for val in prices.values()])
+        if prices['USD']['discount_percent'] > 0:
+            priceString += assembleFormattedText(A.normal[A.fg.green[' ({0}% sale!)'.format(prices['USD']['discount_percent'])]])
+
+        data.append(priceString)
+
         return IRCResponse(ResponseType.Say, self.graySplitter.join(data), message.ReplyTo)
+
+    def getSteamPrice(self, appId, region):
+        webPage = WebUtils.FetchURL('http://store.steampowered.com/api/appdetails/?appids={0}&cc={1}&l=english&v=1'.format(appId, region))
+        response = json.loads(webPage.Page)
+        if region == 'AU':
+            response[appId]['data']['price_overview']['currency'] = 'AUD'
+        return response[appId]['data']['price_overview']
 
     def FollowKickstarter(self, ksID, message):
         webPage = WebUtils.FetchURL('https://www.kickstarter.com/projects/{0}/'.format(ksID))
