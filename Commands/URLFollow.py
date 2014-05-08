@@ -214,10 +214,11 @@ class Command(CommandInterface):
             data.append(u'Release Date: Coming Soon')
 
         # metacritic
+        # http://www.metacritic.com/faq#item32 (Why is the breakdown of green, yellow, and red scores different for games?)
         metaScore = appData['metacritic']['score']
-        if metaScore < 40:
+        if metaScore < 50:
             metacritic = assembleFormattedText(A.normal[A.fg.red[str(metaScore)]])
-        elif metaScore < 60:
+        elif metaScore < 75:
             metacritic = assembleFormattedText(A.normal[A.fg.yellow[str(metaScore)]])
         else:
             metacritic = assembleFormattedText(A.normal[A.fg.green[str(metaScore)]])
