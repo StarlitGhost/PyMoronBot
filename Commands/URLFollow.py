@@ -208,41 +208,44 @@ class Command(CommandInterface):
         data.append(u'Genres: ' + ', '.join([genre['description'] for genre in appData['genres']]))
 
         # release date
-        if not appData['release_date']['coming_soon']:
-            data.append(u'Release Date: {0}'.format(appData['release_date']['date']))
+        releaseDate = appData['release_date']
+        if not releaseDate['coming_soon']:
+            data.append(u'Release Date: ' + releaseDate['date'])
         else:
-            data.append(u'Release Date: Coming Soon')
+            data.append(assembleFormattedText(A.normal['Release Date: ', A.fg.cyan[str(releaseDate['date'])]]))
 
         # metacritic
         # http://www.metacritic.com/faq#item32 (Why is the breakdown of green, yellow, and red scores different for games?)
-        metaScore = appData['metacritic']['score']
-        if metaScore < 50:
-            metacritic = assembleFormattedText(A.normal[A.fg.red[str(metaScore)]])
-        elif metaScore < 75:
-            metacritic = assembleFormattedText(A.normal[A.fg.yellow[str(metaScore)]])
-        else:
-            metacritic = assembleFormattedText(A.normal[A.fg.green[str(metaScore)]])
-        data.append(u'Metacritic: {0}'.format(metacritic))
+        if 'metacritic' in appData:
+            metaScore = appData['metacritic']['score']
+            if metaScore < 50:
+                metacritic = assembleFormattedText(A.normal[A.fg.red[str(metaScore)]])
+            elif metaScore < 75:
+                metacritic = assembleFormattedText(A.normal[A.fg.yellow[str(metaScore)]])
+            else:
+                metacritic = assembleFormattedText(A.normal[A.fg.green[str(metaScore)]])
+            data.append(u'Metacritic: {0}'.format(metacritic))
 
         # prices
-        prices = {'USD': appData['price_overview']}
-        prices['GBP'] = self.getSteamPrice(steamAppId, 'GB')
-        prices['EUR'] = self.getSteamPrice(steamAppId, 'FR')
-        prices['AUD'] = self.getSteamPrice(steamAppId, 'AU')
+        if 'price_overview' in appData:
+            prices = {'USD': appData['price_overview']}
+            prices['GBP'] = self.getSteamPrice(steamAppId, 'GB')
+            prices['EUR'] = self.getSteamPrice(steamAppId, 'FR')
+            prices['AUD'] = self.getSteamPrice(steamAppId, 'AU')
 
-        currencies = {'USD': u'$',
-                      'GBP': u'\xa3',
-                      'EUR': u'\x80',
-                      'AUD': u'AU$'}
+            currencies = {'USD': u'$',
+                          'GBP': u'\xa3',
+                          'EUR': u'\x80',
+                          'AUD': u'AU$'}
 
-        if prices['AUD']['final'] == prices['USD']['final']:
-            del prices['AUD']
+            if prices['AUD']['final'] == prices['USD']['final']:
+                del prices['AUD']
 
-        priceString = u'/'.join([currencies[val['currency']] + unicode(val['final'] / 100.0) for val in prices.values()])
-        if prices['USD']['discount_percent'] > 0:
-            priceString += assembleFormattedText(A.normal[A.fg.green[' ({0}% sale!)'.format(prices['USD']['discount_percent'])]])
+            priceString = u'/'.join([currencies[val['currency']] + unicode(val['final'] / 100.0) for val in prices.values()])
+            if prices['USD']['discount_percent'] > 0:
+                priceString += assembleFormattedText(A.normal[A.fg.green[' ({0}% sale!)'.format(prices['USD']['discount_percent'])]])
 
-        data.append(priceString)
+            data.append(priceString)
         
         # description
         description = appData['about_the_game']
