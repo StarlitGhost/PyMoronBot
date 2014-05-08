@@ -202,7 +202,7 @@ class Command(CommandInterface):
         data = []
 
         # name
-        data.append(appData['name'].strip())
+        data.append(assembleFormattedText(A.normal[appData['name'], A.fg.gray[' by '], u', '.join(appData['developers'])]))
 
         # genres
         data.append(u'Genres: ' + ', '.join([genre['description'] for genre in appData['genres']]))
