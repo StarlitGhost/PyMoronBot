@@ -222,15 +222,6 @@ class Command(CommandInterface):
         else:
             metacritic = assembleFormattedText(A.normal[A.fg.green[str(metaScore)]])
         data.append(u'Metacritic: {0}'.format(metacritic))
-        
-        # description
-        description = appData['about_the_game']
-        if description is not None:
-            limit = 200
-            description = re.sub(r'(<[^>]+>|[\r\n\t])+',assembleFormattedText(A.normal[' ',A.fg.gray['>'],' ']),description)
-            if len(description) > limit:
-                description = u'{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
-            data.append(description)
 
         # prices
         prices = {'USD': appData['price_overview']}
@@ -251,6 +242,15 @@ class Command(CommandInterface):
             priceString += assembleFormattedText(A.normal[A.fg.green[' ({0}% sale!)'.format(prices['USD']['discount_percent'])]])
 
         data.append(priceString)
+        
+        # description
+        description = appData['about_the_game']
+        if description is not None:
+            limit = 150
+            description = re.sub(r'(<[^>]+>|[\r\n\t])+',assembleFormattedText(A.normal[' ',A.fg.gray['>'],' ']),description)
+            if len(description) > limit:
+                description = u'{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
+            data.append(description)
 
         return IRCResponse(ResponseType.Say, self.graySplitter.join(data), message.ReplyTo)
 
