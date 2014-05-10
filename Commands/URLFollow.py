@@ -27,7 +27,7 @@ class Command(CommandInterface):
         self.youtubeKey = load_key(u'YouTube')
         self.imgurClientID = load_key(u'imgur Client ID')
 
-    def shouldExecute(self, message):
+    def shouldExecute(self, message=IRCMessage):
         if message.Type not in self.acceptedTypes:
             return False
         if ignores.ignoreList is not None:
@@ -35,7 +35,7 @@ class Command(CommandInterface):
                 return False
         return True
     
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.MessageString, re.IGNORECASE)
         if not match:
             return
@@ -68,7 +68,7 @@ class Command(CommandInterface):
 
         url = 'https://gdata.youtube.com/feeds/api/videos/{0}?v=2&key={1}'.format(videoID, self.youtubeKey)
         
-        webPage = WebUtils.FetchURL(url)
+        webPage = WebUtils.fetchURL(url)
         webPage.Page = webPage.Page.decode('utf-8')
         
         titleMatch = re.search('<title>(?P<title>[^<]+?)</title>', webPage.Page)
@@ -119,11 +119,11 @@ class Command(CommandInterface):
 
         headers = [('Authorization', 'Client-ID {0}'.format(self.imgurClientID))]
         
-        webPage = WebUtils.FetchURL(url, headers)
+        webPage = WebUtils.fetchURL(url, headers)
         
         if webPage is None:
             url = 'https://api.imgur.com/3/gallery/{0}'.format(id)
-            webPage = WebUtils.FetchURL(url, headers)
+            webPage = WebUtils.fetchURL(url, headers)
 
         if webPage is None:
             return
@@ -134,12 +134,12 @@ class Command(CommandInterface):
 
         if imageData['title'] is None:
             url = 'https://api.imgur.com/3/gallery/{0}'.format(id)
-            webPage = WebUtils.FetchURL(url, headers)
+            webPage = WebUtils.fetchURL(url, headers)
             if webPage is not None:
                 imageData = json.loads(webPage.Page)['data']
 
             if imageData['title'] is None:
-                webPage = WebUtils.FetchURL('http://imgur.com/{0}'.format(id))
+                webPage = WebUtils.fetchURL('http://imgur.com/{0}'.format(id))
                 imageData['title'] = self.GetTitle(webPage.Page).replace(' - Imgur', '')
                 if imageData['title'] == 'imgur: the simple image sharer':
                     imageData['title'] = None
@@ -166,7 +166,7 @@ class Command(CommandInterface):
         return IRCResponse(ResponseType.Say, self.graySplitter.join(data), message.ReplyTo)
 
     def FollowTwitter(self, tweeter, tweetID, message):
-        webPage = WebUtils.FetchURL('https://twitter.com/{0}/status/{1}'.format(tweeter, tweetID))
+        webPage = WebUtils.fetchURL('https://twitter.com/{0}/status/{1}'.format(tweeter, tweetID))
 
         soup = BeautifulSoup(webPage.Page)
 
@@ -191,7 +191,7 @@ class Command(CommandInterface):
         return IRCResponse(ResponseType.Say, formatString.format(user, text), message.ReplyTo)
 
     def FollowSteam(self, steamAppId, message):
-        webPage = WebUtils.FetchURL('http://store.steampowered.com/api/appdetails/?appids={0}&cc=US&l=english&v=1'.format(steamAppId))
+        webPage = WebUtils.fetchURL('http://store.steampowered.com/api/appdetails/?appids={0}&cc=US&l=english&v=1'.format(steamAppId))
 
         response = json.loads(webPage.Page)
         if not response[steamAppId]['success']:
@@ -259,14 +259,14 @@ class Command(CommandInterface):
         return IRCResponse(ResponseType.Say, self.graySplitter.join(data), message.ReplyTo)
 
     def getSteamPrice(self, appId, region):
-        webPage = WebUtils.FetchURL('http://store.steampowered.com/api/appdetails/?appids={0}&cc={1}&l=english&v=1'.format(appId, region))
+        webPage = WebUtils.fetchURL('http://store.steampowered.com/api/appdetails/?appids={0}&cc={1}&l=english&v=1'.format(appId, region))
         response = json.loads(webPage.Page)
         if region == 'AU':
             response[appId]['data']['price_overview']['currency'] = 'AUD'
         return response[appId]['data']['price_overview']
 
     def FollowKickstarter(self, ksID, message):
-        webPage = WebUtils.FetchURL('https://www.kickstarter.com/projects/{0}/'.format(ksID))
+        webPage = WebUtils.fetchURL('https://www.kickstarter.com/projects/{0}/'.format(ksID))
 
         soup = BeautifulSoup(webPage.Page)
 
@@ -328,7 +328,7 @@ class Command(CommandInterface):
         chanData = {}
         channelOnline = False
         twitchHeaders = [('Accept', 'application/vnd.twitchtv.v2+json')]
-        webPage = WebUtils.FetchURL(u'https://api.twitch.tv/kraken/streams/{0}'.format(channel), twitchHeaders)
+        webPage = WebUtils.fetchURL(u'https://api.twitch.tv/kraken/streams/{0}'.format(channel), twitchHeaders)
 
         streamData = json.loads(webPage.Page)
 
@@ -336,7 +336,7 @@ class Command(CommandInterface):
             chanData = streamData['stream']['channel']
             channelOnline = True
         elif 'error' not in streamData:
-            webPage = WebUtils.FetchURL(u'https://api.twitch.tv/kraken/channels/{0}'.format(channel), twitchHeaders)
+            webPage = WebUtils.fetchURL(u'https://api.twitch.tv/kraken/channels/{0}'.format(channel), twitchHeaders)
             chanData = json.loads(webPage.Page)
 
         if len(chanData) > 0:
@@ -357,7 +357,7 @@ class Command(CommandInterface):
             return IRCResponse(ResponseType.Say, channelInfo, message.ReplyTo)
     
     def FollowStandard(self, url, message):
-        webPage = WebUtils.FetchURL(url)
+        webPage = WebUtils.fetchURL(url)
         
         if webPage is None:
             return

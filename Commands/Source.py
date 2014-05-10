@@ -15,6 +15,6 @@ class Command(CommandInterface):
     triggers = ['source']
     help = "source - returns a link to %s's source" % GlobalVars.CurrentNick
 
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         return IRCResponse(ResponseType.Say, GlobalVars.source, message.ReplyTo)
 

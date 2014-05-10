@@ -1,19 +1,22 @@
+import datetime
+
+from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from CommandInterface import CommandInterface
 import Data.LRRChecker as DataStore
-import WebUtils
 
-import re, datetime
 
 class Command(CommandInterface):
 
     triggers = ['lrr', 'llr']
 
-    def help(self, message):
-        return "lrr (<series>) - returns a link to the latest LRR video, or the latest of a series if you specify one; series are: {0}".format(", ".join(DataStore.LRRChecker.keys()))
+    @staticmethod
+    def help(_):
+        return "lrr (<series>) - returns a link to the latest LRR video, " \
+               "or the latest of a series if you specify one; " \
+               "series are: {0}".format(", ".join(DataStore.LRRChecker.keys()))
     
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         if len(message.Parameters.strip()) > 0:
             feed = self.handleAliases(message.Parameters)
             lowerMap = {key.lower(): key for key in DataStore.LRRChecker.iterkeys()}
@@ -26,7 +29,11 @@ class Command(CommandInterface):
                 
                 return IRCResponse(ResponseType.Say, response, message.ReplyTo)
                 
-            return IRCResponse(ResponseType.Say, u"{0} is not one of the LRR series being monitored (leave a tell for Tyranic-Moron if it's a new series or should be an alias!)".format(message.Parameters.strip()), message.ReplyTo)
+            return IRCResponse(ResponseType.Say,
+                               u"{0} is not one of the LRR series being monitored "
+                               u"(leave a tell for Tyranic-Moron if it's a new series or "
+                               u"should be an alias!)".format(message.Parameters.strip()),
+                               message.ReplyTo)
         else:
             latestDate = datetime.datetime.utcnow() - datetime.timedelta(days=365*10)
             latestFeed = None

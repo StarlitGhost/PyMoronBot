@@ -1,4 +1,6 @@
+from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
+
 
 class CommandInterface(object):
     triggers = []
@@ -12,7 +14,7 @@ class CommandInterface(object):
     def onStart(self):
         pass
 
-    def shouldExecute(self, message):
+    def shouldExecute(self, message=IRCMessage):
         if message.Type not in self.acceptedTypes:
             return False
         if message.Command.lower() not in self.triggers:
@@ -20,5 +22,5 @@ class CommandInterface(object):
         
         return True
 
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         return IRCResponse(ResponseType.Say, '<command not yet implemented>', message.ReplyTo)

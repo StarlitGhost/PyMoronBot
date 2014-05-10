@@ -1,16 +1,15 @@
-'''
+"""
 Created on Dec 01, 2013
 
 @author: Tyranic-Moron
-'''
+"""
 
+from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from CommandInterface import CommandInterface
 import GlobalVars
 from Data import ignores
 
-import re
 
 class Command(CommandInterface):
     triggers = ['ignore']
@@ -24,7 +23,7 @@ class Command(CommandInterface):
         if ignores.ignoreList is not None and 'Unignore' not in GlobalVars.commands:
             ignores.ignoreList = None
 
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can edit the ignore list', message.ReplyTo)
 
@@ -41,6 +40,8 @@ class Command(CommandInterface):
 
         else:
             if ignores.ignoreList is not None and len(ignores.ignoreList) > 0:
-                return IRCResponse(ResponseType.Say, 'Ignored users: {0}'.format(', '.join( sorted(ignores.ignoreList) )), message.ReplyTo)
+                return IRCResponse(ResponseType.Say,
+                                   'Ignored users: {0}'.format(', '.join(sorted(ignores.ignoreList))),
+                                   message.ReplyTo)
             else:
                 return IRCResponse(ResponseType.Say, 'Not currently ignoring anyone!', message.ReplyTo)

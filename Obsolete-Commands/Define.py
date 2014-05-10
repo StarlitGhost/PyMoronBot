@@ -7,17 +7,18 @@ import re
 import urllib
 import json
 
+
 class Command(CommandInterface):
     triggers = ['define','def']
     help = "define <word> - Fetches the dictionary definition of the given word from Google"
     
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say, 'Define what?', message.ReplyTo)
         
         query = urllib.quote(message.Parameters.encode('utf8'))
         url = 'http://www.google.com/dictionary/json?callback=a&sl=en&tl=en&q={0}'.format(query)
-        j = WebUtils.SendToServer(url)
+        j = WebUtils.sendToServer(url)
         j = j[2:]
         j = j[:-10]
         j = j.decode('string_escape')
@@ -45,4 +46,3 @@ class Command(CommandInterface):
             return IRCResponse(ResponseType.Say, 'No definitions found for {0}'.format(message.Parameters), message.ReplyTo)
         
         return responses
-

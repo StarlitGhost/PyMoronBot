@@ -41,3 +41,7 @@ Data/*.json
 *.suo
 *.user
 .gitattributes
+.idea/*
+parser.out
+parsetab.py
+PTVS/*

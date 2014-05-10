@@ -1,7 +1,10 @@
 from enumType import enum
-import GlobalVars, ServerInfo
+import GlobalVars
+import ServerInfo
+
 
 TargetTypes = enum('CHANNEL', 'USER')
+
 
 class IRCChannel(object):
     def __init__(self, name):
@@ -22,6 +25,7 @@ class IRCChannel(object):
 
         return None
 
+
 class IRCUser(object):
     Hostmask = None
     Name = None
@@ -34,6 +38,7 @@ class IRCUser(object):
             userArray = userArray[1].split('@')
             self.User = userArray[0]
             self.Hostmask = userArray[1]
+
 
 class IRCMessage(object):
     Type = None
@@ -62,7 +67,8 @@ class IRCMessage(object):
             self.TargetType = TargetTypes.USER
         else:
             self.Channel = channel
-            self.ReplyTo = channel.Name # I would like to set this to the channel object but I would probably break functionality if I did :I
+            # I would like to set this to the channel object but I would probably break functionality if I did :I
+            self.ReplyTo = channel.Name
             self.TargetType = TargetTypes.CHANNEL
 
         if self.MessageList[0].startswith(GlobalVars.CommandChar):

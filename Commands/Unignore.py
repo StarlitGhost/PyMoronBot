@@ -24,7 +24,7 @@ class Command(CommandInterface):
         if ignores.ignoreList is not None and 'Ignore' not in GlobalVars.commands:
             ignores.ignoreList = None
 
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can edit the ignore list', message.ReplyTo)
 

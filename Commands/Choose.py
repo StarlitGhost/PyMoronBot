@@ -1,14 +1,15 @@
-'''
+"""
 Created on May 04, 2014
 
 @author: Tyranic-Moron
-'''
-
-from IRCMessage import IRCMessage, IRCChannel
-from IRCResponse import IRCResponse, ResponseType
-from CommandInterface import CommandInterface
+"""
 
 import random
+
+from CommandInterface import CommandInterface
+from IRCMessage import IRCMessage
+from IRCResponse import IRCResponse, ResponseType
+
 
 class Command(CommandInterface):
     triggers = ['choose']

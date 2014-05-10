@@ -11,12 +11,12 @@ class Command(CommandInterface):
     triggers = ['mtg', 'mtgf']
     help = 'mtg(f) <card name> - fetches details of the Magic: The Gathering card you specify from gatherer.wizards.com. mtgf includes the flavour text, if it has any'
 
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         searchTerm = 'http://gatherer.wizards.com/pages/search/default.aspx?name='
         for param in message.ParameterList:
             searchTerm += '+[%s]' % param
 
-        webPage = WebUtils.FetchURL(searchTerm)
+        webPage = WebUtils.fetchURL(searchTerm)
 
         soup = BeautifulSoup(webPage.Page)
 

@@ -1,12 +1,15 @@
-import os, sys
+import sys
 from glob import glob
+import os
+
 import GlobalVars
 
-def LoadCommand(name, loadAs=''):
+
+def loadCommand(name, loadAs=''):
 
     name = name.lower()
 
-    cmdList = GetCommandDirList()
+    cmdList = getCommandDirList()
     cmdListCaseMap = {key.lower(): key for key in cmdList}
 
     if name not in cmdListCaseMap:
@@ -42,7 +45,7 @@ def LoadCommand(name, loadAs=''):
 
     return True
 
-def UnloadCommand(name):
+def unloadCommand(name):
 
     if name.lower() in GlobalVars.commandCaseMapping.keys():
         del GlobalVars.commands[GlobalVars.commandCaseMapping[name]]
@@ -52,15 +55,15 @@ def UnloadCommand(name):
 
     return True
 
-def AutoLoadCommands():
+def autoLoadCommands():
 
-    for command in GetCommandDirList():
+    for command in getCommandDirList():
         try:
-            LoadCommand(command)
+            loadCommand(command)
         except Exception, x:
             print x.args
 
-def GetCommandDirList():
+def getCommandDirList():
 
     root = os.path.join('.', 'Commands')
 

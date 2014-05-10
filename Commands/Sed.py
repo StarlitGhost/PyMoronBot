@@ -13,22 +13,27 @@ import re, copy
 
 
 class Command(CommandInterface):
+    triggers = ['sed']
     acceptedTypes = ['PRIVMSG', 'ACTION']
     help = 's/search/replacement/flags - matches sed-like regex replacement patterns and attempts to execute them on the latest matching line from the last 10\n'\
             'flags are g (global), i (case-insensitive), o (only user messages), v (verbose, ignores whitespace)\n'\
             'Example usage: "I\'d eat some tacos" -> s/some/all the/ -> "I\'d eat all the tacos"'
 
+    #TODO: make these per-channel
     messages = []
     unmodifiedMessages = []
     
     historySize = 20
 
-    def shouldExecute(self, message):
+    def shouldExecute(self, message=IRCMessage):
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message):
-        match = self.match(message.MessageString)
+    def execute(self, message=IRCMessage):
+        if message.Command.lower() == 'sed':
+            match = self.match(message.Parameters)
+        else:
+            match = self.match(message.MessageString)
 
         if match:
             search, replace, flags = match

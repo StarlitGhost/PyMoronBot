@@ -15,7 +15,7 @@ class Command(CommandInterface):
     triggers = ['leave', 'gtfo']
     help = "leave/gtfo - makes the bot leave the current channel"
 
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can tell me to %s' % message.Command, message.ReplyTo)
         

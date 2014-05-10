@@ -18,7 +18,7 @@ class Command(CommandInterface):
     triggers = ['urban','ud']
     help = "urban <search term> - returns the definition of the given search term from UrbanDictionary.com"
     
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say, "You didn't give a word! Usage: {0}".format(self.help), message.ReplyTo)
         
@@ -26,7 +26,7 @@ class Command(CommandInterface):
 
         url = 'http://www.urbandictionary.com/define.php?term={0}'.format(search)
         
-        webPage = WebUtils.FetchURL(url)
+        webPage = WebUtils.fetchURL(url)
 
         soup = BeautifulSoup(webPage.Page)
         # replace link tags with their contents

@@ -1,30 +1,29 @@
-'''
+"""
 Created on Apr 26, 2013
 
 @author: Tyranic-Moron, Emily
-'''
+"""
 
+import json
+
+from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from CommandInterface import CommandInterface
 import GlobalVars
-
-import re, json
+import StringUtils
 
 from storm.locals import *
 
-import StringUtils
 
 class Command(CommandInterface):
-
-    ChatMapDB = None
+    chatMapDB = None
 
     triggers = ['chatmap', 'map']
 
     def onStart(self):
         try:
             with open('Data/ChatMapDB.json', 'r') as f:
-                self.ChatMapDB = json.load(f)
+                self.chatMapDB = json.load(f)
         except IOError:
             pass
 
@@ -34,37 +33,42 @@ class Command(CommandInterface):
         coords = ''.join(message.ParameterList[1:])
         if not ',' in coords:
             return 'lat,lon coords must be comma separated'
-        (lat,lon) = coords.split(',')
+        (lat, lon) = coords.split(',')
         if not StringUtils.is_number(lat) or not StringUtils.is_number(lon):
             return 'latitude or longitude are not numeric'
 
-        (lat,lon) = float(lat),float(lon)
+        (lat, lon) = float(lat), float(lon)
 
         if not -90.0 < lat < 90.0:
             return 'latitude is outside valid range (-90 -> 90)'
         if not -180.0 < lon < 180.0:
             return 'longitude is outside valid range (-180 -> 180)'
 
-        db = create_database("mysql://{0}:{1}@{2}:{3}/{4}".format(self.ChatMapDB['User'],
-                                                                  self.ChatMapDB['Password'],
-                                                                  self.ChatMapDB['Host'],
+        db = create_database("mysql://{0}:{1}@{2}:{3}/{4}".format(self.chatMapDB['User'],
+                                                                  self.chatMapDB['Password'],
+                                                                  self.chatMapDB['Host'],
                                                                   3306,
-                                                                  self.ChatMapDB['DB']))
+                                                                  self.chatMapDB['DB']))
         store = Store(db)
 
-        result = store.execute("SELECT nick, latitude, longitude FROM " + self.ChatMapDB['Table'] + " WHERE nick=%s", [message.User.Name])
+        result = store.execute("SELECT nick, latitude, longitude FROM " + self.chatMapDB['Table'] + " WHERE nick=%s",
+                               [message.User.Name])
 
         response = 'There has been a fatal error updating your GPS coordinates. Please contact Emily to let her know.'
 
         if result.rowcount == 1:
-            result = store.execute("UPDATE " + self.ChatMapDB['Table'] + " SET latitude=%s, longitude=%s WHERE nick=%s", [lat, lon, message.User.Name])
+            result = store.execute("UPDATE " + self.chatMapDB['Table'] + " SET latitude=%s, longitude=%s WHERE nick=%s",
+                                   [lat, lon, message.User.Name])
             if result:
                 response = 'Your chatmap position has been updated with the new GPS coordinates!'
 
         elif result.rowcount == 0:
-            result = store.execute("INSERT INTO " + self.ChatMapDB['Table'] + " (nick, latitude, longitude) VALUES(%s, %s, %s)", [message.User.Name, lat, lon])
+            result = store.execute(
+                "INSERT INTO " + self.chatMapDB['Table'] + " (nick, latitude, longitude) VALUES(%s, %s, %s)",
+                [message.User.Name, lat, lon])
             if result:
-                response = 'You are now on the chatmap at the specified GPS coordinates! Be sure to do an addYear to add the year you first started as a Survivor!'
+                response = 'You are now on the chatmap at the specified GPS coordinates! ' \
+                           'Be sure to do an addYear to add the year you first started as a Survivor!'
 
         store.close()
 
@@ -82,22 +86,24 @@ class Command(CommandInterface):
         if not -1 < year < 8:
             return 'the desert bus year should only be for valid years (1 -> 7)'
 
-        db = create_database("mysql://{0}:{1}@{2}:{3}/{4}".format(self.ChatMapDB['User'],
-                                                                  self.ChatMapDB['Password'],
-                                                                  self.ChatMapDB['Host'],
+        db = create_database("mysql://{0}:{1}@{2}:{3}/{4}".format(self.chatMapDB['User'],
+                                                                  self.chatMapDB['Password'],
+                                                                  self.chatMapDB['Host'],
                                                                   3306,
-                                                                  self.ChatMapDB['DB']))
+                                                                  self.chatMapDB['DB']))
         store = Store(db)
 
-        result = store.execute("SELECT nick, dbyear FROM " + self.ChatMapDB['Table'] + " WHERE nick=%s", [message.User.Name])
+        result = store.execute("SELECT nick, dbyear FROM " + self.chatMapDB['Table'] + " WHERE nick=%s",
+                               [message.User.Name])
 
         response = 'There has been a fatal error updating your Desert Bus Year. Please contact Emily to let her know.'
 
         if result.rowcount == 1:
-            result = store.execute("UPDATE " + self.ChatMapDB['Table'] + " SET dbyear=%s WHERE nick=%s", [year, message.User.Name])
+            result = store.execute("UPDATE " + self.chatMapDB['Table'] + " SET dbyear=%s WHERE nick=%s",
+                                   [year, message.User.Name])
             if result:
                 response = 'Your desert bus year has been updated with your information!'
-                
+
         elif result.rowcount == 0:
             response = 'You do not currently have a chatmap record, please use add lat,lon first.'
 
@@ -108,23 +114,31 @@ class Command(CommandInterface):
     def delete(self, message):
         """del - deletes a nick from the chat map"""
 
-        db = create_database("mysql://{0}:{1}@{2}:{3}/{4}".format(self.ChatMapDB['User'],
-                                                                  self.ChatMapDB['Password'],
-                                                                  self.ChatMapDB['Host'],
+        db = create_database("mysql://{0}:{1}@{2}:{3}/{4}".format(self.chatMapDB['User'],
+                                                                  self.chatMapDB['Password'],
+                                                                  self.chatMapDB['Host'],
                                                                   3306,
-                                                                  self.ChatMapDB['DB']))
+                                                                  self.chatMapDB['DB']))
         store = Store(db)
 
-        result = store.execute("SELECT nick, latitude, longitude FROM " + self.ChatMapDB['Table'] + " WHERE nick=%s", [message.User.Name])
+        result = store.execute("SELECT nick, latitude, longitude FROM " + self.chatMapDB['Table'] + " WHERE nick=%s",
+                               [message.User.Name])
 
         if result.rowcount == 1:
-            result = store.execute("DELETE FROM " + self.ChatMapDB['Table'] + " WHERE nick=%s", [message.User.Name])
+            result = store.execute("DELETE FROM " + self.chatMapDB['Table'] + " WHERE nick=%s", [message.User.Name])
 
             if result:
                 response = 'Your chatmap record has been deleted!'
+            else:
+                response = "Something weird happened and I didn't delete your chatmap record. " \
+                           "Someone tell my owner!"
 
         elif result.rowcount == 0:
             response = 'You do not currently have a chatmap record, and therefore cannot be deleted.'
+
+        else:
+            response = 'It seems like I just deleted a bunch of chatmap records with the same name! ' \
+                       'Someone tell my owner!'
 
         store.close()
 
@@ -140,18 +154,21 @@ class Command(CommandInterface):
             if subCommand in self.subCommands:
                 return 'chatmap {0}'.format(self.subCommands[subCommand].__doc__)
             else:
-                return self.UnrecognizedSubcommand(subCommand)
+                return self.unrecognizedSubcommand(subCommand)
         else:
-            return "{1}chatmap ({0}) - where are the people of #DesertBus? Links to a Chat Map using the Google Maps API. Use '{1}help chatmap <subcommand>' for subcommand help. You can use '{1}gpslookup <address>' via PM to find your lat,lon coords".format('/'.join(self.subCommands.keys()), GlobalVars.CommandChar)
+            return "{1}chatmap ({0}) - where are the people of #DesertBus? " \
+                   "Links to a Chat Map using the Google Maps API. " \
+                   "Use '{1}help chatmap <subcommand>' for subcommand help. " \
+                   "You can use '{1}gpslookup <address>' via PM to find your lat,lon coords".format(
+                '/'.join(self.subCommands.keys()), GlobalVars.CommandChar)
 
-    def execute(self, message):
-        subCommand = None
+    def execute(self, message=IRCMessage):
         if len(message.ParameterList) > 0:
             subCommand = message.ParameterList[0].lower()
             if subCommand not in self.subCommands:
-                return IRCResponse(ResponseType.Say, self.UnrecognizedSubcommand(subCommand), message.ReplyTo)
-            
-            if self.ChatMapDB is None:
+                return IRCResponse(ResponseType.Say, self.unrecognizedSubcommand(subCommand), message.ReplyTo)
+
+            if self.chatMapDB is None:
                 return IRCResponse(ResponseType.Say, '[Chatmap database details not found]', message.ReplyTo)
 
             response = self.subCommands[subCommand](self, message)
@@ -163,5 +180,6 @@ class Command(CommandInterface):
                                'The Wonderful World of #desertbus People! http://www.tsukiakariusagi.net/chatmap.php',
                                message.ReplyTo)
 
-    def UnrecognizedSubcommand(self, subCommand):
-        return 'unrecognized subcommand \'{0}\', available subcommands for chatmap are: {1}'.format(subCommand, ', '.join(self.subCommands.keys()))
+    def unrecognizedSubcommand(self, subCommand):
+        return 'unrecognized subcommand \'{0}\', ' \
+               'available subcommands for chatmap are: {1}'.format(subCommand, ', '.join(self.subCommands.keys()))

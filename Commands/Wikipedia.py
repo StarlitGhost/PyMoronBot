@@ -41,7 +41,7 @@ class Command(CommandInterface):
     triggers = ['wiki', 'wikipedia']
     help = 'wiki(pedia) <search term> - returns the top result for a given search term from wikipedia'
     
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         article = message.Parameters
         article = urllib.quote(article)
         

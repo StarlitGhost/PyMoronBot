@@ -1,21 +1,26 @@
+from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from CommandInterface import CommandInterface
 import GlobalVars
 
-import sys
-from CommandHandler import LoadCommand, UnloadCommand, AutoLoadCommands
+from CommandHandler import loadCommand, unloadCommand
+
 
 class Command(CommandInterface):
     triggers = ['load', 'reload', 'unload']
-    help = "load/reload <function>, unload <function> - handles loading/unloading/reloading of functions. Use 'all' with load/reload to reload all active functions"
+    help = "load/reload <function>, unload <function> - handles loading/unloading/reloading of functions. " \
+           "Use 'all' with load/reload to reload all active functions"
 
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         if message.User.Name not in GlobalVars.admins:
-            return IRCResponse(ResponseType.Say, "Only my admins can use {0}".format(message.Command), message.ReplyTo)
+            return IRCResponse(ResponseType.Say,
+                               "Only my admins can use {0}".format(message.Command),
+                               message.ReplyTo)
 
         if len(message.ParameterList) == 0:
-            return IRCResponse(ResponseType.Say, "You didn't specify a function name! Usage: {0}".format(self.help), message.ReplyTo)
+            return IRCResponse(ResponseType.Say,
+                               "You didn't specify a function name! Usage: {0}".format(self.help),
+                               message.ReplyTo)
 
         if message.Command.lower() in ['load', 'reload']:
             successes, failures, exceptions = self.load(message.ParameterList)
@@ -25,15 +30,24 @@ class Command(CommandInterface):
 
         responses = []
         if len(successes) > 0:
-            responses.append(IRCResponse(ResponseType.Say, "'{0}' {1}ed successfully".format(', '.join(successes), message.Command.lower()), message.ReplyTo))
+            responses.append(IRCResponse(ResponseType.Say,
+                                         "'{0}' {1}ed successfully".format(', '.join(successes),
+                                                                           message.Command.lower()),
+                                         message.ReplyTo))
         if len(failures) > 0:
-            responses.append(IRCResponse(ResponseType.Say, "'{0}' failed to {1}, or (they) do not exist".format(', '.join(failures), message.Command.lower()), message.ReplyTo))
+            responses.append(IRCResponse(ResponseType.Say,
+                                         "'{0}' failed to {1}, or (they) do not exist".format(', '.join(failures),
+                                                                                              message.Command.lower()),
+                                         message.ReplyTo))
         if len(exceptions) > 0:
-            responses.append(IRCResponse(ResponseType.Say, "'{0}' threw an exception (printed to console)".format(', '.join(exceptions)), message.ReplyTo))
+            responses.append(IRCResponse(ResponseType.Say,
+                                         "'{0}' threw an exception (printed to console)".format(', '.join(exceptions)),
+                                         message.ReplyTo))
 
         return responses
 
-    def load(self, funcNames):
+    @staticmethod
+    def load(funcNames):
 
         funcNameCaseMap = {f.lower(): f for f in funcNames}
 
@@ -46,8 +60,8 @@ class Command(CommandInterface):
                 if name == 'FuncLoader':
                     continue
 
-                LoadCommand(name)
-                LoadCommand(name)
+                loadCommand(name)
+                loadCommand(name)
 
             return ['all functions'], [], []
 
@@ -58,9 +72,9 @@ class Command(CommandInterface):
             
             else:
                 try:
-                    success = LoadCommand(funcName)
+                    success = loadCommand(funcName)
                     if success:
-                        LoadCommand(funcName)
+                        loadCommand(funcName)
                         successes.append(GlobalVars.commandCaseMapping[funcName])
                     else:
                         failures.append(funcNameCaseMap[funcName])
@@ -71,7 +85,8 @@ class Command(CommandInterface):
 
         return successes, failures, exceptions
 
-    def unload(self, funcNames):
+    @staticmethod
+    def unload(funcNames):
 
         funcNameCaseMap = {f.lower(): f for f in funcNames}
 
@@ -81,7 +96,7 @@ class Command(CommandInterface):
         
         for funcName in funcNameCaseMap.keys():
             try:
-                success = UnloadCommand(funcName)
+                success = unloadCommand(funcName)
                 if success:
                     successes.append(funcNameCaseMap[funcName])
                 else:

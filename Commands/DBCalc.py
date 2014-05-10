@@ -1,28 +1,28 @@
+import math
+
+from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from CommandInterface import CommandInterface
 
-import re, math
 
 class Command(CommandInterface):
     triggers = ['dbcalc']
-    help = 'dbcalc (hours <hours> / money <money>) - tells you how much money is required for a given number of hours, or how many hours will be bussed for a given amount of money'
+    help = 'dbcalc (hours <hours> / money <money>) - tells you how much money is required for a given number of hours, ' \
+           'or how many hours will be bussed for a given amount of money'
 
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         if len(message.ParameterList) < 2:
             return IRCResponse(ResponseType.Say, self.help, message.ReplyTo)
 
         if message.ParameterList[0].lower() == 'hours':
-            return IRCResponse(ResponseType.Say, self.Hours(message.ParameterList[1]), message.ReplyTo)
+            return IRCResponse(ResponseType.Say, self.hours(message.ParameterList[1]), message.ReplyTo)
         elif message.ParameterList[0].lower() == 'money':
-            return IRCResponse(ResponseType.Say, self.Money(message.ParameterList[1]), message.ReplyTo)
+            return IRCResponse(ResponseType.Say, self.money(message.ParameterList[1]), message.ReplyTo)
         else:
             return IRCResponse(ResponseType.Say, self.help, message.ReplyTo)
 
-    def Hours(self, hours):
-
-        f_hours = 0.0
-        money = 0.0
+    @staticmethod
+    def hours(hours):
 
         try:
             f_hours = float(hours)
@@ -36,10 +36,8 @@ class Command(CommandInterface):
 
         return "For {0:,} hour(s), the team needs a total of ${1:,.2f}".format(f_hours, money)
 
-    def Money(self, money):
-
-        hours = 0.0
-        f_money = 0.0
+    @staticmethod
+    def money(money):
 
         try:
             f_money = float(money)

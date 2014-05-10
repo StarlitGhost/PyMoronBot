@@ -12,7 +12,7 @@ class Command(CommandInterface):
     triggers = ['say']
     help = 'say <text> - makes the bot repeat the specified text'
 
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         if len(message.ParameterList) > 0:
             return IRCResponse(ResponseType.Say, message.Parameters, message.ReplyTo)
         else:

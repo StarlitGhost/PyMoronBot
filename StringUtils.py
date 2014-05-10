@@ -44,5 +44,6 @@ def strip_colours(msg):
                 break
             strip_length += 1
         msg = msg[:color_pos] + msg[color_pos + strip_length:]
-    msg = msg.replace(chr(2), "").replace(chr(29), "").replace(chr(31), "").replace(chr(15), "").replace(chr(22), "") # bold, italic, underline, plain, reverse
+    # bold, italic, underline, plain, reverse
+    msg = msg.replace(chr(2), "").replace(chr(29), "").replace(chr(31), "").replace(chr(15), "").replace(chr(22), "")
     return msg

@@ -1,27 +1,28 @@
-'''
+"""
 Created on Oct 09, 2013
 
 @author: Tyranic-Moron
-'''
+"""
 
+import json
+import urllib
+
+from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from CommandInterface import CommandInterface
-from GlobalVars import *
-
 import WebUtils
 from Data.api_keys import load_key
 
-import re, json, urllib
 
 class Command(CommandInterface):
     triggers = ['gps', 'gpslookup']
-    help = "gps(lookup) <address> - Uses Microsoft's Bing Maps geocoding API to lookup GPS coordinates for the given address. Must be used over PM"
+    help = "gps(lookup) <address> - Uses Microsoft's Bing Maps geocoding API to " \
+           "lookup GPS coordinates for the given address. Must be used over PM"
 
     def onStart(self):
         self.api_key = load_key(u'Bing Maps')
 
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         if message.User.Name != message.ReplyTo:
             return IRCResponse(ResponseType.Say, "GPS Lookup must be done via PM", message.ReplyTo)
         
@@ -31,12 +32,14 @@ class Command(CommandInterface):
 
             url = "http://dev.virtualearth.net/REST/v1/Locations?q={0}&key={1}".format(urllib.quote_plus(message.Parameters), self.api_key)
 
-            j = WebUtils.SendToServer(url)
+            j = WebUtils.sendToServer(url)
             result = json.loads(j)
 
             if result['resourceSets'][0]['estimatedTotal'] == 0:
                 print result
-                return IRCResponse(ResponseType.Say, "Couldn't find GPS coords for '{0}', sorry!".format(message.Parameters), message.ReplyTo)
+                return IRCResponse(ResponseType.Say,
+                                   "Couldn't find GPS coords for '{0}', sorry!".format(message.Parameters),
+                                   message.ReplyTo)
 
             coords = result['resourceSets'][0]['resources'][0]['point']['coordinates']
 

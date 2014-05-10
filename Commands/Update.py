@@ -17,7 +17,7 @@ class Command(CommandInterface):
     triggers = ['update']
     help = "update - pulls the latest code from GitHub"
 
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can update me', message.ReplyTo)
 

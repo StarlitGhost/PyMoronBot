@@ -186,7 +186,7 @@ class Command(CommandInterface):
         except Exception, e:
             print e
     
-    def shouldExecute(self, message):
+    def shouldExecute(self, message=IRCMessage):
         if message.Type not in self.acceptedTypes:
             return False
         if ignores.ignoreList is not None:
@@ -195,7 +195,7 @@ class Command(CommandInterface):
 
         return True
 
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         if message.Command:
             match = re.search('^responses?$', message.Command, re.IGNORECASE)
             if not match:

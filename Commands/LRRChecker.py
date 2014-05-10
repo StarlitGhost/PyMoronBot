@@ -12,10 +12,10 @@ class Command(CommandInterface):
     help = "Automatic function, scans LRR video RSS feeds and reports new items in the channel."
     runInThread = True
 
-    def shouldExecute(self, message):
+    def shouldExecute(self, message=IRCMessage):
         return True
 
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         responses = []
         for feedName, feedDeets in DataStore.LRRChecker.iteritems():
             if feedDeets['lastCheck'] > datetime.datetime.utcnow() - datetime.timedelta(minutes=10):
@@ -23,7 +23,7 @@ class Command(CommandInterface):
             
             DataStore.LRRChecker[feedName]['lastCheck'] = datetime.datetime.utcnow()
             
-            feedPage = WebUtils.FetchURL(feedDeets['url'])
+            feedPage = WebUtils.fetchURL(feedDeets['url'])
             
             if feedPage is None:
                 #TODO: log an error here that the feed likely no longer exists!
@@ -37,7 +37,7 @@ class Command(CommandInterface):
                 continue
 
             title = DataStore.LRRChecker[feedName]['lastTitle'] = item.find('title').text
-            link = DataStore.LRRChecker[feedName]['lastLink'] = WebUtils.ShortenGoogl(item.find('link').text)
+            link = DataStore.LRRChecker[feedName]['lastLink'] = WebUtils.shortenGoogl(item.find('link').text)
             newestDate = dparser.parse(item.find('pubDate').text, fuzzy=True, ignoretz=True)
             
             if newestDate > feedDeets['lastUpdate']:

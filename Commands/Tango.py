@@ -47,7 +47,7 @@ class Command(CommandInterface):
     triggers = ['tango']
     help = 'tango <words> - reproduces <words> with the NATO phonetic alphabet, because reasons.'
 
-    def execute(self, message):
+    def execute(self, message=IRCMessage):
         if len(message.ParameterList) > 0:
             return IRCResponse(ResponseType.Say,
                                ' '.join(dict[letter.upper()] if letter.upper() in dict else letter for letter in message.Parameters),
