@@ -1,8 +1,8 @@
-'''
+"""
 Created on Dec 07, 2013
 
 @author: Tyranic-Moron
-'''
+"""
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -12,6 +12,7 @@ import GlobalVars
 import re
 
 import subprocess
+
 
 class Command(CommandInterface):
     triggers = ['update']

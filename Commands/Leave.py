@@ -1,15 +1,14 @@
-'''
+"""
 Created on Dec 20, 2011
 
 @author: Tyranic-Moron
-'''
+"""
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
 import GlobalVars
 
-import re
 
 class Command(CommandInterface):
     triggers = ['leave', 'gtfo']
@@ -23,4 +22,3 @@ class Command(CommandInterface):
             return IRCResponse(ResponseType.Raw, 'PART %s :%s' % (message.ReplyTo, message.Parameters), '')
         else:
             return IRCResponse(ResponseType.Raw, 'PART %s :toodles!' % (message.ReplyTo), '')
-

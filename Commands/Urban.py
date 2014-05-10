@@ -1,26 +1,30 @@
-'''
+"""
 Created on Jan 24, 2014
 
 @author: Tyranic-Moron
-'''
+"""
+
+import urllib
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
+
 import WebUtils
 
-import re
-import urllib, urllib2
 from bs4 import BeautifulSoup
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
+
 class Command(CommandInterface):
-    triggers = ['urban','ud']
+    triggers = ['urban', 'ud']
     help = "urban <search term> - returns the definition of the given search term from UrbanDictionary.com"
     
     def execute(self, message=IRCMessage):
         if len(message.ParameterList) == 0:
-            return IRCResponse(ResponseType.Say, "You didn't give a word! Usage: {0}".format(self.help), message.ReplyTo)
+            return IRCResponse(ResponseType.Say,
+                               "You didn't give a word! Usage: {0}".format(self.help),
+                               message.ReplyTo)
         
         search = urllib.quote(message.Parameters)
 
@@ -65,7 +69,8 @@ class Command(CommandInterface):
                            A.normal[A.bold["{0}:"], " {1}\n",
                                     A.bold["Example(s):"], " {2}\n",
                                     "{3}", graySplitter,
-                                    A.fg.lightGreen["+{4}"], A.fg.gray["/"], A.fg.lightRed["-{5}"], graySplitter, "More defs: {6}"])
+                                    A.fg.lightGreen["+{4}"], A.fg.gray["/"], A.fg.lightRed["-{5}"], graySplitter,
+                                    "More defs: {6}"])
 
         response = formatString.format(word, definition, example, author, up, down, url)
         

@@ -1,15 +1,13 @@
-'''
+"""
 Created on Feb 15, 2013
 
 @author: Emily, Tyranic-Moron
-'''
+"""
 
+from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from CommandInterface import CommandInterface
-from GlobalVars import *
 
-import re
 
 class Command(CommandInterface):
     triggers = ['torrent']

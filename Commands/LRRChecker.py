@@ -4,9 +4,10 @@ from CommandInterface import CommandInterface
 import Data.LRRChecker as DataStore
 import WebUtils
 
-import re, datetime
+import datetime
 import xml.etree.ElementTree as ET
 import dateutil.parser as dparser
+
 
 class Command(CommandInterface):
     help = "Automatic function, scans LRR video RSS feeds and reports new items in the channel."
@@ -50,4 +51,3 @@ class Command(CommandInterface):
                     responses.append(IRCResponse(ResponseType.Say, response, '#desertbus'))
             
         return responses
-

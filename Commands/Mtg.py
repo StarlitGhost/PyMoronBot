@@ -9,7 +9,8 @@ from bs4 import BeautifulSoup
 
 class Command(CommandInterface):
     triggers = ['mtg', 'mtgf']
-    help = 'mtg(f) <card name> - fetches details of the Magic: The Gathering card you specify from gatherer.wizards.com. mtgf includes the flavour text, if it has any'
+    help = 'mtg(f) <card name> - fetches details of the Magic: The Gathering card you specify ' \
+           'from gatherer.wizards.com. mtgf includes the flavour text, if it has any'
 
     def execute(self, message=IRCMessage):
         searchTerm = 'http://gatherer.wizards.com/pages/search/default.aspx?name='

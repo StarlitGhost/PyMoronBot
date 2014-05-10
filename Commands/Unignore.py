@@ -1,8 +1,8 @@
-'''
+"""
 Created on Dec 01, 2013
 
 @author: Tyranic-Moron
-'''
+"""
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -10,7 +10,6 @@ from CommandInterface import CommandInterface
 import GlobalVars
 from Data import ignores
 
-import re
 
 class Command(CommandInterface):
     triggers = ['unignore']
@@ -41,4 +40,3 @@ class Command(CommandInterface):
 
         else:
             return IRCResponse(ResponseType.Say, self.help, message.ReplyTo)
-

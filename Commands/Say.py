@@ -1,12 +1,13 @@
-'''
+"""
 Created on Dec 20, 2011
 
 @author: Tyranic-Moron
-'''
+"""
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
+
 
 class Command(CommandInterface):
     triggers = ['say']

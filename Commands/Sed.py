@@ -1,23 +1,23 @@
-'''
+"""
 Created on Feb 14, 2014
 
 @author: Tyranic-Moron
-'''
+"""
+
+import copy
+import re
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-from GlobalVars import *
-
-import re, copy
 
 
 class Command(CommandInterface):
     triggers = ['sed']
     acceptedTypes = ['PRIVMSG', 'ACTION']
     help = 's/search/replacement/flags - matches sed-like regex replacement patterns and attempts to execute them on the latest matching line from the last 10\n'\
-            'flags are g (global), i (case-insensitive), o (only user messages), v (verbose, ignores whitespace)\n'\
-            'Example usage: "I\'d eat some tacos" -> s/some/all the/ -> "I\'d eat all the tacos"'
+           'flags are g (global), i (case-insensitive), o (only user messages), v (verbose, ignores whitespace)\n'\
+           'Example usage: "I\'d eat some tacos" -> s/some/all the/ -> "I\'d eat all the tacos"'
 
     #TODO: make these per-channel
     messages = []
