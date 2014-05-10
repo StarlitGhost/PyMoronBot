@@ -14,8 +14,8 @@ import ply.lex as lex
 import ply.yacc as yacc
 
 
-MAX_DICE = 1000
-MAX_SIDES = 1000
+MAX_DICE = 10000
+MAX_SIDES = 10000
 
 
 class UnknownCharacterException(Exception):
@@ -146,10 +146,10 @@ class Command(CommandInterface):
             raise SyntaxErrorException(u"syntax error at '{0}' (col {1})".format(p.value, col))
 
         def rollDice(numDice, numSides):
-            #if numDice > MAX_DICE:
-            #    raise TooManyDiceException(u'attempted to roll more than 1000 dice in a single d expression')
-            #if numSides > MAX_SIDES:
-            #    raise TooManySidesException(u'attempted to roll a dice with more than 1000 sides')
+            if numDice > MAX_DICE:
+                raise TooManyDiceException(u'attempted to roll more than 1000 dice in a single d expression')
+            if numSides > MAX_SIDES:
+                raise TooManySidesException(u'attempted to roll a dice with more than 1000 sides')
             if numDice < 0:
                 raise NegativeDiceException(u'attempted to roll a negative number of dice')
             if numSides < 0:
