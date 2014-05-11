@@ -1,13 +1,11 @@
-from IRCMessage import IRCMessage
-from IRCResponse import IRCResponse, ResponseType
-from CommandInterface import CommandInterface
-
 import datetime
 import subprocess
 
+from IRCMessage import IRCMessage
+from IRCResponse import IRCResponse, ResponseType
+from CommandInterface import CommandInterface
+from Utils import StringUtils
 import dateutil.parser as dparser
-
-import StringUtils
 
 
 class Command(CommandInterface):

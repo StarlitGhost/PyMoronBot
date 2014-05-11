@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 
-from IRCMessage import IRCMessage
-from IRCResponse import IRCResponse, ResponseType
-from CommandInterface import CommandInterface
-import WebUtils
-from Data.api_keys import load_key
-from Data import ignores
-
-import re
 import HTMLParser
 import json
 import math
+
+from IRCMessage import IRCMessage
+from IRCResponse import IRCResponse, ResponseType
+from CommandInterface import CommandInterface
+from Data.api_keys import load_key
+from Data import ignores
+from Utils import WebUtils
+import re
 from bs4 import BeautifulSoup
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
+
 
 class Command(CommandInterface):
     acceptedTypes = ['PRIVMSG','ACTION']

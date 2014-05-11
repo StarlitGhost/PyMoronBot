@@ -3,17 +3,15 @@ import platform
 import traceback
 import datetime
 import argparse
+
+from Utils import StringUtils
 import os
 import codecs
-
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol, threads
-
 from IRCResponse import ResponseType
 from IRCMessage import IRCMessage, IRCChannel, IRCUser
 from CommandHandler import autoLoadCommands
-
-import StringUtils
 import GlobalVars
 import ServerInfo
 

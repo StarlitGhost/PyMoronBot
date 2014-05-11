@@ -9,7 +9,7 @@ from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 import GlobalVars
 
-import StringUtils
+from Utils import StringUtils
 
 import re
 

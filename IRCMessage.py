@@ -1,9 +1,11 @@
-from enumType import enum
 import GlobalVars
 import ServerInfo
+from enum import Enum
 
 
-TargetTypes = enum('CHANNEL', 'USER')
+class TargetTypes(Enum):
+    CHANNEL = 1
+    USER = 2
 
 
 class IRCChannel(object):

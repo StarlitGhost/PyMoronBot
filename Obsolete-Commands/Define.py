@@ -1,11 +1,11 @@
+import urllib
+import json
+
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-import WebUtils
-
+from Utils import WebUtils
 import re
-import urllib
-import json
 
 
 class Command(CommandInterface):

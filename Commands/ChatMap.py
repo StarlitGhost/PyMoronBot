@@ -10,8 +10,7 @@ from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 import GlobalVars
-import StringUtils
-
+from Utils import StringUtils
 from storm.locals import *
 
 

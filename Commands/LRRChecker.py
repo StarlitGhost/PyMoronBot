@@ -1,11 +1,11 @@
+import datetime
+import xml.etree.ElementTree as ET
+
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
 import Data.LRRChecker as DataStore
-import WebUtils
-
-import datetime
-import xml.etree.ElementTree as ET
+from Utils import WebUtils
 import dateutil.parser as dparser
 
 

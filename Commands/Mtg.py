@@ -1,7 +1,7 @@
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-import WebUtils
+from Utils import WebUtils
 
 import re
 

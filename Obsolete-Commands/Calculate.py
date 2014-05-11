@@ -1,12 +1,12 @@
-from IRCMessage import IRCMessage
-from IRCResponse import IRCResponse, ResponseType
-from CommandInterface import CommandInterface
-import WebUtils
-
-import re
 import json
 import urllib
 import HTMLParser
+
+from IRCMessage import IRCMessage
+from IRCResponse import IRCResponse, ResponseType
+from CommandInterface import CommandInterface
+from Utils import WebUtils
+import re
 
 
 class Command(CommandInterface):

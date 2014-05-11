@@ -3,6 +3,7 @@ Created on May 10, 2014
 
 @author: Tyranic-Moron
 """
+
 import random
 
 from IRCMessage import IRCMessage
@@ -45,7 +46,7 @@ class Command(CommandInterface):
 
         tokens = ('NUMBER',
                   'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'DICE',
-                  'LPAREN', 'RPAREN')
+                  'LPAREN', 'RPAREN', 'POINT')
 
         # Tokens
 
@@ -56,6 +57,7 @@ class Command(CommandInterface):
         t_DICE = r'd'
         t_LPAREN = r'\('
         t_RPAREN = r'\)'
+        t_POINT = r'\.'
 
         def t_NUMBER(t):
             r"""\d+"""

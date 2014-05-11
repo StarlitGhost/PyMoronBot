@@ -9,9 +9,7 @@ import urllib
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-
-import WebUtils
-
+from Utils import WebUtils
 from bs4 import BeautifulSoup
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 

@@ -1,6 +1,11 @@
-from enumType import enum
+from enum import Enum
 
-ResponseType = enum('Say', 'Do', 'Notice', 'Raw')
+
+class ResponseType(Enum):
+    Say = 1
+    Do = 2
+    Notice = 3
+    Raw = 4
 
 
 class IRCResponse(object):

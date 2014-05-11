@@ -10,8 +10,8 @@ import urllib
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-import WebUtils
 from Data.api_keys import load_key
+from Utils import WebUtils
 
 
 class Command(CommandInterface):

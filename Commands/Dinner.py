@@ -8,7 +8,7 @@ from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 
-import WebUtils
+from Utils import WebUtils
 
 from bs4 import BeautifulSoup
 
