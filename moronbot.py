@@ -58,19 +58,16 @@ class MoronBot(irc.IRCClient):
     def privmsg(self, user, channel, msg):
         chan = self.getChannel(channel)
         message = IRCMessage('PRIVMSG', user, chan, msg)
-        self.log(u'<{0}> {1}'.format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
 
     def action(self, user, channel, msg):
         chan = self.getChannel(channel)
         message = IRCMessage('ACTION', user, chan, msg)
-        self.log(u'*{0} {1}*'.format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
 
     def noticed(self, user, channel, msg):
         chan = self.getChannel(channel)
         message = IRCMessage('NOTICE', user, chan, msg)
-        self.log(u'[{0}] {1}'.format(message.User.Name, message.MessageString), message.ReplyTo)
         self.handleMessage(message)
 
     def irc_NICK(self, prefix, params):
@@ -109,11 +106,7 @@ class MoronBot(irc.IRCClient):
         else:
             channel.Users[message.User.Name] = message.User
 
-        self.log(u' >> {0} ({1}@{2}) joined {3}'.format(message.User.Name,
-                                                        message.User.User,
-                                                        message.User.Hostmask,
-                                                        message.ReplyTo),
-                 message.ReplyTo)
+        self.handleMessage(message)
 
     def irc_PART(self, prefix, params):
         partMessage = u''
@@ -331,21 +324,6 @@ class MoronBot(irc.IRCClient):
                 # ^ dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
                 print "Python Execution Error in '{0}': {1}".format(name, str(sys.exc_info()))
                 traceback.print_tb(sys.exc_info()[2])
-
-    def log(self, text, target):
-        now = datetime.datetime.utcnow()
-        time = now.strftime("[%H:%M]")
-        data = u'{0} {1}'.format(time, text)
-        print target, data
-
-        fileName = "{0}{1}.txt".format(target, now.strftime("-%Y%m%d"))
-        fileDirs = os.path.join(GlobalVars.logPath, cmdArgs.server)
-        if not os.path.exists(fileDirs):
-            os.makedirs(fileDirs)
-        filePath = os.path.join(fileDirs, fileName)
-
-        with codecs.open(filePath, 'a+', 'utf-8') as f:
-            f.write(data + '\n')
 
 
 class MoronBotFactory(protocol.ReconnectingClientFactory):
