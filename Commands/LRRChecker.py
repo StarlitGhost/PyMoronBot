@@ -4,19 +4,22 @@ import xml.etree.ElementTree as ET
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
+from moronbot import MoronBot
+
 import Data.LRRChecker as DataStore
 from Utils import WebUtils
+
 import dateutil.parser as dparser
 
 
-class Command(CommandInterface):
+class LRRChecker(CommandInterface):
     help = "Automatic function, scans LRR video RSS feeds and reports new items in the channel."
     runInThread = True
 
-    def shouldExecute(self, message=IRCMessage):
+    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
         return True
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         responses = []
         for feedName, feedDeets in DataStore.LRRChecker.iteritems():
             if feedDeets['lastCheck'] > datetime.datetime.utcnow() - datetime.timedelta(minutes=10):

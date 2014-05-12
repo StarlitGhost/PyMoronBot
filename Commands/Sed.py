@@ -10,9 +10,10 @@ import re
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
+from moronbot import MoronBot
 
 
-class Command(CommandInterface):
+class Sed(CommandInterface):
     triggers = ['sed']
     acceptedTypes = ['PRIVMSG', 'ACTION']
     help = 's/search/replacement/flags - matches sed-like regex replacement patterns and attempts to execute them on the latest matching line from the last 10\n'\
@@ -25,11 +26,11 @@ class Command(CommandInterface):
     
     historySize = 20
 
-    def shouldExecute(self, message=IRCMessage):
+    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if message.Command.lower() == 'sed':
             match = self.match(message.Parameters)
         else:

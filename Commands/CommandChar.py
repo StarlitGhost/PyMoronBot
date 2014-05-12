@@ -8,13 +8,14 @@ from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 import GlobalVars
+from moronbot import MoronBot
 
 
-class Command(CommandInterface):
+class CommandChar(CommandInterface):
     triggers = ['commandchar']
     help = "commandchar <char> - changes the prefix character for bot commands (admin-only)"
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can change my command character', message.ReplyTo)
 

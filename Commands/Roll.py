@@ -5,12 +5,13 @@ Created on May 10, 2014
 """
 
 import random
+import operator
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
+from moronbot import MoronBot
 
-import operator
 import ply.lex as lex
 import ply.yacc as yacc
 
@@ -38,11 +39,11 @@ class NegativeSidesException(Exception):
     pass
 
 
-class Command(CommandInterface):
+class Roll(CommandInterface):
     triggers = ['roll', 'rollv']
     help = 'roll(v) - dice roller, remind me to write more here later!'
 
-    def onStart(self):
+    def onStart(self, bot=MoronBot):
 
         tokens = ('NUMBER',
                   'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'DICE',
@@ -168,7 +169,7 @@ class Command(CommandInterface):
         self.yaccer = yacc.yacc()
         self.yaccer.rolls = []
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
 
         verbose = False
         if message.Command.lower().endswith('v'):

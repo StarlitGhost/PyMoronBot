@@ -9,13 +9,14 @@ import random
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
+from moronbot import MoronBot
 
 
-class Command(CommandInterface):
+class EightBall(CommandInterface):
     triggers = ['8ball']
     help = '8ball (question) - swirls a magic 8-ball to give you the answer to your questions'
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         answers = ['It is certain',  # positive
                    'It is decidedly so',
                    'Without a doubt',

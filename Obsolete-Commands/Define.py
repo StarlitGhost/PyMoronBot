@@ -12,7 +12,7 @@ class Command(CommandInterface):
     triggers = ['define','def']
     help = "define <word> - Fetches the dictionary definition of the given word from Google"
     
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say, 'Define what?', message.ReplyTo)
         

@@ -1,18 +1,21 @@
 import random
+import datetime
 
 from CommandInterface import CommandInterface
+from IRCMessage import IRCMessage
+from IRCResponse import ResponseType, IRCResponse
+from moronbot import MoronBot
 
-from MobroResponses import *
 from Data import ignores
 import re
 
 
-class Command(CommandInterface):
+class Responses(CommandInterface):
     acceptedTypes = ['PRIVMSG', 'ACTION']
     help = 'Talkwords from the mouth place - response <name> to enable/disable a particular response ' \
            '(might need to check the source for names)'
 
-    def onStart(self):
+    def onStart(self, bot=MoronBot):
         try:
             self.responses = MobroResponseDict()
 
@@ -192,7 +195,7 @@ class Command(CommandInterface):
         except Exception, e:
             print e
 
-    def shouldExecute(self, message=IRCMessage):
+    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
         if message.Type not in self.acceptedTypes:
             return False
         if ignores.ignoreList is not None:
@@ -201,7 +204,7 @@ class Command(CommandInterface):
 
         return True
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if message.Command:
             match = re.search('^responses?$', message.Command, re.IGNORECASE)
             if not match:
@@ -221,3 +224,68 @@ class Command(CommandInterface):
                 except:
                     triggers = triggers
             return triggers
+
+
+class MobroResponse(object):
+    lastTriggered = datetime.datetime.min
+
+    def __init__(self, name, response, regex, responseType=ResponseType.Say,
+                 enabled=True, seconds=300, regexMustAllMatch=True):
+        self.name = name
+        self.response = response
+        self.regex = regex
+        self.enabled = enabled
+        self.seconds = seconds
+        self.mustAllMatch = regexMustAllMatch
+        self.responseType = responseType
+
+    #overwrite this with your own match(message) function if a response calls for different logic
+    def match(self, message):
+        if isinstance(self.regex, str):
+            self.regex = [self.regex]
+        for regex in self.regex:
+            if re.search(regex, message, re.IGNORECASE):
+                if not self.mustAllMatch:
+                    return True
+            elif self.mustAllMatch:
+                return False
+        return self.mustAllMatch
+
+    def eligible(self, message):
+        return (self.enabled and
+                (datetime.datetime.utcnow() - self.lastTriggered).seconds >= self.seconds and
+                self.match(message))
+
+    def chat(self, saywords, chatMessage=IRCMessage):
+        return IRCResponse(self.responseType, saywords, chatMessage.ReplyTo)
+
+    def toggle(self, chatMessage):
+        self.enabled = not self.enabled
+        return self.chat("Response '%s' %s" % (self.name, {True: "Enabled", False: "Disabled"}[self.enabled]),
+                         chatMessage)
+
+    #overwrite this with your own talkwords(IRCMessage) function if a response calls for it
+    def talkwords(self, chatMessage=IRCMessage):
+        if isinstance(self.response, str):
+            self.response = [self.response]
+        responses = []
+        for response in self.response:
+            responses.append(self.chat(response, chatMessage))
+        return responses
+
+    def trigger(self, chatMessage=IRCMessage):
+        if self.eligible(chatMessage.MessageString):
+            self.lastTriggered = datetime.datetime.utcnow()
+            return self.talkwords(chatMessage)
+
+
+class MobroResponseDict(object):
+    dict = {}
+
+    def add(self, mbr):
+        self.dict[mbr.name] = mbr
+
+    def toggle(self, name, chatMessage=IRCMessage):
+        if name in self.dict:
+            return self.dict[name].toggle(chatMessage)
+        return

@@ -1,20 +1,20 @@
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-import GlobalVars
+from moronbot import MoronBot
 
 import re
 
 
-class Command(CommandInterface):
+class Actions(CommandInterface):
     acceptedTypes = ['ACTION']
     help = 'Responds to various actions'
 
-    def shouldExecute(self, message=IRCMessage):
+    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         actions = ['pokes',
                    'gropes',
                    'molests',
@@ -26,7 +26,7 @@ class Command(CommandInterface):
                    'glomps']
         regex = r"^(?P<action>({0})),?[ ]{1}([^a-zA-Z0-9_\|`\[\]\^-]|$)"
         match = re.search(
-            regex.format('|'.join(actions), GlobalVars.CurrentNick),
+            regex.format('|'.join(actions), bot.nickname),
             message.MessageString,
             re.IGNORECASE)
         if match:

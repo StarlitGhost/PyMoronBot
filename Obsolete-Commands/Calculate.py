@@ -15,7 +15,7 @@ class Command(CommandInterface):
     
     htmlParser = HTMLParser.HTMLParser()
     
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
                                "You didn't give an expression to calculate! {0}".format(self.help),

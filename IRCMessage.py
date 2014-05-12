@@ -34,12 +34,15 @@ class IRCUser(object):
     User = None
 
     def __init__(self, user):
-        userArray = user.split('!')
-        self.Name = userArray[0]
-        if len(userArray) > 1:
-            userArray = userArray[1].split('@')
-            self.User = userArray[0]
-            self.Hostmask = userArray[1]
+        if '!' in user:
+            userArray = user.split('!')
+            self.Name = userArray[0]
+            if len(userArray) > 1:
+                userArray = userArray[1].split('@')
+                self.User = userArray[0]
+                self.Hostmask = userArray[1]
+        else:
+            self.Name = user
 
 
 class IRCMessage(object):

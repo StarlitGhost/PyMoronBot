@@ -10,6 +10,7 @@ import datetime
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
+from moronbot import MoronBot
 
 
 class Data(object):
@@ -18,17 +19,17 @@ class Data(object):
     lastUser = None
 
 
-class Command(CommandInterface):
+class HangoutTracker(CommandInterface):
     triggers = ['hangout', 'hangoot']
     help = 'hangout - gives you the last posted G+ hangout link'
 
     hangoutDict = {}
 
-    def shouldExecute(self, message=IRCMessage):
+    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         match = re.search('^hango+?u?t$', message.Command, re.IGNORECASE)
         if match:
             if message.ReplyTo not in self.hangoutDict:

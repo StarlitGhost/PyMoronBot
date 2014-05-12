@@ -9,21 +9,25 @@ from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 import GlobalVars
 from Data import ignores
+from moronbot import MoronBot
 
 
-class Command(CommandInterface):
+class Ignore(CommandInterface):
     triggers = ['ignore']
     help = 'ignore <user> - ignore all lines from the specified user'
 
-    def onStart(self):
+    bot = None
+
+    def onStart(self, bot=MoronBot):
+        self.bot = bot
         if ignores.ignoreList is None:
             ignores.loadList()
 
     def __del__(self):
-        if ignores.ignoreList is not None and 'Unignore' not in GlobalVars.commands:
+        if ignores.ignoreList is not None and 'Unignore' not in self.bot.moduleHandler.commands:
             ignores.ignoreList = None
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can edit the ignore list', message.ReplyTo)
 

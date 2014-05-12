@@ -13,11 +13,11 @@ class Command(CommandInterface):
     help = "log (<-n>/<date>) - gives you a link to today's log, the log from -n days ago, " \
            "or the log for the specified date"
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
 
         date = datetime.datetime.utcnow()
         if len(message.ParameterList) == 1:
-            if StringUtils.is_number(message.ParameterList[0]):
+            if StringUtils.isNumber(message.ParameterList[0]):
                 date += datetime.timedelta(days=int(message.ParameterList[0]))
             else:
                 try:

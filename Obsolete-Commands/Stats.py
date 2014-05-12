@@ -13,7 +13,7 @@ class Command(CommandInterface):
     triggers = ['stats']
     help = 'stats - Responds with a link to the chat stats webpage(s)'
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         return IRCResponse(ResponseType.Say,
                            'sss: http://www.moronic-works.co.uk/ | '
                            #'pisg: http://silver.amazon.fooproject.net/pisg/desertbus.html | '

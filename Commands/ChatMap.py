@@ -9,17 +9,20 @@ import json
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
+from moronbot import MoronBot
 import GlobalVars
+
 from Utils import StringUtils
+
 from storm.locals import *
 
 
-class Command(CommandInterface):
+class ChatMap(CommandInterface):
     chatMapDB = None
 
     triggers = ['chatmap', 'map']
 
-    def onStart(self):
+    def onStart(self, bot=MoronBot):
         try:
             with open('Data/ChatMapDB.json', 'r') as f:
                 self.chatMapDB = json.load(f)
@@ -33,7 +36,7 @@ class Command(CommandInterface):
         if not ',' in coords:
             return 'lat,lon coords must be comma separated'
         (lat, lon) = coords.split(',')
-        if not StringUtils.is_number(lat) or not StringUtils.is_number(lon):
+        if not StringUtils.isNumber(lat) or not StringUtils.isNumber(lon):
             return 'latitude or longitude are not numeric'
 
         (lat, lon) = float(lat), float(lon)
@@ -77,7 +80,7 @@ class Command(CommandInterface):
         """addYear - updates desert bus year for the user, (first surviving year)"""
 
         year = ''.join(message.ParameterList[1:])
-        if not StringUtils.is_number(year):
+        if not StringUtils.isNumber(year):
             return 'the desert bus year should only be numeric (1-7)'
 
         year = int(year)
@@ -161,7 +164,7 @@ class Command(CommandInterface):
                    "You can use '{1}gpslookup <address>' via PM to find your lat,lon coords".format(
                 '/'.join(self.subCommands.keys()), GlobalVars.CommandChar)
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if len(message.ParameterList) > 0:
             subCommand = message.ParameterList[0].lower()
             if subCommand not in self.subCommands:

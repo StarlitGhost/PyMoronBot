@@ -3,19 +3,22 @@
 import HTMLParser
 import json
 import math
+import re
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
+from moronbot import MoronBot
+
 from Data.api_keys import load_key
 from Data import ignores
 from Utils import WebUtils
-import re
+
 from bs4 import BeautifulSoup
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
-class Command(CommandInterface):
+class URLFollow(CommandInterface):
     acceptedTypes = ['PRIVMSG','ACTION']
     help = 'automatic function that follows urls and grabs information about the resultant webpage'
     runInThread = True
@@ -24,11 +27,11 @@ class Command(CommandInterface):
     
     graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
-    def onStart(self):
+    def onStart(self, bot=MoronBot):
         self.youtubeKey = load_key(u'YouTube')
         self.imgurClientID = load_key(u'imgur Client ID')
 
-    def shouldExecute(self, message=IRCMessage):
+    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
         if message.Type not in self.acceptedTypes:
             return False
         if ignores.ignoreList is not None:
@@ -36,7 +39,7 @@ class Command(CommandInterface):
                 return False
         return True
     
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.MessageString, re.IGNORECASE)
         if not match:
             return

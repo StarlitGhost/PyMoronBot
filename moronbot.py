@@ -1,17 +1,13 @@
+import os
 import sys
 import platform
-import traceback
 import datetime
 import argparse
 
-from Utils import StringUtils
-import os
-import codecs
 from twisted.words.protocols import irc
-from twisted.internet import reactor, protocol, threads
-from IRCResponse import ResponseType
+from twisted.internet import reactor, protocol
 from IRCMessage import IRCMessage, IRCChannel, IRCUser
-from CommandHandler import autoLoadCommands
+import ModuleHandler
 import GlobalVars
 import ServerInfo
 
@@ -28,25 +24,28 @@ startTime = datetime.datetime.utcnow()
 
 
 class MoronBot(irc.IRCClient):
-    GlobalVars.CurrentNick = cmdArgs.nick
 
-    nickname = GlobalVars.CurrentNick
+    def __init__(self):
+        self.moduleHandler = ModuleHandler.ModuleHandler(self)
+        self.moduleHandler.loadAll()
 
-    realname = GlobalVars.CurrentNick
-    username = GlobalVars.CurrentNick
+        GlobalVars.CurrentNick = cmdArgs.nick
 
-    channels = {}
-    userModes = {}
+        self.nickname = GlobalVars.CurrentNick
 
-    fingerReply = GlobalVars.finger
+        self.realname = GlobalVars.CurrentNick
+        self.username = GlobalVars.CurrentNick
 
-    versionName = GlobalVars.CurrentNick
-    versionNum = GlobalVars.version
-    versionEnv = platform.platform()
+        self.channels = {}
+        self.userModes = {}
 
-    sourceURL = GlobalVars.source
+        self.fingerReply = GlobalVars.finger
 
-    responses = []
+        self.versionName = GlobalVars.CurrentNick
+        self.versionNum = GlobalVars.version
+        self.versionEnv = platform.platform()
+
+        self.sourceURL = GlobalVars.source
 
     def signedOn(self):
         for channel in cmdArgs.channels:
@@ -85,7 +84,8 @@ class MoronBot(irc.IRCClient):
                     if oldnick in channel.Ranks:
                         channel.Ranks[newnick] = channel.Ranks[oldnick]
                         del channel.Ranks[oldnick]
-                    self.log(u'{0} is now known as {1}'.format(oldnick, newnick), channel.Name)
+                    message = IRCMessage('NICK', prefix, channel, newnick)
+                    self.handleMessage(message)
 
     def nickChanged(self, nick):
         self.nickname = nick
@@ -122,12 +122,7 @@ class MoronBot(irc.IRCClient):
             if message.User.Name in channel.Ranks:
                 del channel.Ranks[message.User.Name]
 
-        self.log(u' << {0} ({1}@{2}) left {3}{4}'.format(message.User.Name,
-                                                         message.User.User,
-                                                         message.User.Hostmask,
-                                                         message.ReplyTo,
-                                                         partMessage),
-                 message.ReplyTo)
+        self.handleMessage(message)
 
     def irc_KICK(self, prefix, params):
         kickMessage = u''
@@ -136,38 +131,30 @@ class MoronBot(irc.IRCClient):
 
         channel = self.channels[params[0]]
         message = IRCMessage('KICK', prefix, channel, kickMessage)
-        kickee = params[1]
+        message.Kickee = params[1]
 
-        if kickee == GlobalVars.CurrentNick:
+        if message.Kickee == GlobalVars.CurrentNick:
             del self.channels[message.ReplyTo]
         else:
-            del channel.Users[kickee]
-            if kickee in channel.Ranks:
-                del channel.Ranks[kickee]
+            del channel.Users[message.Kickee]
+            if message.Kickee in channel.Ranks:
+                del channel.Ranks[message.Kickee]
 
-        self.log(u'!<< {0} was kicked by {1}{2}'.format(kickee,
-                                                        message.User.Name,
-                                                        kickMessage),
-                 message.ReplyTo)
+        self.handleMessage(message)
 
     def irc_QUIT(self, prefix, params):
         quitMessage = u''
         if len(params) > 0:
             quitMessage = u', message: ' + u' '.join(params[0:])
 
-        message = IRCMessage('QUIT', prefix, None, quitMessage)
-
         for key in self.channels:
             channel = self.channels[key]
+            message = IRCMessage('QUIT', prefix, channel, quitMessage)
             if message.User.Name in channel.Users:
                 del channel.Users[message.User.Name]
                 if message.User.Name in channel.Ranks:
                     del channel.Ranks[message.User.Name]
-                self.log(u' << {0} ({1}@{2}) quit{3}'.format(message.User.Name,
-                                                             message.User.User,
-                                                             message.User.Hostmask,
-                                                             quitMessage),
-                         channel.Name)
+                self.handleMessage(message)
 
     def irc_RPL_WHOREPLY(self, prefix, params):
         user = IRCUser('{0}!{1}@{2}'.format(params[5], params[2], params[3]))
@@ -246,11 +233,12 @@ class MoronBot(irc.IRCClient):
                     else:
                         del self.channels[channel].Modes[mode]
 
-        logArgs = [arg for arg in args if arg is not None]
-        operator = '+' if set else '-'
-        target = message.ReplyTo if message.Channel else ''
+        message.ModeArgs = [arg for arg in args if arg is not None]
+        message.Modes = modes
+        message.ModeOperator = '+' if set else '-'
+        message.ReplyTo = message.ReplyTo if message.Channel else ''
 
-        self.log(u'# {0} sets mode: {1}{2} {3}'.format(message.User.Name, operator, modes, ' '.join(logArgs)), target)
+        self.handleMessage(message)
 
     def getChannel(self, name):
         if name in self.channels:
@@ -263,71 +251,26 @@ class MoronBot(irc.IRCClient):
         self.channels[channel].Topic = newTopic
         self.channels[channel].TopicSetBy = user
 
-        self.log(u'# {0} set the topic to: {1}'.format(user, newTopic), channel)
+        message = IRCMessage('TOPIC', user, self.getChannel(channel), newTopic)
 
-    def sendResponse(self, response, channel):
-        responses = []
-
-        if hasattr(response, '__iter__'):
-            for r in response:
-                if r is None or r.Response is None or r.Response == '':
-                    continue
-                responses.append(r)
-
-        elif response is not None and response.Response is not None and response.Response != '':
-            responses.append(response)
-
-        for response in responses:
-            try:
-                if channel is not None:
-                    # strip formatting if colours are blocked on the channel
-                    if 'c' in channel.Modes:
-                        response.Response = StringUtils.strip_colours(response.Response)
-
-                if (response.Type == ResponseType.Say):
-                    self.msg(response.Target, response.Response.encode('utf-8'))
-                    self.log(u'<{0}> {1}'.format(self.nickname, response.Response), response.Target)
-                elif (response.Type == ResponseType.Do):
-                    self.describe(response.Target, response.Response.encode('utf-8'))
-                    self.log(u'*{0} {1}*'.format(self.nickname, response.Response), response.Target)
-                elif (response.Type == ResponseType.Notice):
-                    self.notice(response.Target, response.Response.encode('utf-8'))
-                    self.log(u'[{0}] {1}'.format(self.nickname, response.Response), response.Target)
-                elif (response.Type == ResponseType.Raw):
-                    self.sendLine(response.Response.encode('utf-8'))
-            except Exception:
-                # ^ dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
-                print "Python Execution Error sending responses '{0}': {1}".format(responses, str(sys.exc_info()))
-                traceback.print_tb(sys.exc_info()[2])
+        self.handleMessage(message)
 
     def handleMessage(self, message):
         # restart command, can't restart within 1 minute of starting (avoids chanhistory triggering another restart)
         if (message.Command == 'restart' and
-                    datetime.datetime.utcnow() > startTime + datetime.timedelta(seconds=10) and
-                    message.User.Name in GlobalVars.admins):
+                datetime.datetime.utcnow() > startTime + datetime.timedelta(seconds=10) and
+                message.User.Name in GlobalVars.admins):
             global restarting
             restarting = True
             self.quit(message='restarting')
             return
 
-        responses = []
-        for (name, command) in GlobalVars.commands.items():
-            try:
-                if command.shouldExecute(message):
-                    if not command.runInThread:
-                        response = command.execute(message)
-                        self.sendResponse(response, message.Channel)
-                    else:
-                        d = threads.deferToThread(command.execute, message)
-                        d.addCallback(self.sendResponse, message.Channel)
-            except Exception:
-                # ^ dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
-                print "Python Execution Error in '{0}': {1}".format(name, str(sys.exc_info()))
-                traceback.print_tb(sys.exc_info()[2])
-
+        self.moduleHandler.handleMessage(message)
 
 class MoronBotFactory(protocol.ReconnectingClientFactory):
-    protocol = MoronBot
+
+    def __init__(self):
+        self.protocol = MoronBot
 
     def startedConnecting(self, connector):
         print '-#- Started to connect.'
@@ -353,7 +296,6 @@ class MoronBotFactory(protocol.ReconnectingClientFactory):
 
 
 if __name__ == '__main__':
-    autoLoadCommands()
     moronbot = MoronBotFactory()
     reactor.connectTCP(cmdArgs.server, cmdArgs.port, moronbot)
     reactor.run()

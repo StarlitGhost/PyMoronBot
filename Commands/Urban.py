@@ -9,16 +9,19 @@ import urllib
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
+from moronbot import MoronBot
+
 from Utils import WebUtils
+
 from bs4 import BeautifulSoup
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
-class Command(CommandInterface):
+class Urban(CommandInterface):
     triggers = ['urban', 'ud']
     help = "urban <search term> - returns the definition of the given search term from UrbanDictionary.com"
     
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
                                "You didn't give a word! Usage: {0}".format(self.help),

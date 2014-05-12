@@ -9,7 +9,7 @@ class Command(CommandInterface):
     triggers = ['lastseen', 'lastsaw']
     help = 'lastseen/lastsaw <nick> - finds a nick\'s last message'
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if len(message.MessageList) > 1 and message.Command == "lastseen":
             proc = subprocess.Popen(['/usr/bin/php',
                                      '/opt/moronbot/loggrep.php',

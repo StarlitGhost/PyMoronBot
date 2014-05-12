@@ -1,4 +1,4 @@
-def is_number(s):
+def isNumber(s):
     """returns True if string s can be cast to a number, False otherwise"""
     try:
         float(s)
@@ -7,7 +7,7 @@ def is_number(s):
         return False
 
 # From this SO answer: http://stackoverflow.com/a/6043797/331047
-def split_utf8(s, n):
+def splitUTF8(s, n):
     """Split UTF-8 s into chunks of maximum byte length n"""
     while len(s) > n:
         k = n
@@ -19,7 +19,7 @@ def split_utf8(s, n):
 
 # Taken from txircd
 # https://github.com/ElementalAlchemist/txircd/blob/889b19cdfedd8f1bb2aa6f23e9a745bdf7330b81/txircd/modules/stripcolor.py#L4
-def strip_colours(msg):
+def stripColours(msg):
     """Strip colours (and other formatting) from the given string"""
     while chr(3) in msg:
         color_pos = msg.index(chr(3))

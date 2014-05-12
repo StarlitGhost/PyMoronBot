@@ -8,13 +8,14 @@ from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 import GlobalVars
+from moronbot import MoronBot
 
 from Utils import StringUtils
 
 import re
 
 
-class Command(CommandInterface):
+class Chain(CommandInterface):
     triggers = ['chain']
     help = 'chain <command 1> | <command 2> [| <command n>] - chains multiple commands together, feeding the output of each command into the next\n' \
            'syntax: command1 params | command2 %output% | command3 %var%\n' \
@@ -22,12 +23,12 @@ class Command(CommandInterface):
            '%var% is any extra var that may have been added to the message by commands earlier in the chain'
     runInThread = True
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
 
         # TODO: maybe do this in the command handler?
         # map triggers to commands so we can call them via dict lookup
         mappedTriggers = {}
-        for command in GlobalVars.commands.values():
+        for command in bot.moduleHandler.commands.values():
             for trigger in command.triggers:
                 mappedTriggers[trigger] = command
 
@@ -63,6 +64,6 @@ class Command(CommandInterface):
 
         if response.Response is not None:
             # limit response length (chains can get pretty large)
-            response.Response = list(StringUtils.split_utf8(response.Response.encode('utf-8'), 700))[0]
+            response.Response = list(StringUtils.splitUTF8(response.Response.encode('utf-8'), 700))[0]
             response.Response = unicode(response.Response, 'utf-8')
         return response

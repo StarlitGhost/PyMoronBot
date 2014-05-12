@@ -1,15 +1,11 @@
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-
-import socket
-origGetAddrInfo = socket.getaddrinfo
-def getAddrInfoWrapper(host, port, family=0, socktype=0, proto=0, flags=0):
-    return origGetAddrInfo(host, port, socket.AF_INET, socktype, proto, flags)
-socket.getaddrinfo = getAddrInfoWrapper
+from moronbot import MoronBot
 
 import re
-import urllib, urllib2
+import urllib
+import urllib2
 
 import htmlentitydefs
 # Removes HTML or XML character references and entities from a text string.
@@ -37,11 +33,11 @@ def unescape(text):
         return text # leave as is
     return re.sub('&#?\w+;', fixup, text)
 
-class Command(CommandInterface):
+class Wikipedia(CommandInterface):
     triggers = ['wiki', 'wikipedia']
     help = 'wiki(pedia) <search term> - returns the top result for a given search term from wikipedia'
     
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         article = message.Parameters
         article = urllib.quote(article)
         

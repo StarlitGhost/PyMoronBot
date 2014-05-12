@@ -1,3 +1,4 @@
+from moronbot import MoronBot
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 
@@ -7,14 +8,16 @@ class CommandInterface(object):
     acceptedTypes = ['PRIVMSG']
     help = '<no help defined (yet)>'
     runInThread = False
-    
-    def __init__(self):
-        self.onStart()
 
-    def onStart(self):
+    priority = 0
+    
+    def __init__(self, bot=MoronBot):
+        self.onStart(bot)
+
+    def onStart(self, bot=MoronBot):
         pass
 
-    def shouldExecute(self, message=IRCMessage):
+    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
         if message.Type not in self.acceptedTypes:
             return False
         if message.Command.lower() not in self.triggers:
@@ -22,5 +25,5 @@ class CommandInterface(object):
         
         return True
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         return IRCResponse(ResponseType.Say, '<command not yet implemented>', message.ReplyTo)

@@ -8,17 +8,23 @@ import datetime
 import codecs
 import os
 
-from moronbot import cmdArgs
+from moronbot import cmdArgs, MoronBot
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
 import GlobalVars
 
 
-logFuncs = {'PRIVMSG': lambda m,t: log(u'<{0}> {1}'.format(m.User.Name, m.MessageString), t),
-            'ACTION': lambda m,t: log(u'*{0} {1}*'.format(m.User.Name, m.MessageString), t),
-            'NOTICE': lambda m,t: log(u'[{0}] {1}'.format(m.User.Name, m.MessageString), t),
-            'JOIN': lambda m,t: log(u' >> {0} ({1}@{2}) joined {3}'.format(m.User.Name, m.User.User, m.User.Hostmask, m.ReplyTo), t)}
+logFuncs = {'PRIVMSG': lambda m: u'<{0}> {1}'.format(m.User.Name, m.MessageString),
+            'ACTION': lambda m: u'*{0} {1}*'.format(m.User.Name, m.MessageString),
+            'NOTICE': lambda m: u'[{0}] {1}'.format(m.User.Name, m.MessageString),
+            'JOIN': lambda m: u' >> {0} ({1}@{2}) joined {3}'.format(m.User.Name, m.User.User, m.User.Hostmask, m.ReplyTo),
+            'NICK': lambda m: u'{0} is now known as {1}'.format(m.User.Name, m.MessageString),
+            'PART': lambda m: u' << {0} ({1}@{2}) left {3}{4}'.format(m.User.Name, m.User.User, m.User.Hostmask, m.ReplyTo, m.MessageString),
+            'QUIT': lambda m: u' << {0} ({1}@{2}) quit{3}'.format(m.User.Name, m.User.User, m.User.Hostmask, m.MessageString),
+            'KICK': lambda m: u'!<< {0} was kicked by {1}{2}'.format(m.Kickee, m.User.Name, m.MessageString),
+            'TOPIC': lambda m: u'# {0} set the topic to: {1}'.format(m.User.Name, m.MessageString),
+            'MODE': lambda m: u'# {0} sets mode: {1}{2} {3}'.format(m.User.Name, m.ModeOperator, m.Modes, ' '.join(m.ModeArgs))}
 
 
 def log(text, target):
@@ -37,19 +43,23 @@ def log(text, target):
         f.write(data + '\n')
 
 
-class Command(CommandInterface):
+class Log(CommandInterface):
     triggers = ['log']
     help = "log (-n / yyyy-mm-dd) - " \
            "without parameters, links to today's log. " \
            "-n links to the log n days ago. " \
            "yyyy-mm-dd links to the log for the specified date"
 
-    def shouldExecute(self, message=IRCMessage):
+    priority = -1
+
+    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
         return True
 
-    def execute(self, message=IRCMessage):
-        logFuncs[message.Type](message, message.ReplyTo)
+    def execute(self, message=IRCMessage, bot=MoronBot):
+        if message.Type in logFuncs:
+            logString = logFuncs[message.Type](message)
+            log(logString, message.ReplyTo)
 
-        if message.Type == 'PRIVMSG' and message.Command in self.triggers:
+        if message.Type in self.acceptedTypes and message.Command in self.triggers:
             # log linking things
-            pass
+            super(Log, self).execute(message, bot)

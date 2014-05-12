@@ -8,13 +8,14 @@ from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
 import GlobalVars
+from moronbot import MoronBot
 
 
-class Command(CommandInterface):
+class Leave(CommandInterface):
     triggers = ['leave', 'gtfo']
     help = "leave/gtfo - makes the bot leave the current channel"
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can tell me to %s' % message.Command, message.ReplyTo)
         

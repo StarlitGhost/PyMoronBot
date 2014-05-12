@@ -7,14 +7,15 @@ Created on Dec 20, 2011
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
+from moronbot import MoronBot
 import GlobalVars
 
 
-class Command(CommandInterface):
+class Nick(CommandInterface):
     triggers = ['nick', 'name']
     help = "nick <nick> - changes the bot's nick to the one specified"
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can change my name', message.ReplyTo)
 

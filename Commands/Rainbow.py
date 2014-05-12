@@ -7,11 +7,12 @@ Created on May 04, 2014
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
+from moronbot import MoronBot
 
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
-class Command(CommandInterface):
+class Rainbow(CommandInterface):
     triggers = ['rainbow']
     help = 'rainbow <text> - outputs the specified text with rainbow colours'
 
@@ -24,7 +25,7 @@ class Command(CommandInterface):
                assembleFormattedText(A.fg.lightMagenta['']),
                ]
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say, "You didn't give me any text to rainbow!", message.ReplyTo)
 

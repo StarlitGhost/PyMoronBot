@@ -8,17 +8,18 @@ from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
 import GlobalVars
+from moronbot import MoronBot
 
 import re
 
 import subprocess
 
 
-class Command(CommandInterface):
+class Update(CommandInterface):
     triggers = ['update']
     help = "update - pulls the latest code from GitHub"
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can update me', message.ReplyTo)
 

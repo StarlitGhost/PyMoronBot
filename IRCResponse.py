@@ -9,6 +9,10 @@ class ResponseType(Enum):
 
 
 class IRCResponse(object):
+    Type = ResponseType.Say
+    Response = ''
+    Target = ''
+
     def __init__(self, messageType, response, target, extraVars=None):
         if extraVars is None:
             extraVars = {}

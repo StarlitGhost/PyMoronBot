@@ -1,8 +1,5 @@
 import os
 
-commands = {}
-commandCaseMapping = {}
-
 CurrentNick = 'PyMoronBot'
 
 admins = ['Tyranic-Moron', 'T-M|Work', 'Tyranic_Moron', 'T-M|Asleep', 'GarrusVakarian', 'LordCustardSmingleigh', 'XelaReko', 'XelaReco', 'dave_random', 'ElementalAlchemist', 'Homoglyph', 'Heufy|Work', 'Heufneutje', 'Mara']

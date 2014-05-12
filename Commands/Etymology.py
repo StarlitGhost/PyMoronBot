@@ -2,15 +2,16 @@ from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from Utils import WebUtils
+from moronbot import MoronBot
 
 from bs4 import BeautifulSoup
 
 
-class Command(CommandInterface):
+class Etymology(CommandInterface):
     triggers = ['etym', 'etymology']
     help = "etym(ology) <word> - returns the etymology of the given word from etymonline.com"
     
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
                                "You didn't give a word! Usage: {0}".format(self.help),

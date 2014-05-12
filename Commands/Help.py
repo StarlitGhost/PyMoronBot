@@ -1,18 +1,20 @@
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-import GlobalVars
+from moronbot import MoronBot
 
 
-class Command(CommandInterface):
+class Help(CommandInterface):
     triggers = ['help', 'command', 'commands']
     help = 'help/command(s) (<module>) - returns a list of loaded command modules, ' \
            'or the help text of a particular module if one is specified'
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
+        moduleHandler = bot.moduleHandler
+
         if len(message.ParameterList) > 0:
-            if message.ParameterList[0].lower() in GlobalVars.commandCaseMapping:
-                func = GlobalVars.commands[GlobalVars.commandCaseMapping[message.ParameterList[0].lower()]]
+            if message.ParameterList[0].lower() in moduleHandler.commandCaseMapping:
+                func = moduleHandler.commands[moduleHandler.commandCaseMapping[message.ParameterList[0].lower()]]
                 if isinstance(func.help, basestring):
                     return IRCResponse(ResponseType.Say, func.help, message.ReplyTo)
                 else:
@@ -24,7 +26,7 @@ class Command(CommandInterface):
                                                                                  message.Command),
                                    message.ReplyTo)
         else:
-            funcs = ', '.join(sorted(GlobalVars.commands.iterkeys(), key=lambda s: s.lower()))
+            funcs = ', '.join(sorted(moduleHandler.commands.iterkeys(), key=lambda s: s.lower()))
             return [IRCResponse(ResponseType.Say,
                                 "Command modules loaded are (use 'help <module>' to get help for that module):",
                                 message.ReplyTo),

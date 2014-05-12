@@ -2,18 +2,19 @@ from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 import GlobalVars
+from moronbot import MoronBot
 
 import re
 
 
-class Command(CommandInterface):
+class Conversation(CommandInterface):
     help = 'Responds to greetings and such'
 
-    def shouldExecute(self, message=IRCMessage):
+    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         greetings = ["(wa+s+|')?so?u+p",
                      "hi(ya)?",
                      "hello",

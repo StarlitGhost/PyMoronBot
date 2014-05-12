@@ -1,6 +1,7 @@
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
+from moronbot import MoronBot
 
 tang = {'A': 'ALPHA',
         'B': 'BRAVO',
@@ -41,11 +42,11 @@ tang = {'A': 'ALPHA',
         '-': 'DASH'}
 
 
-class Command(CommandInterface):
+class Tango(CommandInterface):
     triggers = ['tango']
     help = 'tango <words> - reproduces <words> with the NATO phonetic alphabet, because reasons.'
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if len(message.ParameterList) == 0:
             return
 

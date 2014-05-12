@@ -7,15 +7,16 @@ Created on Dec 05, 2013
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
+from moronbot import MoronBot
 
 from Utils import WebUtils
 
 
-class Command(CommandInterface):
+class Gif(CommandInterface):
     triggers = ['gif']
     help = 'gif - fetches a random gif posted during Desert Bus'
     
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         url = "http://greywool.com/desertbus/gifs/random.php"
 
         webPage = WebUtils.fetchURL(url)

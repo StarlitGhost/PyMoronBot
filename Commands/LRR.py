@@ -3,10 +3,12 @@ import datetime
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
+from moronbot import MoronBot
+
 import Data.LRRChecker as DataStore
 
 
-class Command(CommandInterface):
+class LRR(CommandInterface):
 
     triggers = ['lrr', 'llr']
 
@@ -16,7 +18,7 @@ class Command(CommandInterface):
                "or the latest of a series if you specify one; " \
                "series are: {0}".format(", ".join(DataStore.LRRChecker.keys()))
     
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if len(message.Parameters.strip()) > 0:
             feed = self.handleAliases(message.Parameters)
             lowerMap = {key.lower(): key for key in DataStore.LRRChecker.iterkeys()}
@@ -54,4 +56,3 @@ class Command(CommandInterface):
             if series.lower() in feedDeets['aliases']:
                 return feedName
         return series
-

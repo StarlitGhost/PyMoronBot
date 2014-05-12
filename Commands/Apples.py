@@ -1,19 +1,19 @@
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-import GlobalVars
+from moronbot import MoronBot
 
 
-class Command(CommandInterface):
+class Apples(CommandInterface):
     help = 'playapples, stopapples - For when you need a 4th for Apples to Apples (will always pick 0)'
 
     playApples = 0
 
-    def shouldExecute(self, message=IRCMessage):
+    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message=IRCMessage):
+    def execute(self, message=IRCMessage, bot=MoronBot):
         if message.Command.lower() == "playapples":
             self.playApples = 1
             return IRCResponse(ResponseType.Say, "!join", message.ReplyTo)
@@ -26,9 +26,9 @@ class Command(CommandInterface):
             cmd = " ".join(msgArr).strip()
             if cmd == "to Apples! You have 60 seconds to join.":
                 return IRCResponse(ResponseType.Say, "!join", message.ReplyTo)
-            elif name.lower() == GlobalVars.CurrentNick and cmd == "is judging.":
+            elif name.lower() == bot.nickname and cmd == "is judging.":
                 return IRCResponse(ResponseType.Say, "!pick 0", message.ReplyTo)
-            elif name.lower() != GlobalVars.CurrentNick and (cmd == "is judging next." or cmd == "is judging first."):
+            elif name.lower() != bot.nickname and (cmd == "is judging next." or cmd == "is judging first."):
                 return IRCResponse(ResponseType.Say, "!play 0", message.ReplyTo)
             elif cmd == "wins the game!" or name == "Sorry,":
                 self.playApples = 0
