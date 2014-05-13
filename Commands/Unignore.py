@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Dec 01, 2013
 
@@ -18,7 +19,10 @@ class Unignore(CommandInterface):
 
     bot = None
 
-    def onStart(self, bot=MoronBot):
+    def onLoad(self, bot):
+        """
+        @type bot: MoronBot
+        """
         self.bot = bot
         if ignores.ignoreList is None:
             ignores.loadList()
@@ -27,7 +31,11 @@ class Unignore(CommandInterface):
         if ignores.ignoreList is not None and 'Ignore' not in self.bot.moduleHandler.commands:
             ignores.ignoreList = None
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can edit the ignore list', message.ReplyTo)
 

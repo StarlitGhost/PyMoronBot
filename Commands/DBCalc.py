@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import math
 
 from CommandInterface import CommandInterface
@@ -11,7 +12,11 @@ class DBCalc(CommandInterface):
     help = 'dbcalc (hours <hours> / money <money>) - tells you how much money is required for a given number of hours, ' \
            'or how many hours will be bussed for a given amount of money'
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if len(message.ParameterList) < 2:
             return IRCResponse(ResponseType.Say, self.help, message.ReplyTo)
 

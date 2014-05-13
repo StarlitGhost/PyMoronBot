@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Apr 26, 2013
 
@@ -22,7 +23,10 @@ class ChatMap(CommandInterface):
 
     triggers = ['chatmap', 'map']
 
-    def onStart(self, bot=MoronBot):
+    def onLoad(self, bot):
+        """
+        @type bot: MoronBot
+        """
         try:
             with open('Data/ChatMapDB.json', 'r') as f:
                 self.chatMapDB = json.load(f)
@@ -164,7 +168,11 @@ class ChatMap(CommandInterface):
                    "You can use '{1}gpslookup <address>' via PM to find your lat,lon coords".format(
                 '/'.join(self.subCommands.keys()), GlobalVars.CommandChar)
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if len(message.ParameterList) > 0:
             subCommand = message.ParameterList[0].lower()
             if subCommand not in self.subCommands:

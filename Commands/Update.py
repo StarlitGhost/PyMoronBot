@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Dec 07, 2013
 
@@ -19,7 +20,11 @@ class Update(CommandInterface):
     triggers = ['update']
     help = "update - pulls the latest code from GitHub"
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can update me', message.ReplyTo)
 

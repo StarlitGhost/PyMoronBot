@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on May 04, 2014
 
@@ -25,7 +26,11 @@ class Rainbow(CommandInterface):
                assembleFormattedText(A.fg.lightMagenta['']),
                ]
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say, "You didn't give me any text to rainbow!", message.ReplyTo)
 

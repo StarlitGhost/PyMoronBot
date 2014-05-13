@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -9,7 +10,11 @@ class Help(CommandInterface):
     help = 'help/command(s) (<module>) - returns a list of loaded command modules, ' \
            'or the help text of a particular module if one is specified'
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         moduleHandler = bot.moduleHandler
 
         if len(message.ParameterList) > 0:

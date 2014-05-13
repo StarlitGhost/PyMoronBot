@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import random
 import datetime
 
@@ -15,7 +16,10 @@ class Responses(CommandInterface):
     help = 'Talkwords from the mouth place - response <name> to enable/disable a particular response ' \
            '(might need to check the source for names)'
 
-    def onStart(self, bot=MoronBot):
+    def onLoad(self, bot):
+        """
+        @type bot: MoronBot
+        """
         try:
             self.responses = MobroResponseDict()
 
@@ -195,7 +199,11 @@ class Responses(CommandInterface):
         except Exception, e:
             print e
 
-    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
+    def shouldExecute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.Type not in self.acceptedTypes:
             return False
         if ignores.ignoreList is not None:
@@ -204,7 +212,11 @@ class Responses(CommandInterface):
 
         return True
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.Command:
             match = re.search('^responses?$', message.Command, re.IGNORECASE)
             if not match:
@@ -256,16 +268,27 @@ class MobroResponse(object):
                 (datetime.datetime.utcnow() - self.lastTriggered).seconds >= self.seconds and
                 self.match(message))
 
-    def chat(self, saywords, chatMessage=IRCMessage):
+    def chat(self, saywords, chatMessage):
+        """
+        @type saywords: str
+        @type chatMessage: IRCMessage
+        @return: IRCResponse
+        """
         return IRCResponse(self.responseType, saywords, chatMessage.ReplyTo)
 
     def toggle(self, chatMessage):
+        """
+        @type chatMessage: IRCMessage
+        """
         self.enabled = not self.enabled
         return self.chat("Response '%s' %s" % (self.name, {True: "Enabled", False: "Disabled"}[self.enabled]),
                          chatMessage)
 
     #overwrite this with your own talkwords(IRCMessage) function if a response calls for it
-    def talkwords(self, chatMessage=IRCMessage):
+    def talkwords(self, chatMessage):
+        """
+        @type chatMessage: IRCMessage
+        """
         if isinstance(self.response, str):
             self.response = [self.response]
         responses = []
@@ -273,7 +296,10 @@ class MobroResponse(object):
             responses.append(self.chat(response, chatMessage))
         return responses
 
-    def trigger(self, chatMessage=IRCMessage):
+    def trigger(self, chatMessage):
+        """
+        @type chatMessage: IRCMessage
+        """
         if self.eligible(chatMessage.MessageString):
             self.lastTriggered = datetime.datetime.utcnow()
             return self.talkwords(chatMessage)

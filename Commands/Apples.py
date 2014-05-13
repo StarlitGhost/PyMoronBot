@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -9,11 +10,19 @@ class Apples(CommandInterface):
 
     playApples = 0
 
-    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
+    def shouldExecute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.Command.lower() == "playapples":
             self.playApples = 1
             return IRCResponse(ResponseType.Say, "!join", message.ReplyTo)

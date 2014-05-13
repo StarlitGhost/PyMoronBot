@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from moronbot import MoronBot
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -11,13 +12,29 @@ class CommandInterface(object):
 
     priority = 0
     
-    def __init__(self, bot=MoronBot):
-        self.onStart(bot)
+    def __init__(self, bot):
+        """
+        @type bot: MoronBot
+        """
+        self.onLoad(bot)
 
-    def onStart(self, bot=MoronBot):
+    def onLoad(self, bot):
+        """
+        @type bot: MoronBot
+        """
         pass
 
-    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
+    def onUnload(self, bot):
+        """
+        @type bot: MoronBot
+        """
+        pass
+
+    def shouldExecute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.Type not in self.acceptedTypes:
             return False
         if message.Command.lower() not in self.triggers:
@@ -25,5 +42,9 @@ class CommandInterface(object):
         
         return True
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         return IRCResponse(ResponseType.Say, '<command not yet implemented>', message.ReplyTo)

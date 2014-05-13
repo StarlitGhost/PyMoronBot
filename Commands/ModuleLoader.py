@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from CommandInterface import CommandInterface
 from moronbot import MoronBot
 from ModuleHandler import ModuleHandler
@@ -12,7 +13,11 @@ class ModuleLoader(CommandInterface):
     help = "load/reload <command>, unload <command> - handles loading/unloading/reloading of commands. " \
            "Use 'all' with load/reload to reload all active commands"
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say,
                                "Only my admins can use {0}".format(message.Command),
@@ -48,8 +53,12 @@ class ModuleLoader(CommandInterface):
         return responses
 
     @staticmethod
-    def load(commandNames, moduleHandler=ModuleHandler):
-
+    def load(commandNames, moduleHandler):
+        """
+        @type commandNames: list[str]
+        @type moduleHandler: ModuleHandler
+        @return: (list[str], list[str], list[str])
+        """
         commandNameCaseMap = {c.lower(): c for c in commandNames}
 
         successes = []
@@ -87,8 +96,12 @@ class ModuleLoader(CommandInterface):
         return successes, failures, exceptions
 
     @staticmethod
-    def loadp(postProcessNames, moduleHandler=ModuleHandler):
-
+    def loadp(postProcessNames, moduleHandler):
+        """
+        @type postProcessNames: list[str]
+        @type moduleHandler: ModuleHandler
+        @return: (list[str], list[str], list[str])
+        """
         postProcessNameCaseMap = {p.lower(): p for p in postProcessNames}
 
         successes = []
@@ -118,7 +131,12 @@ class ModuleLoader(CommandInterface):
         return successes, failures, exceptions
 
     @staticmethod
-    def unload(commandNames, moduleHandler=ModuleHandler):
+    def unload(commandNames, moduleHandler):
+        """
+        @type commandNames: list[str]
+        @type moduleHandler: ModuleHandler
+        @return: (list[str], list[str], list[str])
+        """
 
         commandNameCaseMap = {c.lower(): c for c in commandNames}
 
@@ -140,7 +158,12 @@ class ModuleLoader(CommandInterface):
         return successes, failures, exceptions
 
     @staticmethod
-    def unloadp(postProcessNames, moduleHandler=ModuleHandler):
+    def unloadp(postProcessNames, moduleHandler):
+        """
+        @type postProcessNames: list[str]
+        @type moduleHandler: ModuleHandler
+        @return: (list[str], list[str], list[str])
+        """
 
         postProcessNameCaseMap = {p.lower(): p for p in postProcessNames}
 

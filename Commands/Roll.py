@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on May 10, 2014
 
@@ -43,7 +44,10 @@ class Roll(CommandInterface):
     triggers = ['roll', 'rollv']
     help = 'roll(v) - dice roller, remind me to write more here later!'
 
-    def onStart(self, bot=MoronBot):
+    def onLoad(self, bot):
+        """
+        @type bot: MoronBot
+        """
 
         tokens = ('NUMBER',
                   'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'DICE',
@@ -169,7 +173,11 @@ class Roll(CommandInterface):
         self.yaccer = yacc.yacc()
         self.yaccer.rolls = []
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
 
         verbose = False
         if message.Command.lower().endswith('v'):

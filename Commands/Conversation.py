@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -10,11 +11,19 @@ import re
 class Conversation(CommandInterface):
     help = 'Responds to greetings and such'
 
-    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
+    def shouldExecute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         greetings = ["(wa+s+|')?so?u+p",
                      "hi(ya)?",
                      "hello",

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Dec 13, 2011
 
@@ -25,11 +26,19 @@ class HangoutTracker(CommandInterface):
 
     hangoutDict = {}
 
-    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
+    def shouldExecute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         match = re.search('^hango+?u?t$', message.Command, re.IGNORECASE)
         if match:
             if message.ReplyTo not in self.hangoutDict:

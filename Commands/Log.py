@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on May 11, 2014
 
@@ -52,10 +53,18 @@ class Log(CommandInterface):
 
     priority = -1
 
-    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
+    def shouldExecute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         return True
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.Type in logFuncs:
             logString = logFuncs[message.Type](message)
             log(logString, message.ReplyTo)

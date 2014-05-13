@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import importlib
 import sys
 import traceback
@@ -12,13 +13,10 @@ from IRCResponse import IRCResponse, ResponseType
 
 class ModuleHandler(object):
 
-    commands = {}
-    commandCaseMapping = {}
-
-    postProcesses = {}
-    postProcessCaseMapping = {}
-
     def __init__(self, bot):
+        """
+        @type bot: MoronBot
+        """
         self.bot = bot
 
         self.commands = {}
@@ -132,6 +130,9 @@ class ModuleHandler(object):
     def _unload(self, name, category, categoryDict, categoryCaseMap):
         if name.lower() in categoryCaseMap.keys():
             properName = categoryCaseMap[name.lower()]
+
+            categoryDict[properName].onUnload(self.bot)
+
             del categoryDict[properName]
             del categoryCaseMap[name.lower()]
             del sys.modules['{0}.{1}'.format(category, properName)]

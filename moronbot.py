@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import sys
 import platform
@@ -256,6 +257,9 @@ class MoronBot(irc.IRCClient):
         self.handleMessage(message)
 
     def handleMessage(self, message):
+        """
+        @type message: IRCMessage
+        """
         # restart command, can't restart within 1 minute of starting (avoids chanhistory triggering another restart)
         if (message.Command == 'restart' and
                 datetime.datetime.utcnow() > startTime + datetime.timedelta(seconds=10) and

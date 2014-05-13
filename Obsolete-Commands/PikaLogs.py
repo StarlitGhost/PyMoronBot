@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
@@ -13,14 +14,22 @@ class Command(CommandInterface):
     lastMessageDate = datetime.datetime.utcnow()
     lastJoinDate = datetime.datetime.utcnow()
 
-    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
+    def shouldExecute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.Type not in self.acceptedTypes:
             return False
         if message.User.Name in ['Pikachaos', 'Raichaos', 'Pika']:
             return True
         return False
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         now = datetime.datetime.utcnow()
         lastJoin = self.lastJoinDate
 

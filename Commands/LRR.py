@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 
 from CommandInterface import CommandInterface
@@ -18,7 +19,11 @@ class LRR(CommandInterface):
                "or the latest of a series if you specify one; " \
                "series are: {0}".format(", ".join(DataStore.LRRChecker.keys()))
     
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if len(message.Parameters.strip()) > 0:
             feed = self.handleAliases(message.Parameters)
             lowerMap = {key.lower(): key for key in DataStore.LRRChecker.iterkeys()}
@@ -51,7 +56,8 @@ class LRR(CommandInterface):
             response = u'Latest {0}: {1} | {2}'.format(latestFeed, latestTitle, latestLink)
             return IRCResponse(ResponseType.Say, response, message.ReplyTo)
 
-    def handleAliases(self, series):
+    @classmethod
+    def handleAliases(cls, series):
         for feedName, feedDeets in DataStore.LRRChecker.iteritems():
             if series.lower() in feedDeets['aliases']:
                 return feedName

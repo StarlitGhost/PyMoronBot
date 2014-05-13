@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on May 03, 2014
 
@@ -23,7 +24,11 @@ class Chain(CommandInterface):
            '%var% is any extra var that may have been added to the message by commands earlier in the chain'
     runInThread = True
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
 
         # TODO: maybe do this in the command handler?
         # map triggers to commands so we can call them via dict lookup
@@ -56,7 +61,7 @@ class Chain(CommandInterface):
             inputMessage.chained = True  # might be used at some point to tell commands they're being called from Chain
 
             if inputMessage.Command.lower() in mappedTriggers:
-                response = mappedTriggers[inputMessage.Command.lower()].execute(inputMessage)
+                response = mappedTriggers[inputMessage.Command.lower()].execute(inputMessage, )
             else:
                 return IRCResponse(ResponseType.Say,
                                    "'{0}' is not a recognized command trigger".format(inputMessage.Command),

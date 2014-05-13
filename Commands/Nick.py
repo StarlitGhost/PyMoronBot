@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Dec 20, 2011
 
@@ -15,7 +16,11 @@ class Nick(CommandInterface):
     triggers = ['nick', 'name']
     help = "nick <nick> - changes the bot's nick to the one specified"
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can change my name', message.ReplyTo)
 

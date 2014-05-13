@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Dec 20, 2011
 
@@ -14,7 +15,11 @@ class Say(CommandInterface):
     triggers = ['say']
     help = 'say <text> - makes the bot repeat the specified text'
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if len(message.ParameterList) > 0:
             return IRCResponse(ResponseType.Say, message.Parameters, message.ReplyTo)
         else:

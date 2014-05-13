@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 import urllib
 import HTMLParser
@@ -15,7 +16,11 @@ class Command(CommandInterface):
     
     htmlParser = HTMLParser.HTMLParser()
     
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
                                "You didn't give an expression to calculate! {0}".format(self.help),

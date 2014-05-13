@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Jul 31, 2013
 
@@ -18,7 +19,11 @@ class Dinner(CommandInterface):
     triggers = ['dinner']
     help = 'dinner (meat/veg/drink) - asks WhatTheFuckShouldIMakeForDinner.com what you should make for dinner'
     
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         wtfsimfd = "http://whatthefuckshouldimakefordinner.com/{0}"
 
         options = {'meat': 'index.php', 'veg': 'veg.php', 'drink': 'drinks.php'}

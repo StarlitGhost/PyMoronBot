@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
@@ -33,11 +34,16 @@ def unescape(text):
         return text # leave as is
     return re.sub('&#?\w+;', fixup, text)
 
+
 class Wikipedia(CommandInterface):
     triggers = ['wiki', 'wikipedia']
     help = 'wiki(pedia) <search term> - returns the top result for a given search term from wikipedia'
     
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         article = message.Parameters
         article = urllib.quote(article)
         

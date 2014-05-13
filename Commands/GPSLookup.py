@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Oct 09, 2013
 
@@ -21,10 +22,17 @@ class GPSLookup(CommandInterface):
     help = "gps(lookup) <address> - Uses Microsoft's Bing Maps geocoding API to " \
            "lookup GPS coordinates for the given address. Must be used over PM"
 
-    def onStart(self, bot=MoronBot):
+    def onLoad(self, bot):
+        """
+        @type bot: MoronBot
+        """
         self.api_key = load_key(u'Bing Maps')
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.User.Name != message.ReplyTo:
             return IRCResponse(ResponseType.Say, "GPS Lookup must be done via PM", message.ReplyTo)
         

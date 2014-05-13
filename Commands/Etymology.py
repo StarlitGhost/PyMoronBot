@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -11,7 +12,11 @@ class Etymology(CommandInterface):
     triggers = ['etym', 'etymology']
     help = "etym(ology) <word> - returns the etymology of the given word from etymonline.com"
     
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
                                "You didn't give a word! Usage: {0}".format(self.help),

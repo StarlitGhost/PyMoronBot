@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Aug 14, 2013
 
@@ -16,7 +17,11 @@ class EightBall(CommandInterface):
     triggers = ['8ball']
     help = '8ball (question) - swirls a magic 8-ball to give you the answer to your questions'
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         answers = ['It is certain',  # positive
                    'It is decidedly so',
                    'Without a doubt',

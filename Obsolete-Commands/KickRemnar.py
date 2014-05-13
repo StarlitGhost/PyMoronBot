@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Dec 18, 2011
 
@@ -15,7 +16,11 @@ class Command(CommandInterface):
     acceptedTypes = ['PRIVMSG', 'ACTION']
     help = 'Guards against the terrible influx of Mormon Jesus'
 
-    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
+    def shouldExecute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.Type not in self.acceptedTypes:
             return False
         match = re.search('([^a-zA-Z]|^)mormon jesus([^a-zA-Z]|$)',
@@ -25,7 +30,11 @@ class Command(CommandInterface):
             return True
         return False
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
-            return IRCResponse(ResponseType.Raw,
-                               'KICK %s remnar ::I' % message.ReplyTo,
-                               '')
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
+        return IRCResponse(ResponseType.Raw,
+                           'KICK %s remnar ::I' % message.ReplyTo,
+                           '')

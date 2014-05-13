@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on May 11, 2014
 
@@ -20,7 +21,11 @@ class LogSelf(PostProcessInterface):
 
     priority = -1
 
-    def execute(self, response=IRCResponse, bot=MoronBot):
+    def execute(self, response, bot):
+        """
+        @type response: IRCResponse
+        @type bot: MoronBot
+        """
         if response.Type in logFuncs:
             logString = logFuncs[response.Type](response)
             log(logString, response.Target)

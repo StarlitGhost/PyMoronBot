@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import socket
 
 # somewhat hacky and I forget what this is solving

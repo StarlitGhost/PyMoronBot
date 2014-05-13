@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 
 aYearAgo = datetime.datetime.utcnow() - datetime.timedelta(days=365)

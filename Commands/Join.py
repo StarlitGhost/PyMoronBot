@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Dec 20, 2011
 
@@ -14,7 +15,11 @@ class Join(CommandInterface):
     triggers = ['join']
     help = 'join <channel> - makes the bot join the specified channel(s)'
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if len(message.ParameterList) > 0:
             responses = []
             for param in message.ParameterList:

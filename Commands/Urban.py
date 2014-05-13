@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Jan 24, 2014
 
@@ -21,7 +22,11 @@ class Urban(CommandInterface):
     triggers = ['urban', 'ud']
     help = "urban <search term> - returns the definition of the given search term from UrbanDictionary.com"
     
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
                                "You didn't give a word! Usage: {0}".format(self.help),

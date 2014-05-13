@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 def isNumber(s):
     """returns True if string s can be cast to a number, False otherwise"""
     try:

@@ -27,11 +27,18 @@ class URLFollow(CommandInterface):
     
     graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
-    def onStart(self, bot=MoronBot):
+    def onLoad(self, bot):
+        """
+        @type bot: MoronBot
+        """
         self.youtubeKey = load_key(u'YouTube')
         self.imgurClientID = load_key(u'imgur Client ID')
 
-    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
+    def shouldExecute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.Type not in self.acceptedTypes:
             return False
         if ignores.ignoreList is not None:
@@ -39,7 +46,11 @@ class URLFollow(CommandInterface):
                 return False
         return True
     
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.MessageString, re.IGNORECASE)
         if not match:
             return
@@ -105,28 +116,28 @@ class URLFollow(CommandInterface):
         
         return
     
-    def FollowImgur(self, id, message):
+    def FollowImgur(self, imgurID, message):
         if self.imgurClientID is None:
             return IRCResponse(ResponseType.Say, '[imgur Client ID not found]', message.ReplyTo)
 
-        if id.startswith('gallery/'):
-            id = id.replace('gallery/', '')
+        if imgurID.startswith('gallery/'):
+            imgurID = imgurID.replace('gallery/', '')
 
         url = ''
         albumLink = False
-        if id.startswith('a/'):
-            id = id.replace('a/', '')
-            url = 'https://api.imgur.com/3/album/{0}'.format(id)
+        if imgurID.startswith('a/'):
+            imgurID = imgurID.replace('a/', '')
+            url = 'https://api.imgur.com/3/album/{0}'.format(imgurID)
             albumLink = True
         else:
-            url = 'https://api.imgur.com/3/image/{0}'.format(id)
+            url = 'https://api.imgur.com/3/image/{0}'.format(imgurID)
 
         headers = [('Authorization', 'Client-ID {0}'.format(self.imgurClientID))]
         
         webPage = WebUtils.fetchURL(url, headers)
         
         if webPage is None:
-            url = 'https://api.imgur.com/3/gallery/{0}'.format(id)
+            url = 'https://api.imgur.com/3/gallery/{0}'.format(imgurID)
             webPage = WebUtils.fetchURL(url, headers)
 
         if webPage is None:
@@ -137,13 +148,13 @@ class URLFollow(CommandInterface):
         imageData = response['data']
 
         if imageData['title'] is None:
-            url = 'https://api.imgur.com/3/gallery/{0}'.format(id)
+            url = 'https://api.imgur.com/3/gallery/{0}'.format(imgurID)
             webPage = WebUtils.fetchURL(url, headers)
             if webPage is not None:
                 imageData = json.loads(webPage.Page)['data']
 
             if imageData['title'] is None:
-                webPage = WebUtils.fetchURL('http://imgur.com/{0}'.format(id))
+                webPage = WebUtils.fetchURL('http://imgur.com/{0}'.format(imgurID))
                 imageData['title'] = self.GetTitle(webPage.Page).replace(' - Imgur', '')
                 if imageData['title'] == 'imgur: the simple image sharer':
                     imageData['title'] = None
@@ -232,10 +243,10 @@ class URLFollow(CommandInterface):
 
         # prices
         if 'price_overview' in appData:
-            prices = {'USD': appData['price_overview']}
-            prices['GBP'] = self.getSteamPrice(steamAppId, 'GB')
-            prices['EUR'] = self.getSteamPrice(steamAppId, 'FR')
-            prices['AUD'] = self.getSteamPrice(steamAppId, 'AU')
+            prices = {'USD': appData['price_overview'],
+                      'GBP': self.getSteamPrice(steamAppId, 'GB'),
+                      'EUR': self.getSteamPrice(steamAppId, 'FR'),
+                      'AUD': self.getSteamPrice(steamAppId, 'AU')}
 
             currencies = {'USD': u'$',
                           'GBP': u'\xa3',
@@ -262,7 +273,8 @@ class URLFollow(CommandInterface):
 
         return IRCResponse(ResponseType.Say, self.graySplitter.join(data), message.ReplyTo)
 
-    def getSteamPrice(self, appId, region):
+    @classmethod
+    def getSteamPrice(cls, appId, region):
         webPage = WebUtils.fetchURL('http://store.steampowered.com/api/appdetails/?appids={0}&cc={1}&l=english&v=1'.format(appId, region))
         response = json.loads(webPage.Page)
         if region == 'AU':

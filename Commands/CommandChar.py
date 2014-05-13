@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Feb 05, 2014
 
@@ -15,7 +16,11 @@ class CommandChar(CommandInterface):
     triggers = ['commandchar']
     help = "commandchar <char> - changes the prefix character for bot commands (admin-only)"
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can change my command character', message.ReplyTo)
 

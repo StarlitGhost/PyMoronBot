@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 import xml.etree.ElementTree as ET
 
@@ -16,10 +17,18 @@ class LRRChecker(CommandInterface):
     help = "Automatic function, scans LRR video RSS feeds and reports new items in the channel."
     runInThread = True
 
-    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
+    def shouldExecute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         return True
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         responses = []
         for feedName, feedDeets in DataStore.LRRChecker.iteritems():
             if feedDeets['lastCheck'] > datetime.datetime.utcnow() - datetime.timedelta(minutes=10):

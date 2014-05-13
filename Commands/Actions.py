@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -10,11 +11,19 @@ class Actions(CommandInterface):
     acceptedTypes = ['ACTION']
     help = 'Responds to various actions'
 
-    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
+    def shouldExecute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         actions = ['pokes',
                    'gropes',
                    'molests',

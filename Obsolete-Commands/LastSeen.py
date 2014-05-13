@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
@@ -9,7 +10,11 @@ class Command(CommandInterface):
     triggers = ['lastseen', 'lastsaw']
     help = 'lastseen/lastsaw <nick> - finds a nick\'s last message'
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if len(message.MessageList) > 1 and message.Command == "lastseen":
             proc = subprocess.Popen(['/usr/bin/php',
                                      '/opt/moronbot/loggrep.php',

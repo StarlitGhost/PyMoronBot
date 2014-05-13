@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Dec 05, 2013
 
@@ -16,7 +17,11 @@ class Gif(CommandInterface):
     triggers = ['gif']
     help = 'gif - fetches a random gif posted during Desert Bus'
     
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         url = "http://greywool.com/desertbus/gifs/random.php"
 
         webPage = WebUtils.fetchURL(url)

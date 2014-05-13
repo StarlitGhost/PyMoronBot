@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Dec 20, 2011
 
@@ -15,5 +16,9 @@ class Source(CommandInterface):
     triggers = ['source']
     help = "source - returns a link to {0}'s source".format(GlobalVars.CurrentNick)
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         return IRCResponse(ResponseType.Say, GlobalVars.source, message.ReplyTo)

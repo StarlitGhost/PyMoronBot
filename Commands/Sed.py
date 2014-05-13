@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Created on Feb 14, 2014
 
@@ -20,17 +21,29 @@ class Sed(CommandInterface):
            'flags are g (global), i (case-insensitive), o (only user messages), v (verbose, ignores whitespace)\n'\
            'Example usage: "I\'d eat some tacos" -> s/some/all the/ -> "I\'d eat all the tacos"'
 
-    #TODO: make these per-channel
-    messages = []
-    unmodifiedMessages = []
-    
     historySize = 20
 
-    def shouldExecute(self, message=IRCMessage, bot=MoronBot):
+    def onLoad(self, bot):
+        """
+        @type bot: MoronBot
+        """
+        #TODO: make these per-channel
+        self.messages = []
+        self.unmodifiedMessages = []
+
+    def shouldExecute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         if message.Command.lower() == 'sed':
             match = self.match(message.Parameters)
         else:
@@ -53,7 +66,8 @@ class Sed(CommandInterface):
         else:
             self.storeMessage(message)
 
-    def match(self, message):
+    @classmethod
+    def match(cls, message):
         """Returns (search, replace, flags) if message is a replacement pattern, otherwise None"""
         if not message.startswith('s/'):
             return

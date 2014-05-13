@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import GlobalVars
 import ServerInfo
 from enum import Enum
@@ -17,6 +18,9 @@ class IRCChannel(object):
         self.Ranks = {}
         self.Modes = {}
 
+    def __str__(self):
+        return self.Name
+
     def getHighestStatusOfUser(self, nickname):
         if not self.Ranks[nickname]:
             return None
@@ -29,11 +33,10 @@ class IRCChannel(object):
 
 
 class IRCUser(object):
-    Hostmask = None
-    Name = None
-    User = None
-
     def __init__(self, user):
+        self.User = None
+        self.Hostmask = None
+
         if '!' in user:
             userArray = user.split('!')
             self.Name = userArray[0]
@@ -46,28 +49,25 @@ class IRCUser(object):
 
 
 class IRCMessage(object):
-    Type = None
-    User = None
-    TargetType = TargetTypes.CHANNEL
-    ReplyTo = None
-    MessageList = []
-    MessageString = None
-    Channel = None
-    
-    Command = ''
-    Parameters = ''
-    ParameterList = []
 
-    def __init__(self, type, user, channel, message):
+    def __init__(self, msgType, user, channel, message):
+        """
+        @param msgType: str
+        @param user: str
+        @param channel: str
+        @param message: str
+        """
         try:
             unicodeMessage = message.decode('utf-8', 'ignore')
-        except UnicodeEncodeError: # Already utf-8?
+        except UnicodeEncodeError:  # Already utf-8?
             unicodeMessage = message
-        self.Type = type
+        self.Type = msgType
         self.MessageList = unicodeMessage.strip().split(' ')
         self.MessageString = unicodeMessage
         self.User = IRCUser(user)
-        if channel == None:
+
+        self.Channel = None
+        if channel is None:
             self.ReplyTo = self.User.Name
             self.TargetType = TargetTypes.USER
         else:
@@ -75,6 +75,10 @@ class IRCMessage(object):
             # I would like to set this to the channel object but I would probably break functionality if I did :I
             self.ReplyTo = channel.Name
             self.TargetType = TargetTypes.CHANNEL
+
+        self.Command = ''
+        self.Parameters = ''
+        self.ParameterList = []
 
         if self.MessageList[0].startswith(GlobalVars.CommandChar):
             self.Command = self.MessageList[0][len(GlobalVars.CommandChar):]

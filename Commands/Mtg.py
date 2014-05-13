@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
@@ -14,7 +15,11 @@ class Mtg(CommandInterface):
     help = 'mtg(f) <card name> - fetches details of the Magic: The Gathering card you specify ' \
            'from gatherer.wizards.com. mtgf includes the flavour text, if it has any'
 
-    def execute(self, message=IRCMessage, bot=MoronBot):
+    def execute(self, message, bot):
+        """
+        @type message: IRCMessage
+        @type bot: MoronBot
+        """
         searchTerm = 'http://gatherer.wizards.com/pages/search/default.aspx?name='
         for param in message.ParameterList:
             searchTerm += '+[%s]' % param
@@ -84,7 +89,8 @@ class Mtg(CommandInterface):
 
         return IRCResponse(ResponseType.Say, reply, message.ReplyTo)
 
-    def translateSymbols(self, text):
+    @classmethod
+    def translateSymbols(cls, text):
         text = unicode(text)
         text = re.sub(r'<img.+?name=(tap).+?>', r'Tap', text) # tap
         text = re.sub(r'<img.+?name=([0-9]{2,}).+?>', r'\1', text) # long numbers
