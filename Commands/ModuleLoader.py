@@ -71,7 +71,6 @@ class ModuleLoader(CommandInterface):
                     continue
 
                 moduleHandler.loadCommand(name)
-                moduleHandler.loadCommand(name)
 
             return ['all commands'], [], []
 
@@ -84,7 +83,6 @@ class ModuleLoader(CommandInterface):
                 try:
                     success = moduleHandler.loadCommand(commandName)
                     if success:
-                        moduleHandler.loadCommand(commandName)
                         successes.append(moduleHandler.commandCaseMapping[commandName])
                     else:
                         failures.append(commandNameCaseMap[commandName])
@@ -111,7 +109,6 @@ class ModuleLoader(CommandInterface):
         if len(postProcessNames) == 1 and 'all' in postProcessNameCaseMap:
             for name, _ in moduleHandler.postProcesses.iteritems():
                 moduleHandler.loadPostProcess(name)
-                moduleHandler.loadPostProcess(name)
 
             return ['all post processes'], [], []
 
@@ -119,7 +116,6 @@ class ModuleLoader(CommandInterface):
             try:
                 success = moduleHandler.loadPostProcess(postProcessName)
                 if success:
-                    moduleHandler.loadPostProcess(postProcessName)
                     successes.append(moduleHandler.postProcessCaseMapping[postProcessName])
                 else:
                     failures.append(postProcessNameCaseMap[postProcessName])

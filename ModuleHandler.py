@@ -104,12 +104,12 @@ class ModuleHandler(object):
 
         alreadyExisted = False
 
-        module = importlib.import_module(category + '.' + catListCaseMap[name])
-
         # unload first if the module is already loaded, we're doing a reload
         if name in categoryCaseMap:
             self._unload(name, category, categoryDict, categoryCaseMap)
             alreadyExisted = True
+
+        module = importlib.import_module(category + '.' + catListCaseMap[name])
 
         reload(module)
 
