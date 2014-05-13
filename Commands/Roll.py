@@ -154,9 +154,9 @@ class Roll(CommandInterface):
 
         def rollDice(numDice, numSides):
             if numDice > MAX_DICE:
-                raise TooManyDiceException(u'attempted to roll more than 1000 dice in a single d expression')
+                raise TooManyDiceException(u'attempted to roll more than {0} dice in a single d expression'.format(MAX_DICE))
             if numSides > MAX_SIDES:
-                raise TooManySidesException(u'attempted to roll a dice with more than 1000 sides')
+                raise TooManySidesException(u'attempted to roll a dice with more than {0} sides'.format(MAX_SIDES))
             if numDice < 0:
                 raise NegativeDiceException(u'attempted to roll a negative number of dice')
             if numSides < 0:
