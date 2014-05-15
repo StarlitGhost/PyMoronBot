@@ -13,6 +13,8 @@ from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from moronbot import MoronBot
 
+from Utils import StringUtils
+
 
 class Data(object):
     lastCode = None
@@ -52,10 +54,9 @@ class HangoutTracker(CommandInterface):
 
             timeDiff = datetime.datetime.utcnow() - hangout.lastDate
             url = 'https://talkgadget.google.com/hangouts/_/{0}'.format(hangout.lastCode)
-            byLine = 'first posted {0} ago by {1}'.format(
-                self.strfdelta(timeDiff, '{days} day(s) {hours} hour(s) {minutes} minute(s)'), hangout.lastUser)
+            byLine = 'first linked {0} ago by {1}'.format(StringUtils.deltaTimeToString(timeDiff), hangout.lastUser)
 
-            response = 'Last hangout posted: {0} ({1})'.format(url, byLine)
+            response = 'Last hangout linked: {0} ({1})'.format(url, byLine)
 
             return IRCResponse(ResponseType.Say, response, message.ReplyTo)
 
@@ -75,10 +76,3 @@ class HangoutTracker(CommandInterface):
         self.hangoutDict[message.ReplyTo].lastUser = message.User.Name
         self.hangoutDict[message.ReplyTo].lastDate = datetime.datetime.utcnow()
         return
-
-    @staticmethod
-    def strfdelta(tdelta, fmt):
-        d = {"days": tdelta.days}
-        d["hours"], rem = divmod(tdelta.seconds, 3600)
-        d["minutes"], d["seconds"] = divmod(rem, 60)
-        return fmt.format(**d)

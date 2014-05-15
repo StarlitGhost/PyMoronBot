@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
+
+
 def isNumber(s):
     """returns True if string s can be cast to a number, False otherwise"""
     try:
@@ -48,3 +51,22 @@ def stripColours(msg):
     # bold, italic, underline, plain, reverse
     msg = msg.replace(chr(2), "").replace(chr(29), "").replace(chr(31), "").replace(chr(15), "").replace(chr(22), "")
     return msg
+
+
+def deltaTimeToString(timeDelta):
+    """
+    @type timeDelta: timedelta
+    """
+    d = OrderedDict()
+    d['days'] = timeDelta.days
+    d['hours'], rem = divmod(timeDelta.seconds, 3600)
+    d['minutes'], _ = divmod(rem, 60)  # replace _ with d['seconds'] to get seconds
+
+    def lex(word, number):
+        if number == 1:
+            return '{0} {1}'.format(number, word[:-1])
+        else:
+            return '{0} {1}'.format(number, word)
+
+    deltaString = ' '.join([lex(word, number) for word, number in d.iteritems() if number > 0])
+    return deltaString if len(deltaString) > 0 else 'seconds'
