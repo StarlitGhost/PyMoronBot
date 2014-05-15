@@ -182,6 +182,7 @@ class Responses(CommandInterface):
                     "http://i.imgur.com/8VFggj4.gif",   # What's in the boop box? (it's kittens)
                     "http://i.imgur.com/2dqTNoQ.gif",   # Sheep and Cow charge boop
                     "http://i.imgur.com/h1TAtur.gif",   # Young deer head boop
+                    "http://i.imgur.com/Bv6r4Lu.gif",   # Dancing boxer boop
                 ]
                 return [IRCResponse(ResponseType.Say,
                                     'Boop! %s' % random.choice(boops),
