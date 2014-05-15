@@ -249,8 +249,8 @@ class URLFollow(CommandInterface):
                       'AUD': self.getSteamPrice(steamAppId, 'AU')}
 
             currencies = {'USD': u'$',
-                          'GBP': u'\xa3',
-                          'EUR': u'\x80',
+                          'GBP': u'\u00A3',
+                          'EUR': u'\u20AC',
                           'AUD': u'AU$'}
 
             if prices['AUD']['final'] == prices['USD']['final']:
