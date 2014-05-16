@@ -61,7 +61,7 @@ class Chain(CommandInterface):
             inputMessage.chained = True  # might be used at some point to tell commands they're being called from Chain
 
             if inputMessage.Command.lower() in mappedTriggers:
-                response = mappedTriggers[inputMessage.Command.lower()].execute(inputMessage, )
+                response = mappedTriggers[inputMessage.Command.lower()].execute(inputMessage, bot)
             else:
                 return IRCResponse(ResponseType.Say,
                                    "'{0}' is not a recognized command trigger".format(inputMessage.Command),

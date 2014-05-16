@@ -52,7 +52,7 @@ def stripColours(msg):
     msg = msg.replace(chr(2), "").replace(chr(29), "").replace(chr(31), "").replace(chr(15), "").replace(chr(22), "")
     return msg
 
-
+# mostly taken from dave_random's UnsafeBot (whose source is not generally accessible)
 def deltaTimeToString(timeDelta):
     """
     @type timeDelta: timedelta
