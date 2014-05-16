@@ -30,19 +30,17 @@ class MoronBot(irc.IRCClient):
         self.moduleHandler = ModuleHandler.ModuleHandler(self)
         self.moduleHandler.loadAll()
 
-        GlobalVars.CurrentNick = cmdArgs.nick
+        self.nickname = cmdArgs.nick
 
-        self.nickname = GlobalVars.CurrentNick
-
-        self.realname = GlobalVars.CurrentNick
-        self.username = GlobalVars.CurrentNick
+        self.realname = self.nickname
+        self.username = self.nickname
 
         self.channels = {}
         self.userModes = {}
 
         self.fingerReply = GlobalVars.finger
 
-        self.versionName = GlobalVars.CurrentNick
+        self.versionName = self.nickname
         self.versionNum = GlobalVars.version
         self.versionEnv = platform.platform()
 
@@ -90,7 +88,6 @@ class MoronBot(irc.IRCClient):
 
     def nickChanged(self, nick):
         self.nickname = nick
-        GlobalVars.CurrentNick = nick
 
     def irc_JOIN(self, prefix, params):
         if params[0] in self.channels:
@@ -100,7 +97,7 @@ class MoronBot(irc.IRCClient):
 
         message = IRCMessage('JOIN', prefix, channel, '')
 
-        if message.User.Name == GlobalVars.CurrentNick:
+        if message.User.Name == self.nickname:
             self.channels[message.ReplyTo] = channel
             self.sendLine('WHO ' + message.ReplyTo)
             self.sendLine('MODE ' + message.ReplyTo)
@@ -116,7 +113,7 @@ class MoronBot(irc.IRCClient):
         channel = self.channels[params[0]]
         message = IRCMessage('PART', prefix, channel, partMessage)
 
-        if message.User.Name == GlobalVars.CurrentNick:
+        if message.User.Name == self.nickname:
             del self.channels[message.ReplyTo]
         else:
             del channel.Users[message.User.Name]
@@ -134,7 +131,7 @@ class MoronBot(irc.IRCClient):
         message = IRCMessage('KICK', prefix, channel, kickMessage)
         message.Kickee = params[1]
 
-        if message.Kickee == GlobalVars.CurrentNick:
+        if message.Kickee == self.nickname:
             del self.channels[message.ReplyTo]
         else:
             del channel.Users[message.Kickee]
