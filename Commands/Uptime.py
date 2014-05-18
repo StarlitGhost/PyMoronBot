@@ -8,7 +8,6 @@ Created on Dec 18, 2011
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-from moronbot import MoronBot
 
 import datetime
 
@@ -20,10 +19,9 @@ class Uptime(CommandInterface):
     help = "uptime - tells you the bot's uptime " \
            "(actually that's a lie right now, it gives you the bot's server's uptime)"
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         uptime = datetime.datetime.now() - datetime.datetime.fromtimestamp(psutil.BOOT_TIME)
         

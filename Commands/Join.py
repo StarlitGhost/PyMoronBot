@@ -8,17 +8,15 @@ Created on Dec 20, 2011
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from moronbot import MoronBot
 
 
 class Join(CommandInterface):
     triggers = ['join']
     help = 'join <channel> - makes the bot join the specified channel(s)'
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if len(message.ParameterList) > 0:
             responses = []

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import GlobalVars
 import ServerInfo
 from enum import Enum
 
@@ -11,6 +10,9 @@ class TargetTypes(Enum):
 
 class IRCChannel(object):
     def __init__(self, name):
+        """
+        @type name: str
+        """
         self.Name = name
         self.Topic = ''
         self.TopicSetBy = ''
@@ -34,6 +36,9 @@ class IRCChannel(object):
 
 class IRCUser(object):
     def __init__(self, user):
+        """
+        @type user: str
+        """
         self.User = None
         self.Hostmask = None
 
@@ -50,12 +55,13 @@ class IRCUser(object):
 
 class IRCMessage(object):
 
-    def __init__(self, msgType, user, channel, message):
+    def __init__(self, msgType, user, channel, message, bot):
         """
-        @param msgType: str
-        @param user: str
-        @param channel: str
-        @param message: str
+        @type msgType: str
+        @type user: str
+        @type channel: IRCChannel
+        @type message: unicode
+        @type bot: MoronBot
         """
         try:
             unicodeMessage = message.decode('utf-8', 'ignore')
@@ -80,14 +86,14 @@ class IRCMessage(object):
         self.Parameters = ''
         self.ParameterList = []
 
-        if self.MessageList[0].startswith(GlobalVars.CommandChar):
-            self.Command = self.MessageList[0][len(GlobalVars.CommandChar):]
+        if self.MessageList[0].startswith(bot.commandChar):
+            self.Command = self.MessageList[0][len(bot.commandChar):]
             if self.Command == '':
                 self.Command = self.MessageList[1]
                 self.Parameters = u' '.join(self.MessageList[2:])
             else:
                 self.Parameters = u' '.join(self.MessageList[1:])
-        elif self.MessageList[0].startswith(GlobalVars.CurrentNick) and len(self.MessageList) > 1:
+        elif self.MessageList[0].startswith(bot.nickname) and len(self.MessageList) > 1:
             self.Command = self.MessageList[1]
             self.Parameters = u' '.join(self.MessageList[2:])
 

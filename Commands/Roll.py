@@ -11,7 +11,6 @@ import operator
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-from moronbot import MoronBot
 
 import ply.lex as lex
 import ply.yacc as yacc
@@ -44,10 +43,8 @@ class Roll(CommandInterface):
     triggers = ['roll', 'rollv']
     help = 'roll(v) - dice roller, remind me to write more here later!'
 
-    def onLoad(self, bot):
-        """
-        @type bot: MoronBot
-        """
+    # noinspection PyUnusedLocal
+    def onLoad(self):
 
         tokens = ('NUMBER',
                   'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'DICE',
@@ -75,7 +72,7 @@ class Roll(CommandInterface):
         # Ignored characters
         t_ignore = ' \t'
 
-        def t_COMMENT(t):
+        def t_COMMENT(_):
             r"""\#.*"""
             pass
             # No return value. Token discarded
@@ -98,7 +95,6 @@ class Roll(CommandInterface):
             raise UnknownCharacterException(u"unknown character '{0}' (col {1})".format(t.value[0], col))
 
         self.lexer = lex.lex()
-
 
         # Parsing rules
         precedence = (('left', 'PLUS', 'MINUS'),
@@ -173,10 +169,9 @@ class Roll(CommandInterface):
         self.yaccer = yacc.yacc()
         self.yaccer.rolls = []
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
 
         verbose = False

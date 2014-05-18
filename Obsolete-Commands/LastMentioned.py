@@ -10,10 +10,9 @@ class Command(CommandInterface):
     triggers = ['lastsaid', 'lastmention', 'lastmentioned']
     help = 'lastmention(ed)/lastsaid <text> - checks the log for the last time someone mentioned a given word or phrase'
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if len(message.MessageList) > 1 and (message.Command == "lastmention" or message.Command == "lastmentioned"):
             proc = subprocess.Popen(['/usr/bin/php',

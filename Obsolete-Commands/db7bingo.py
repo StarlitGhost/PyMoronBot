@@ -8,10 +8,9 @@ class Command(CommandInterface):
     triggers = ['db7bingo']
     help = "db7bingo - outputs a link for betsy's DB7 Bingo Card"
     
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         reply = "Betsy's DB7 Bingo Card: https://www.dropbox.com/s/0uihcw5my1zb95e/DesertBusBingo.pdf"
         

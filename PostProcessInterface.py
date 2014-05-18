@@ -10,31 +10,27 @@ class PostProcessInterface(object):
     priority = 0
 
     def __init__(self, bot):
-        self.onLoad(bot)
-
-    def onLoad(self, bot):
         """
         @type bot: MoronBot
         """
+        self.bot = bot
+        self.onLoad()
+
+    def onLoad(self):
         pass
 
-    def onUnload(self, bot):
-        """
-        @type bot: MoronBot
-        """
+    def onUnload(self):
         pass
 
-    def shouldExecute(self, response, bot):
+    def shouldExecute(self, response):
         """
         @type response: IRCResponse
-        @type bot: MoronBot
         """
         if response.Type in self.acceptedTypes:
             return True
 
-    def execute(self, response, bot):
+    def execute(self, response):
         """
         @type response: IRCResponse
-        @type bot: MoronBot
         """
         return response

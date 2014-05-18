@@ -3,7 +3,6 @@ from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from Utils import WebUtils
-from moronbot import MoronBot
 
 from bs4 import BeautifulSoup
 
@@ -12,10 +11,9 @@ class Etymology(CommandInterface):
     triggers = ['etym', 'etymology']
     help = "etym(ology) <word> - returns the etymology of the given word from etymonline.com"
     
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,

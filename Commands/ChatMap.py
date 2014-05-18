@@ -7,15 +7,12 @@ Created on Apr 26, 2013
 
 import json
 
+from storm.locals import *
+
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from moronbot import MoronBot
-import GlobalVars
-
 from Utils import StringUtils
-
-from storm.locals import *
 
 
 class ChatMap(CommandInterface):
@@ -23,10 +20,7 @@ class ChatMap(CommandInterface):
 
     triggers = ['chatmap', 'map']
 
-    def onLoad(self, bot):
-        """
-        @type bot: MoronBot
-        """
+    def onLoad(self):
         try:
             with open('Data/ChatMapDB.json', 'r') as f:
                 self.chatMapDB = json.load(f)
@@ -166,12 +160,11 @@ class ChatMap(CommandInterface):
                    "Links to a Chat Map using the Google Maps API. " \
                    "Use '{1}help chatmap <subcommand>' for subcommand help. " \
                    "You can use '{1}gpslookup <address>' via PM to find your lat,lon coords".format(
-                '/'.join(self.subCommands.keys()), GlobalVars.CommandChar)
+                '/'.join(self.subCommands.keys()), self.bot.commandChar)
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if len(message.ParameterList) > 0:
             subCommand = message.ParameterList[0].lower()

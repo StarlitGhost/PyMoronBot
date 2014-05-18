@@ -11,7 +11,6 @@ import urllib
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from moronbot import MoronBot
 
 from Data.api_keys import load_key
 from Utils import WebUtils
@@ -22,16 +21,12 @@ class GPSLookup(CommandInterface):
     help = "gps(lookup) <address> - Uses Microsoft's Bing Maps geocoding API to " \
            "lookup GPS coordinates for the given address. Must be used over PM"
 
-    def onLoad(self, bot):
-        """
-        @type bot: MoronBot
-        """
+    def onLoad(self):
         self.api_key = load_key(u'Bing Maps')
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.User.Name != message.ReplyTo:
             return IRCResponse(ResponseType.Say, "GPS Lookup must be done via PM", message.ReplyTo)

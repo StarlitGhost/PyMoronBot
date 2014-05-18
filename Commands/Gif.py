@@ -8,7 +8,6 @@ Created on Dec 05, 2013
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from moronbot import MoronBot
 
 from Utils import WebUtils
 
@@ -17,10 +16,9 @@ class Gif(CommandInterface):
     triggers = ['gif']
     help = 'gif - fetches a random gif posted during Desert Bus'
     
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         url = "http://greywool.com/desertbus/gifs/random.php"
 

@@ -8,7 +8,6 @@ Created on Dec 20, 2011
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-from moronbot import MoronBot
 import GlobalVars
 
 
@@ -16,10 +15,9 @@ class Nick(CommandInterface):
     triggers = ['nick', 'name']
     help = "nick <nick> - changes the bot's nick to the one specified"
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can change my name', message.ReplyTo)

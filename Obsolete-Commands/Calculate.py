@@ -16,10 +16,9 @@ class Command(CommandInterface):
     
     htmlParser = HTMLParser.HTMLParser()
     
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,

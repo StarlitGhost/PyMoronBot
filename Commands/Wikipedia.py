@@ -2,36 +2,37 @@
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-from moronbot import MoronBot
 
 import re
 import urllib
 import urllib2
 
 import htmlentitydefs
+
+
 # Removes HTML or XML character references and entities from a text string.
 #
 # @param text The HTML (or XML) source text.
 # @return The plain text, as a Unicode string, if necessary.
 def unescape(text):
     def fixup(m):
-        text = m.group(0)
-        if text[:2] == '&#':
+        escapeText = m.group(0)
+        if escapeText[:2] == '&#':
             # character reference
             try:
-                if text[:3] == '&#x':
-                    return unichr(int(text[3:-1], 16))
+                if escapeText[:3] == '&#x':
+                    return unichr(int(escapeText[3:-1], 16))
                 else:
-                    return unichr(int(text[2:-1]))
+                    return unichr(int(escapeText[2:-1]))
             except ValueError:
                 pass
         else:
             # named entity
             try:
-                text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
+                escapeText = unichr(htmlentitydefs.name2codepoint[escapeText[1:-1]])
             except KeyError:
                 pass
-        return text # leave as is
+        return escapeText  # leave as is
     return re.sub('&#?\w+;', fixup, text)
 
 
@@ -39,10 +40,9 @@ class Wikipedia(CommandInterface):
     triggers = ['wiki', 'wikipedia']
     help = 'wiki(pedia) <search term> - returns the top result for a given search term from wikipedia'
     
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         article = message.Parameters
         article = urllib.quote(article)

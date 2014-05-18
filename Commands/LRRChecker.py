@@ -5,7 +5,6 @@ import xml.etree.ElementTree as ET
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-from moronbot import MoronBot
 
 import Data.LRRChecker as DataStore
 from Utils import WebUtils
@@ -17,17 +16,15 @@ class LRRChecker(CommandInterface):
     help = "Automatic function, scans LRR video RSS feeds and reports new items in the channel."
     runInThread = True
 
-    def shouldExecute(self, message, bot):
+    def shouldExecute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         return True
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         responses = []
         for feedName, feedDeets in DataStore.LRRChecker.iteritems():

@@ -14,10 +14,9 @@ class Command(CommandInterface):
     lastMessageDate = datetime.datetime.utcnow()
     lastJoinDate = datetime.datetime.utcnow()
 
-    def shouldExecute(self, message, bot):
+    def shouldExecute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.Type not in self.acceptedTypes:
             return False
@@ -25,10 +24,9 @@ class Command(CommandInterface):
             return True
         return False
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         now = datetime.datetime.utcnow()
         lastJoin = self.lastJoinDate

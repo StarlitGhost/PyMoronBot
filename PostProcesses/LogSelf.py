@@ -5,29 +5,26 @@ Created on May 11, 2014
 @author: Tyranic-Moron
 """
 
-from moronbot import MoronBot
 from PostProcessInterface import PostProcessInterface
 from IRCResponse import IRCResponse, ResponseType
-from GlobalVars import CurrentNick
 from Commands.Log import log
 
 
-logFuncs = {ResponseType.Say: lambda r: u'<{0}> {1}'.format(CurrentNick, r.Response),
-            ResponseType.Do: lambda r: u'*{0} {1}*'.format(CurrentNick, r.Response),
-            ResponseType.Notice: lambda r: u'[{0}] {1}'.format(CurrentNick, r.Response)}
+logFuncs = {ResponseType.Say: lambda nick, r: u'<{0}> {1}'.format(nick, r.Response),
+            ResponseType.Do: lambda nick, r: u'*{0} {1}*'.format(nick, r.Response),
+            ResponseType.Notice: lambda nick, r: u'[{0}] {1}'.format(nick, r.Response)}
 
 
 class LogSelf(PostProcessInterface):
 
     priority = -1
 
-    def execute(self, response, bot):
+    def execute(self, response):
         """
         @type response: IRCResponse
-        @type bot: MoronBot
         """
         if response.Type in logFuncs:
-            logString = logFuncs[response.Type](response)
+            logString = logFuncs[response.Type](self.bot.nickname, response)
             log(logString, response.Target)
 
         return response

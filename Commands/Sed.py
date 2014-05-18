@@ -11,7 +11,6 @@ import re
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-from moronbot import MoronBot
 
 
 class Sed(CommandInterface):
@@ -23,26 +22,21 @@ class Sed(CommandInterface):
 
     historySize = 20
 
-    def onLoad(self, bot):
-        """
-        @type bot: MoronBot
-        """
+    def onLoad(self):
         #TODO: make these per-channel
         self.messages = []
         self.unmodifiedMessages = []
 
-    def shouldExecute(self, message, bot):
+    def shouldExecute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.Command.lower() == 'sed':
             match = self.match(message.Parameters)
@@ -72,7 +66,7 @@ class Sed(CommandInterface):
         if not message.startswith('s/'):
             return
         parts = re.split(r'(?<!\\)/', message)
-        if len(parts) not in (3,4):
+        if len(parts) not in (3, 4):
             return
         search, replace = parts[1:3]
         if len(parts) == 4:
@@ -101,7 +95,7 @@ class Sed(CommandInterface):
             new = new[:300]
 
             if new != message.MessageString:
-                newMessage = copy.deepcopy(message)
+                newMessage = copy.copy(message)
                 newMessage.MessageString = new
                 self.storeMessage(newMessage, False)
                 return newMessage

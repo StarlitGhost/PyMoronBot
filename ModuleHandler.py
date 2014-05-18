@@ -69,8 +69,8 @@ class ModuleHandler(object):
         newResponse = response
         for post in sorted(self.postProcesses.values(), key=operator.attrgetter('priority'), reverse=True):
             try:
-                if post.shouldExecute(newResponse, self.bot):
-                    newResponse = post.execute(newResponse, self.bot)
+                if post.shouldExecute(newResponse):
+                    newResponse = post.execute(newResponse)
             except Exception:
                 # ^ dirty, but I don't want any responses to kill the bot, especially if I'm working on it live
                 print "Python Execution Error in '{0}': {1}".format(post.__name__, str(sys.exc_info()))
@@ -81,9 +81,9 @@ class ModuleHandler(object):
     def handleMessage(self, message):
         for command in sorted(self.commands.values(), key=operator.attrgetter('priority')):
             try:
-                if command.shouldExecute(message, self.bot):
+                if command.shouldExecute(message):
                     if not command.runInThread:
-                        response = command.execute(message, self.bot)
+                        response = command.execute(message)
                         self.sendResponse(response)
                     else:
                         d = threads.deferToThread(command.execute, message, self.bot)
@@ -92,7 +92,6 @@ class ModuleHandler(object):
                 # ^ dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
                 print "Python Execution Error in '{0}': {1}".format(command.__name__, str(sys.exc_info()))
                 traceback.print_tb(sys.exc_info()[2])
-
 
     def _load(self, name, category, categoryDict, categoryCaseMap):
         name = name.lower()
@@ -131,7 +130,7 @@ class ModuleHandler(object):
         if name.lower() in categoryCaseMap.keys():
             properName = categoryCaseMap[name.lower()]
 
-            categoryDict[properName].onUnload(self.bot)
+            categoryDict[properName].onUnload()
 
             del categoryDict[properName]
             del categoryCaseMap[name.lower()]

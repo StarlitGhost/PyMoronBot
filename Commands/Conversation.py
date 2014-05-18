@@ -1,28 +1,24 @@
 # -*- coding: utf-8 -*-
+import re
+
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-import GlobalVars
-from moronbot import MoronBot
-
-import re
 
 
 class Conversation(CommandInterface):
     help = 'Responds to greetings and such'
 
-    def shouldExecute(self, message, bot):
+    def shouldExecute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         greetings = ["(wa+s+|')?so?u+p",
                      "hi(ya)?",
@@ -45,7 +41,7 @@ class Conversation(CommandInterface):
                      ]
 
         regex = r"^(?P<greeting>{0})( there)?,?[ ]{1}([^a-zA-Z0-9_\|`\[\]\^-]|$)".format('|'.join(greetings),
-                                                                                         GlobalVars.CurrentNick)
+                                                                                         self.bot.nickname)
 
         match = re.search(regex,
                           message.MessageString,

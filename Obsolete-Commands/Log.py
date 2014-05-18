@@ -14,10 +14,9 @@ class Log(CommandInterface):
     help = "log (<-n>/<date>) - gives you a link to today's log, the log from -n days ago, " \
            "or the log for the specified date"
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
 
         date = datetime.datetime.utcnow()

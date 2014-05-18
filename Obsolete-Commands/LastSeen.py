@@ -10,10 +10,9 @@ class Command(CommandInterface):
     triggers = ['lastseen', 'lastsaw']
     help = 'lastseen/lastsaw <nick> - finds a nick\'s last message'
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if len(message.MessageList) > 1 and message.Command == "lastseen":
             proc = subprocess.Popen(['/usr/bin/php',

@@ -2,7 +2,6 @@
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from moronbot import MoronBot
 
 
 class Help(CommandInterface):
@@ -10,12 +9,11 @@ class Help(CommandInterface):
     help = 'help/command(s) (<module>) - returns a list of loaded command modules, ' \
            'or the help text of a particular module if one is specified'
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
-        moduleHandler = bot.moduleHandler
+        moduleHandler = self.bot.moduleHandler
 
         if len(message.ParameterList) > 0:
             if message.ParameterList[0].lower() in moduleHandler.commandCaseMapping:

@@ -10,6 +10,7 @@ def isNumber(s):
     except ValueError:
         return False
 
+
 # From this SO answer: http://stackoverflow.com/a/6043797/331047
 def splitUTF8(s, n):
     """Split UTF-8 s into chunks of maximum byte length n"""
@@ -20,6 +21,7 @@ def splitUTF8(s, n):
         yield s[:k]
         s = s[k:]
     yield s
+
 
 # Taken from txircd
 # https://github.com/ElementalAlchemist/txircd/blob/889b19cdfedd8f1bb2aa6f23e9a745bdf7330b81/txircd/modules/stripcolor.py#L4
@@ -52,6 +54,7 @@ def stripColours(msg):
     msg = msg.replace(chr(2), "").replace(chr(29), "").replace(chr(31), "").replace(chr(15), "").replace(chr(22), "")
     return msg
 
+
 # mostly taken from dave_random's UnsafeBot (whose source is not generally accessible)
 def deltaTimeToString(timeDelta):
     """
@@ -62,11 +65,11 @@ def deltaTimeToString(timeDelta):
     d['hours'], rem = divmod(timeDelta.seconds, 3600)
     d['minutes'], _ = divmod(rem, 60)  # replace _ with d['seconds'] to get seconds
 
-    def lex(word, number):
-        if number == 1:
-            return '{0} {1}'.format(number, word[:-1])
+    def lex(durationWord, duration):
+        if duration == 1:
+            return '{0} {1}'.format(duration, durationWord[:-1])
         else:
-            return '{0} {1}'.format(number, word)
+            return '{0} {1}'.format(duration, durationWord)
 
     deltaString = ' '.join([lex(word, number) for word, number in d.iteritems() if number > 0])
     return deltaString if len(deltaString) > 0 else 'seconds'

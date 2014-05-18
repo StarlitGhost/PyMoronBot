@@ -2,7 +2,6 @@
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from moronbot import MoronBot
 
 
 class Apples(CommandInterface):
@@ -10,18 +9,16 @@ class Apples(CommandInterface):
 
     playApples = 0
 
-    def shouldExecute(self, message, bot):
+    def shouldExecute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.Command.lower() == "playapples":
             self.playApples = 1
@@ -35,9 +32,9 @@ class Apples(CommandInterface):
             cmd = " ".join(msgArr).strip()
             if cmd == "to Apples! You have 60 seconds to join.":
                 return IRCResponse(ResponseType.Say, "!join", message.ReplyTo)
-            elif name.lower() == bot.nickname and cmd == "is judging.":
+            elif name.lower() == self.bot.nickname and cmd == "is judging.":
                 return IRCResponse(ResponseType.Say, "!pick 0", message.ReplyTo)
-            elif name.lower() != bot.nickname and (cmd == "is judging next." or cmd == "is judging first."):
+            elif name.lower() != self.bot.nickname and (cmd == "is judging next." or cmd == "is judging first."):
                 return IRCResponse(ResponseType.Say, "!play 0", message.ReplyTo)
             elif cmd == "wins the game!" or name == "Sorry,":
                 self.playApples = 0

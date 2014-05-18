@@ -8,7 +8,6 @@ Created on Jul 31, 2013
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from moronbot import MoronBot
 
 from Utils import WebUtils
 
@@ -19,10 +18,9 @@ class Dinner(CommandInterface):
     triggers = ['dinner']
     help = 'dinner (meat/veg/drink) - asks WhatTheFuckShouldIMakeForDinner.com what you should make for dinner'
     
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         wtfsimfd = "http://whatthefuckshouldimakefordinner.com/{0}"
 

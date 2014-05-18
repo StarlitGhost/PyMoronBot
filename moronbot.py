@@ -8,6 +8,7 @@ import argparse
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 from IRCMessage import IRCMessage, IRCChannel, IRCUser
+from IRCResponse import IRCResponse
 import ModuleHandler
 import GlobalVars
 import ServerInfo
@@ -31,6 +32,7 @@ class MoronBot(irc.IRCClient):
         self.moduleHandler.loadAll()
 
         self.nickname = cmdArgs.nick
+        self.commandChar = '.'
 
         self.realname = self.nickname
         self.username = self.nickname
@@ -55,17 +57,17 @@ class MoronBot(irc.IRCClient):
 
     def privmsg(self, user, channel, msg):
         chan = self.getChannel(channel)
-        message = IRCMessage('PRIVMSG', user, chan, msg)
+        message = IRCMessage('PRIVMSG', user, chan, msg, self)
         self.handleMessage(message)
 
     def action(self, user, channel, msg):
         chan = self.getChannel(channel)
-        message = IRCMessage('ACTION', user, chan, msg)
+        message = IRCMessage('ACTION', user, chan, msg, self)
         self.handleMessage(message)
 
     def noticed(self, user, channel, msg):
         chan = self.getChannel(channel)
-        message = IRCMessage('NOTICE', user, chan, msg)
+        message = IRCMessage('NOTICE', user, chan, msg, self)
         self.handleMessage(message)
 
     def irc_NICK(self, prefix, params):
@@ -83,7 +85,7 @@ class MoronBot(irc.IRCClient):
                     if oldnick in channel.Ranks:
                         channel.Ranks[newnick] = channel.Ranks[oldnick]
                         del channel.Ranks[oldnick]
-                    message = IRCMessage('NICK', prefix, channel, newnick)
+                    message = IRCMessage('NICK', prefix, channel, newnick, self)
                     self.handleMessage(message)
 
     def nickChanged(self, nick):
@@ -95,7 +97,7 @@ class MoronBot(irc.IRCClient):
         else:
             channel = IRCChannel(params[0])
 
-        message = IRCMessage('JOIN', prefix, channel, '')
+        message = IRCMessage('JOIN', prefix, channel, u'', self)
 
         if message.User.Name == self.nickname:
             self.channels[message.ReplyTo] = channel
@@ -111,7 +113,7 @@ class MoronBot(irc.IRCClient):
         if len(params) > 1:
             partMessage = u', message: ' + u' '.join(params[1:])
         channel = self.channels[params[0]]
-        message = IRCMessage('PART', prefix, channel, partMessage)
+        message = IRCMessage('PART', prefix, channel, partMessage, self)
 
         if message.User.Name == self.nickname:
             del self.channels[message.ReplyTo]
@@ -128,7 +130,7 @@ class MoronBot(irc.IRCClient):
             kickMessage = u', message: ' + u' '.join(params[2:])
 
         channel = self.channels[params[0]]
-        message = IRCMessage('KICK', prefix, channel, kickMessage)
+        message = IRCMessage('KICK', prefix, channel, kickMessage, self)
         message.Kickee = params[1]
 
         if message.Kickee == self.nickname:
@@ -147,14 +149,14 @@ class MoronBot(irc.IRCClient):
 
         for key in self.channels:
             channel = self.channels[key]
-            message = IRCMessage('QUIT', prefix, channel, quitMessage)
+            message = IRCMessage('QUIT', prefix, channel, quitMessage, self)
             if message.User.Name in channel.Users:
                 del channel.Users[message.User.Name]
                 if message.User.Name in channel.Ranks:
                     del channel.Ranks[message.User.Name]
                 self.handleMessage(message)
 
-    def irc_RPL_WHOREPLY(self, prefix, params):
+    def irc_RPL_WHOREPLY(self, _, params):
         user = IRCUser('{0}!{1}@{2}'.format(params[5], params[2], params[3]))
         channel = self.channels[params[1]]
         flags = params[6][2:] if '*' in params[6] else params[6][1:]
@@ -166,7 +168,7 @@ class MoronBot(irc.IRCClient):
         channel.Users[user.Name] = user
         channel.Ranks[user.Name] = statusModes
 
-    def irc_RPL_CHANNELMODEIS(self, prefix, params):
+    def irc_RPL_CHANNELMODEIS(self, _, params):
         channel = self.channels[params[1]]
         modestring = params[2][1:]
         modeparams = params[3:]
@@ -204,7 +206,7 @@ class MoronBot(irc.IRCClient):
                         ServerInfo.StatusesReverse[statusSymbols[i]] = statusChars[i]
 
     def modeChanged(self, user, channel, set, modes, args):
-        message = IRCMessage('MODE', user, self.getChannel(channel), '')
+        message = IRCMessage('MODE', user, self.getChannel(channel), u'', self)
         if not message.Channel:
             # Setting a usermode
             for mode, arg in zip(modes, args):
@@ -249,7 +251,7 @@ class MoronBot(irc.IRCClient):
         self.channels[channel].Topic = newTopic
         self.channels[channel].TopicSetBy = user
 
-        message = IRCMessage('TOPIC', user, self.getChannel(channel), newTopic)
+        message = IRCMessage('TOPIC', user, self.getChannel(channel), newTopic, self)
 
         self.handleMessage(message)
 
@@ -267,6 +269,13 @@ class MoronBot(irc.IRCClient):
             return
 
         self.moduleHandler.handleMessage(message)
+
+    def sendResponse(self, response):
+        """
+        @type response: IRCResponse
+        """
+        self.moduleHandler.sendResponse(response)
+
 
 class MoronBotFactory(protocol.ReconnectingClientFactory):
 

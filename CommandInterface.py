@@ -16,24 +16,18 @@ class CommandInterface(object):
         """
         @type bot: MoronBot
         """
-        self.onLoad(bot)
+        self.bot = bot
+        self.onLoad()
 
-    def onLoad(self, bot):
-        """
-        @type bot: MoronBot
-        """
+    def onLoad(self):
         pass
 
-    def onUnload(self, bot):
-        """
-        @type bot: MoronBot
-        """
+    def onUnload(self):
         pass
 
-    def shouldExecute(self, message, bot):
+    def shouldExecute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.Type not in self.acceptedTypes:
             return False
@@ -42,9 +36,8 @@ class CommandInterface(object):
         
         return True
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         return IRCResponse(ResponseType.Say, '<command not yet implemented>', message.ReplyTo)

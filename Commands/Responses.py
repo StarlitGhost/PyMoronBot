@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 import random
 import datetime
+import re
 
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import ResponseType, IRCResponse
-from moronbot import MoronBot
-
 from Data import ignores
-import re
 
 
 class Responses(CommandInterface):
@@ -16,10 +14,7 @@ class Responses(CommandInterface):
     help = 'Talkwords from the mouth place - response <name> to enable/disable a particular response ' \
            '(might need to check the source for names)'
 
-    def onLoad(self, bot):
-        """
-        @type bot: MoronBot
-        """
+    def onLoad(self):
         try:
             self.responses = MobroResponseDict()
 
@@ -104,7 +99,6 @@ class Responses(CommandInterface):
 
             #This one needs to mess with the object to work right.
             '''Responds to DuctTape being a dick in minecraft'''
-
             def ducktapeMatch(message):
                 match = re.search('([^a-zA-Z]|^)minecraft([^a-zA-Z]|$)', message, re.IGNORECASE)
                 self.ductMatch = re.search('([^a-zA-Z]|^)(?P<duc>duc[kt]tape)([^a-zA-Z]|$)', message, re.IGNORECASE)
@@ -201,10 +195,9 @@ class Responses(CommandInterface):
         except Exception, e:
             print e
 
-    def shouldExecute(self, message, bot):
+    def shouldExecute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.Type not in self.acceptedTypes:
             return False
@@ -214,10 +207,9 @@ class Responses(CommandInterface):
 
         return True
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.Command:
             match = re.search('^responses?$', message.Command, re.IGNORECASE)

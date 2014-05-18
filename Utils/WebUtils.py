@@ -4,7 +4,7 @@ import socket
 # somewhat hacky and I forget what this is solving
 origGetAddrInfo = socket.getaddrinfo
 
-def getAddrInfoWrapper(host, port, family=0, socktype=0, proto=0, flags=0):
+def getAddrInfoWrapper(host, port, _=0, socktype=0, proto=0, flags=0):
     return origGetAddrInfo(host, port, socket.AF_INET, socktype, proto, flags)
 
 socket.getaddrinfo = getAddrInfoWrapper
@@ -57,7 +57,7 @@ def fetchURL(url, headers=None):
             print 'Error code: ', e.code
 
 
-def sendToServer(url, text=None):
+def sendToServer(url, _=None):
     opener = urllib2.build_opener()
     try:
         response = opener.open(url)

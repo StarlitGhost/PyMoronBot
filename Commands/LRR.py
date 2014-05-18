@@ -4,7 +4,6 @@ import datetime
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from moronbot import MoronBot
 
 import Data.LRRChecker as DataStore
 
@@ -19,10 +18,9 @@ class LRR(CommandInterface):
                "or the latest of a series if you specify one; " \
                "series are: {0}".format(", ".join(DataStore.LRRChecker.keys()))
     
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if len(message.Parameters.strip()) > 0:
             feed = self.handleAliases(message.Parameters)

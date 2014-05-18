@@ -9,7 +9,7 @@ import datetime
 import codecs
 import os
 
-from moronbot import cmdArgs, MoronBot
+from moronbot import cmdArgs
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
@@ -53,17 +53,15 @@ class Log(CommandInterface):
 
     priority = -1
 
-    def shouldExecute(self, message, bot):
+    def shouldExecute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         return True
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.Type in logFuncs:
             logString = logFuncs[message.Type](message)
@@ -71,4 +69,4 @@ class Log(CommandInterface):
 
         if message.Type in self.acceptedTypes and message.Command in self.triggers:
             # log linking things
-            super(Log, self).execute(message, bot)
+            super(Log, self).execute(message)

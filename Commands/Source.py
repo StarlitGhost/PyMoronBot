@@ -9,16 +9,19 @@ from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
 import GlobalVars
-from moronbot import MoronBot
 
 
 class Source(CommandInterface):
     triggers = ['source']
-    help = "source - returns a link to {0}'s source".format(GlobalVars.CurrentNick)
 
-    def execute(self, message, bot):
+    def help(self, _):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
+        """
+        return "source - returns a link to {0}'s source".format(self.bot.nickname)
+
+    def execute(self, message):
+        """
+        @type message: IRCMessage
         """
         return IRCResponse(ResponseType.Say, GlobalVars.source, message.ReplyTo)

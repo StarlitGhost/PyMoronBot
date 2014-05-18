@@ -12,7 +12,7 @@ LRRChecker = {
         'lastLink': '',
         'lastCheck': tenMinsAgo,
         'aliases': ['unskipable', 'unskip', 'us', 'u', 'skip'],
-        'suppress': True },
+        'suppress': True},
     'LRR': {
         'url': 'http://www.escapistmagazine.com/rss/videos/list/123.xml',
         'lastUpdate': aYearAgo,
@@ -20,7 +20,7 @@ LRRChecker = {
         'lastLink': '',
         'lastCheck': tenMinsAgo,
         'aliases': ["loadingreadyrun", "l", "llr"],
-        'suppress': True },
+        'suppress': True},
     'Feed Dump': {
         'url': 'http://www.escapistmagazine.com/rss/videos/list/171.xml',
         'lastUpdate': aYearAgo,
@@ -28,7 +28,7 @@ LRRChecker = {
         'lastLink': '',
         'lastCheck': tenMinsAgo,
         'aliases': ["feed", "dump", "fdump", "fd", "f", 'fump', 'frump', 'feeddump'],
-        'suppress': True },
+        'suppress': True},
     'LRRCast': {
         'url': 'http://feeds.feedburner.com/lrrcast',
         'lastUpdate': aYearAgo,
@@ -36,7 +36,7 @@ LRRChecker = {
         'lastLink': '',
         'lastCheck': tenMinsAgo,
         'aliases': ["podcast", "cast", "lrrc", "llrc", "lcast", "lc", 'chat'],
-        'suppress': True },
+        'suppress': True},
     'LRR Blog': {
         'url': 'http://loadingreadyrun.com/blog/feed/',
         'lastUpdate': aYearAgo,
@@ -44,6 +44,6 @@ LRRChecker = {
         'lastLink': '',
         'lastCheck': tenMinsAgo,
         'aliases': ['blog'],
-        'suppress': True }
-    }
+        'suppress': True}
+}
 

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from CommandInterface import CommandInterface
-from moronbot import MoronBot
 from ModuleHandler import ModuleHandler
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -13,10 +12,9 @@ class ModuleLoader(CommandInterface):
     help = "load/reload <command>, unload <command> - handles loading/unloading/reloading of commands. " \
            "Use 'all' with load/reload to reload all active commands"
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say,
@@ -32,7 +30,7 @@ class ModuleLoader(CommandInterface):
                    'loadp': self.loadp, 'reloadp': self.loadp, 'unloadp': self.unloadp,
         }[message.Command.lower()]
 
-        successes, failures, exceptions = command(message.ParameterList, bot.moduleHandler)
+        successes, failures, exceptions = command(message.ParameterList, self.bot.moduleHandler)
 
         responses = []
         if len(successes) > 0:

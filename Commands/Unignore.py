@@ -10,7 +10,6 @@ from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
 import GlobalVars
 from Data import ignores
-from moronbot import MoronBot
 
 
 class Unignore(CommandInterface):
@@ -19,22 +18,17 @@ class Unignore(CommandInterface):
 
     bot = None
 
-    def onLoad(self, bot):
-        """
-        @type bot: MoronBot
-        """
-        self.bot = bot
+    def onLoad(self):
         if ignores.ignoreList is None:
             ignores.loadList()
 
-    def __del__(self):
+    def onUnload(self):
         if ignores.ignoreList is not None and 'Ignore' not in self.bot.moduleHandler.commands:
             ignores.ignoreList = None
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say, 'Only my admins can edit the ignore list', message.ReplyTo)

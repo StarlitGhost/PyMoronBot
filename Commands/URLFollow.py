@@ -8,7 +8,6 @@ import re
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-from moronbot import MoronBot
 
 from Data.api_keys import load_key
 from Data import ignores
@@ -19,7 +18,7 @@ from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
 class URLFollow(CommandInterface):
-    acceptedTypes = ['PRIVMSG','ACTION']
+    acceptedTypes = ['PRIVMSG', 'ACTION']
     help = 'automatic function that follows urls and grabs information about the resultant webpage'
     runInThread = True
 
@@ -27,17 +26,13 @@ class URLFollow(CommandInterface):
     
     graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
-    def onLoad(self, bot):
-        """
-        @type bot: MoronBot
-        """
+    def onLoad(self):
         self.youtubeKey = load_key(u'YouTube')
         self.imgurClientID = load_key(u'imgur Client ID')
 
-    def shouldExecute(self, message, bot):
+    def shouldExecute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.Type not in self.acceptedTypes:
             return False
@@ -46,10 +41,9 @@ class URLFollow(CommandInterface):
                 return False
         return True
     
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.MessageString, re.IGNORECASE)
         if not match:
@@ -98,9 +92,9 @@ class URLFollow(CommandInterface):
             m, s = divmod(int(length), 60)
             h, m = divmod(m, 60)
             if h > 0:
-                length = u'{0:02d}:{1:02d}:{2:02d}'.format(h,m,s)
+                length = u'{0:02d}:{1:02d}:{2:02d}'.format(h, m, s)
             else:
-                length = u'{0:02d}:{1:02d}'.format(m,s)
+                length = u'{0:02d}:{1:02d}'.format(m, s)
 
             description = u'<no description available>'
             if descMatch:
@@ -123,7 +117,6 @@ class URLFollow(CommandInterface):
         if imgurID.startswith('gallery/'):
             imgurID = imgurID.replace('gallery/', '')
 
-        url = ''
         albumLink = False
         if imgurID.startswith('a/'):
             imgurID = imgurID.replace('a/', '')
@@ -169,7 +162,7 @@ class URLFollow(CommandInterface):
         if albumLink:
             data.append(u'Album: {0} Images'.format(imageData['images_count']))
         else:
-            if imageData.has_key('is_album') and imageData['is_album']:
+            if 'is_album' in imageData and imageData['is_album']:
                 data.append(u'Album: {0:,d} Images'.format(len(imageData['images'])))
             else:
                 if imageData[u'animated']:
@@ -191,11 +184,11 @@ class URLFollow(CommandInterface):
 
         tweetText = tweet.find(class_='tweet-text')
 
-        links = tweetText.find_all('a', {'data-expanded-url' : True})
+        links = tweetText.find_all('a', {'data-expanded-url': True})
         for link in links:
             link.string = link['data-expanded-url']
 
-        embeddedLinks = tweetText.find_all('a', {'data-pre-embedded' : 'true'})
+        embeddedLinks = tweetText.find_all('a', {'data-pre-embedded': 'true'})
         for link in embeddedLinks:
             link.string = link['href']
 
@@ -210,7 +203,7 @@ class URLFollow(CommandInterface):
 
         response = json.loads(webPage.Page)
         if not response[steamAppId]['success']:
-            return #failure
+            return  # failure
 
         appData = response[steamAppId]['data']
 
@@ -266,7 +259,7 @@ class URLFollow(CommandInterface):
         description = appData['about_the_game']
         if description is not None:
             limit = 150
-            description = re.sub(r'(<[^>]+>|[\r\n\t])+',assembleFormattedText(A.normal[' ',A.fg.gray['>'],' ']),description)
+            description = re.sub(r'(<[^>]+>|[\r\n\t])+', assembleFormattedText(A.normal[' ', A.fg.gray['>'], ' ']), description)
             if len(description) > limit:
                 description = u'{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
             data.append(description)
@@ -309,7 +302,7 @@ class URLFollow(CommandInterface):
             else:
                 percentageString = A.fg.red['({3:,.0f}% funded)']
                 
-            pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}',A.fg.gray['/'],'{1:,.0f} {2} ',percentageString])
+            pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}', A.fg.gray['/'], '{1:,.0f} {2} ', percentageString])
             data.append(pledgedString.format(float(pledged['data-pledged']),
                                              float(pledged['data-goal']),
                                              pledged.data['data-currency'],

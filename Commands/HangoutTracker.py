@@ -11,8 +11,6 @@ import datetime
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from moronbot import MoronBot
-
 from Utils import StringUtils
 
 
@@ -28,18 +26,16 @@ class HangoutTracker(CommandInterface):
 
     hangoutDict = {}
 
-    def shouldExecute(self, message, bot):
+    def shouldExecute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         match = re.search('^hango+?u?t$', message.Command, re.IGNORECASE)
         if match:

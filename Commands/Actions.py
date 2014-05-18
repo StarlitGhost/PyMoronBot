@@ -1,28 +1,25 @@
 # -*- coding: utf-8 -*-
+import re
+
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from moronbot import MoronBot
-
-import re
 
 
 class Actions(CommandInterface):
     acceptedTypes = ['ACTION']
     help = 'Responds to various actions'
 
-    def shouldExecute(self, message, bot):
+    def shouldExecute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         if message.Type in self.acceptedTypes:
             return True
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         actions = ['pokes',
                    'gropes',
@@ -35,7 +32,7 @@ class Actions(CommandInterface):
                    'glomps']
         regex = r"^(?P<action>({0})),?[ ]{1}([^a-zA-Z0-9_\|`\[\]\^-]|$)"
         match = re.search(
-            regex.format('|'.join(actions), bot.nickname),
+            regex.format('|'.join(actions), self.bot.nickname),
             message.MessageString,
             re.IGNORECASE)
         if match:

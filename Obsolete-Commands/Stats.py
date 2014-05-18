@@ -14,10 +14,9 @@ class Command(CommandInterface):
     triggers = ['stats']
     help = 'stats - Responds with a link to the chat stats webpage(s)'
 
-    def execute(self, message, bot):
+    def execute(self, message):
         """
         @type message: IRCMessage
-        @type bot: MoronBot
         """
         return IRCResponse(ResponseType.Say,
                            'sss: http://www.moronic-works.co.uk/ | '
