@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
+from twisted.words.protocols.irc import assembleFormattedText, attributes as A
+
+
+graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
 
 def isNumber(s):

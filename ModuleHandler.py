@@ -86,7 +86,7 @@ class ModuleHandler(object):
                         response = command.execute(message)
                         self.sendResponse(response)
                     else:
-                        d = threads.deferToThread(command.execute, message, self.bot)
+                        d = threads.deferToThread(command.execute, message)
                         d.addCallback(self.sendResponse)
             except Exception:
                 # ^ dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
