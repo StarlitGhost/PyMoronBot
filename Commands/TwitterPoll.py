@@ -137,7 +137,8 @@ class TwitterPoll(CommandInterface):
     def _restartScanner(self):
         if self.scanner.running:
             self.scanner.stop()
-        self.scanner.start(((60 * 15) / 300) * len(self.follows) + 5, now=False)
+        # * 2 here so we have some breathing room for multiple servers
+        self.scanner.start(((60 * 15) / 300) * len(self.follows) * 2 + 5, now=False)
 
     def _scanLoop(self):
         return threads.deferToThread(self._scanTwitter)
