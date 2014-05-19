@@ -1,26 +1,32 @@
 # -*- coding: utf-8 -*-
+"""
+Created on May 20, 2014
+
+@author: Tyranic-Moron
+"""
+import re
+
+from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from CommandInterface import CommandInterface
 
-import re
 from Utils import StringUtils, WebUtils
 
 
-class Wikipedia(CommandInterface):
-    triggers = ['wiki', 'wikipedia']
-    help = 'wiki(pedia) <search term> - returns the top result for a given search term from wikipedia'
-    
+class Find(CommandInterface):
+    triggers = ['find', 'google', 'g']
+    help = 'find/google/g <searchterm> - returns the first google result for the given search term'
+    runInThread = True
+
     def execute(self, message):
         """
         @type message: IRCMessage
         """
         try:
-            query = 'site:en.wikipedia.org {0}'.format(message.Parameters)
-            results = WebUtils.googleSearch(query)
+            results = WebUtils.googleSearch(message.Parameters)
 
             firstResult = results['responseData']['results'][0]
-            
+
             title = firstResult['titleNoFormatting']
             content = firstResult['content']
             content = re.sub(r'<.*?>', '', content)  # strip html tags
@@ -28,7 +34,7 @@ class Wikipedia(CommandInterface):
             content = StringUtils.unescapeXHTML(content)
             url = firstResult['unescapedUrl']
             replyText = u'{1}{0}{2}{0}{3}'.format(StringUtils.graySplitter, title, content, url)
-            
+
             return IRCResponse(ResponseType.Say, replyText, message.ReplyTo)
         except Exception, x:
             print str(x)
