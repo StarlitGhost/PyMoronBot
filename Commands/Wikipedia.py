@@ -21,7 +21,7 @@ class Wikipedia(CommandInterface):
 
             firstResult = results['responseData']['results'][0]
             
-            title = firstResult['titleNoFormatting']
+            title = firstResult['titleNoFormatting'].replace(u' - Wikipedia, the free encyclopedia', '')
             content = firstResult['content']
             content = re.sub(r'<.*?>', '', content)  # strip html tags
             content = re.sub(r'\s+', ' ', content)  # replace multiple spaces with single ones (includes newlines?)
