@@ -84,6 +84,7 @@ class TwitterPoll(CommandInterface):
                 responses.append(IRCResponse(ResponseType.Say,
                                              "I'm already not following: {0}".format(', '.join(nonexistent)),
                                              message.ReplyTo))
+            return responses
         else:
             # TODO fetch latest tweet from specified user
             pass
@@ -99,7 +100,6 @@ class TwitterPoll(CommandInterface):
             if user.lower() in self.follows:
                 existing.append(user.lower())
             else:
-                # TODO check user is valid somehow
                 if self._checkUserExists(user):
                     new.append(user)
                     self.follows[user] = datetime.datetime.utcnow()
