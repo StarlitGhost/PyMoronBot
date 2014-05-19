@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
+import htmlentitydefs
+import re
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
@@ -77,3 +79,29 @@ def deltaTimeToString(timeDelta):
 
     deltaString = ' '.join([lex(word, number) for word, number in d.iteritems() if number > 0])
     return deltaString if len(deltaString) > 0 else 'seconds'
+
+
+# Removes HTML or XML character references and entities from a text string.
+#
+# @param text The HTML (or XML) source text.
+# @return The plain text, as a Unicode string, if necessary.
+def unescapeXHTML(text):
+    def fixup(m):
+        escapeText = m.group(0)
+        if escapeText[:2] == '&#':
+            # character reference
+            try:
+                if escapeText[:3] == '&#x':
+                    return unichr(int(escapeText[3:-1], 16))
+                else:
+                    return unichr(int(escapeText[2:-1]))
+            except ValueError:
+                pass
+        else:
+            # named entity
+            try:
+                escapeText = unichr(htmlentitydefs.name2codepoint[escapeText[1:-1]])
+            except KeyError:
+                pass
+        return escapeText  # leave as is
+    return re.sub('&#?\w+;', fixup, text)

@@ -168,7 +168,8 @@ class TwitterPoll(CommandInterface):
                     if tweet['in_reply_to_screen_name'] is not None:
                         continue
 
-                    tweetText = re.sub('[\r\n]+', StringUtils.graySplitter, tweet['text'])
+                    tweetText = StringUtils.unescapeXHTML(tweet['text'])
+                    tweetText = re.sub('[\r\n]+', StringUtils.graySplitter, tweetText)
                     for url in tweet['entities']['urls']:
                         tweetText = tweetText.replace(url['url'], url['expanded_url'])
 

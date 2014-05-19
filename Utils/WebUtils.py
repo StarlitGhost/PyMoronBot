@@ -2,6 +2,8 @@
 import socket
 
 # somewhat hacky and I forget what this is solving
+import urllib
+
 origGetAddrInfo = socket.getaddrinfo
 
 def getAddrInfoWrapper(host, port, _=0, socktype=0, proto=0, flags=0):
@@ -93,3 +95,9 @@ def shortenGoogl(url):
     except Exception, e:
         print "Goo.gl error: %s" % e
 
+
+def googleSearch(query):
+    googleAPI = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q='
+    webPage = fetchURL('{0}{1}'.format(googleAPI, urllib.quote(query)))
+    j = json.loads(webPage.Page)
+    return j

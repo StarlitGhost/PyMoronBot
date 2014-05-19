@@ -11,7 +11,7 @@ from CommandInterface import CommandInterface
 
 from Data.api_keys import load_key
 from Data import ignores
-from Utils import WebUtils
+from Utils import WebUtils, StringUtils
 
 from bs4 import BeautifulSoup
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
@@ -192,7 +192,8 @@ class URLFollow(CommandInterface):
         for link in embeddedLinks:
             link.string = link['href']
 
-        text = re.sub('[\r\n]+', self.graySplitter, tweetText.text)
+        text = StringUtils.unescapeXHTML(tweetText.text)
+        text = re.sub('[\r\n]+', self.graySplitter, text)
 
         formatString = unicode(assembleFormattedText(A.normal[A.bold['{0}:'], ' {1}']))
 
@@ -333,7 +334,7 @@ class URLFollow(CommandInterface):
     def FollowTwitch(self, channel, message):
         # Heavily based on Didero's DideRobot code for the same
         # https://github.com/Didero/DideRobot/blob/06629fc3c8bddf8f729ce2d27742ff999dfdd1f6/commands/urlTitleFinder.py#L37
-        # TODO: viewer count and other stats?
+        # TODO: other stats?
         chanData = {}
         channelOnline = False
         twitchHeaders = [('Accept', 'application/vnd.twitchtv.v2+json')]
