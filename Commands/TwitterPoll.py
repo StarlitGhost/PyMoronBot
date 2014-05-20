@@ -173,7 +173,7 @@ class TwitterPoll(CommandInterface):
                     for url in tweet['entities']['urls']:
                         tweetText = tweetText.replace(url['url'], url['expanded_url'])
 
-                    formatString = unicode(assembleFormattedText(A.normal['New tweet from ', A.bold['@{0}:'], ' {1}']))
+                    formatString = unicode(assembleFormattedText(A.normal['Tweet! ', A.bold['@{0}>'], ' {1}']))
                     newTweet = formatString.format(tweet['user']['screen_name'], tweetText)
                     for channel, _ in self.bot.channels.iteritems():
                         self.bot.sendResponse(IRCResponse(ResponseType.Say,
