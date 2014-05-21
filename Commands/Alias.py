@@ -1,7 +1,7 @@
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-
+import GlobalVars
 
 class Alias(CommandInterface):
     triggers = ['alias']
