@@ -48,13 +48,20 @@ class URLFollow(CommandInterface):
         match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.MessageString, re.IGNORECASE)
         if not match:
             return
-        
-        youtubeMatch = re.search(r'(youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#\?]+)', match.group('url'))
-        imgurMatch   = re.search(r'(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', match.group('url'))
-        twitterMatch = re.search(r'twitter.com/(?P<tweeter>[^/]+)/status(es)?/(?P<tweetID>[0-9]+)', match.group('url'))
-        steamMatch   = re.search(r'store.steampowered.com/app/(?P<steamAppID>[0-9]+)', match.group('url'))
-        ksMatch      = re.search(r'kickstarter.com/projects/(?P<ksID>[^/]+/[^/&#\?]+)', match.group('url'))
-        twitchMatch  = re.search(r'twitch\.tv/(?P<twitchChannel>[^/]+)', match.group('url'))
+
+        return self.DispatchToFollows(match.group('url'), message)
+
+    def DispatchToFollows(self, url, message):
+        """
+        @type url: unicode
+        @type message: IRCMessage
+        """
+        youtubeMatch = re.search(r'(youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#\?]+)', url)
+        imgurMatch   = re.search(r'(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', url)
+        twitterMatch = re.search(r'twitter.com/(?P<tweeter>[^/]+)/status(es)?/(?P<tweetID>[0-9]+)', url)
+        steamMatch   = re.search(r'store.steampowered.com/app/(?P<steamAppID>[0-9]+)', url)
+        ksMatch      = re.search(r'kickstarter.com/projects/(?P<ksID>[^/]+/[^/&#\?]+)', url)
+        twitchMatch  = re.search(r'twitch\.tv/(?P<twitchChannel>[^/]+)', url)
         
         if youtubeMatch:
             return self.FollowYouTube(youtubeMatch.group('videoID'), message)
@@ -68,8 +75,8 @@ class URLFollow(CommandInterface):
             return self.FollowKickstarter(ksMatch.group('ksID'), message)
         elif twitchMatch:
             return self.FollowTwitch(twitchMatch.group('twitchChannel'), message)
-        elif not re.search('\.(jpe?g|gif|png|bmp)$', match.group('url')):
-            return self.FollowStandard(match.group('url'), message)
+        elif not re.search('\.(jpe?g|gif|png|bmp)$', url):
+            return self.FollowStandard(url, message)
         
     def FollowYouTube(self, videoID, message):
         if self.youtubeKey is None:
@@ -371,6 +378,9 @@ class URLFollow(CommandInterface):
         
         if webPage is None:
             return
+
+        if webPage.responseUrl != url:
+            return self.DispatchToFollows(webPage.responseUrl, message)
         
         title = self.GetTitle(webPage.body)
         if title is not None:
