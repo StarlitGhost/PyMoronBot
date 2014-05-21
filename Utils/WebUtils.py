@@ -21,10 +21,32 @@ from Data.api_keys import load_key
 
 
 class URLResponse(object):
-    def __init__(self, domain, body, headers):
-        self.domain = domain
-        self.body = body
-        self.headers = headers
+    def __init__(self, response):
+        self.domain = urlparse(response.geturl()).hostname
+        self._body = None
+        self._responseReader = response.read
+        self._responseCloser = response.close
+        self.headers = response.info().dict
+        self.responseUrl = response.url
+
+    def __del__(self):
+        if self._body is None:
+            self._responseCloser()
+
+    @property
+    def body(self):
+        if self._body is None:
+            self._body = self._responseReader()
+            self._responseCloser()
+        return self._body
+
+    @body.setter
+    def body(self, value):
+        self._body = value
+
+    @body.deleter
+    def body(self):
+        del self._body
 
 
 def fetchURL(url, extraHeaders=None):
@@ -49,8 +71,7 @@ def fetchURL(url, extraHeaders=None):
         # Make sure we don't download any unwanted things
         #              |   text|                       rss feeds and xml|                      json|
         if re.match(r"^(text/.*|application/((rss|atom|rdf)\+)?xml(;.*)?|application/(.*)json(;.*)?)$", pageType):
-            urlResponse = URLResponse(urlparse(response.geturl()).hostname, response.read(), responseHeaders)
-            response.close()
+            urlResponse = URLResponse(response)
             return urlResponse
         else:
             response.close()
@@ -90,8 +111,7 @@ def postURL(url, values, extraHeaders=None):
         # Make sure we don't download any unwanted things
         #              |   text|                       rss feeds and xml|                      json|
         if re.match(r"^(text/.*|application/((rss|atom|rdf)\+)?xml(;.*)?|application/(.*)json(;.*)?)$", pageType):
-            urlResponse = URLResponse(urlparse(response.geturl()).hostname, response.read(), responseHeaders)
-            response.close()
+            urlResponse = URLResponse(response)
             return urlResponse
         else:
             response.close()
