@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import ServerInfo
 from enum import Enum
+import re
 
 
 class TargetTypes(Enum):
