@@ -24,6 +24,16 @@ class CommandInterface(object):
 
     def onUnload(self):
         pass
+    
+    def hasAlias(self, message):
+        """
+        @type message: IRCMessage
+        @rtype Boolean
+        """
+        if message.Command in self.bot.moduleHandler.commandAliases.keys():
+            return True
+        else:
+            return False
 
     def shouldExecute(self, message):
         """

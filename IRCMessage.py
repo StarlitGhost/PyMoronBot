@@ -49,9 +49,11 @@ class IRCUser(object):
                 userArray = userArray[1].split('@')
                 self.User = userArray[0]
                 self.Hostmask = userArray[1]
+            self.String = "{}!{}@{}".format(self.Name, self.User, self.Hostmask)
         else:
             self.Name = user
-
+            self.String = "{}!{}@{}".format(self.Name, None, None)
+            
 
 class IRCMessage(object):
 
@@ -104,3 +106,9 @@ class IRCMessage(object):
 
             if len(self.ParameterList) == 1 and not self.ParameterList[0]:
                 self.ParameterList = []
+                
+    def aliasedMessage(self, bot):
+        if self.Command in bot.moduleHandler.commandAliases.keys():
+            alias = bot.moduleHandler.commandAliases[self.Command]
+            newMsg = re.sub(self.Command, " ".join(alias), self.MessageString, count=1)
+            return IRCMessage(self.Type, self.User.String, self.Channel, newMsg, bot)

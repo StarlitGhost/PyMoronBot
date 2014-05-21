@@ -21,6 +21,7 @@ class ModuleHandler(object):
 
         self.commands = {}
         self.commandCaseMapping = {}
+        self.commandAliases = {}
 
         self.postProcesses = {}
         self.postProcessCaseMapping = {}
@@ -81,6 +82,8 @@ class ModuleHandler(object):
     def handleMessage(self, message):
         for command in sorted(self.commands.values(), key=operator.attrgetter('priority')):
             try:
+                if command.hasAlias(message):
+                    message = message.aliasedMessage(self.bot)
                 if command.shouldExecute(message):
                     if not command.runInThread:
                         response = command.execute(message)
