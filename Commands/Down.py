@@ -21,7 +21,7 @@ class Down(CommandInterface):
         url = message.Parameters
         
         webPage = WebUtils.fetchURL('http://www.downforeveryoneorjustme.com/{0}'.format(url))
-        root = BeautifulSoup(webPage.Page)
+        root = BeautifulSoup(webPage.body)
         downText = root.find('div').text.splitlines()[1].strip()
         
         return IRCResponse(ResponseType.Say, downText, message.ReplyTo)

@@ -39,7 +39,7 @@ class LRRChecker(CommandInterface):
                 #TODO: log an error here that the feed likely no longer exists!
                 continue
             
-            root = ET.fromstring(feedPage.Page)
+            root = ET.fromstring(feedPage.body)
             item = root.find('channel/item')
             
             if item is None:

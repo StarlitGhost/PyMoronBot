@@ -36,7 +36,7 @@ class Urban(CommandInterface):
         
         webPage = WebUtils.fetchURL(url)
 
-        soup = BeautifulSoup(webPage.Page)
+        soup = BeautifulSoup(webPage.body)
         # replace link tags with their contents
         [a.unwrap() for a in soup.find_all('a')]
 
@@ -69,13 +69,20 @@ class Urban(CommandInterface):
         if word.lower() != message.Parameters.lower():
             word = "{0} (Contains '{0}')".format(word, message.Parameters)
 
-        formatString = assembleFormattedText(
-            A.normal[A.bold["{0}:"], " {1}\n",
-                     A.bold["Example(s):"], " {2}\n",
-                     "{3}", graySplitter,
-                     A.fg.lightGreen["+{4}"], A.fg.gray["/"], A.fg.lightRed["-{5}"], graySplitter,
-                     "More defs: {6}"])
-
-        response = formatString.format(word, definition, example, author, up, down, url)
+        responses = [IRCResponse(ResponseType.Say,
+                                 assembleFormattedText(A.normal[A.bold["{0}:"], " {1}"]).format(word, definition),
+                                 message.ReplyTo),
+                     IRCResponse(ResponseType.Say,
+                                 assembleFormattedText(A.normal[A.bold["Example(s):"], " {0}"]).format(example),
+                                 message.ReplyTo),
+                     IRCResponse(ResponseType.Say,
+                                 assembleFormattedText(A.normal["{0}",
+                                                                graySplitter,
+                                                                A.fg.lightGreen["+{1}"],
+                                                                A.fg.gray["/"],
+                                                                A.fg.lightRed["-{2}"],
+                                                                graySplitter,
+                                                                "More defs: {3}"]).format(author, up, down, url),
+                                 message.ReplyTo)]
         
-        return IRCResponse(ResponseType.Say, response, message.ReplyTo)
+        return responses

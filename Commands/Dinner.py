@@ -33,7 +33,7 @@ class Dinner(CommandInterface):
         if option in options:
             webPage = WebUtils.fetchURL(wtfsimfd.format(options[option]))
 
-            soup = BeautifulSoup(webPage.Page)
+            soup = BeautifulSoup(webPage.body)
 
             phrase = soup.find('dl').text
             item = soup.find('a')

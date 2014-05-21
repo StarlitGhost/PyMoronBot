@@ -17,7 +17,7 @@ logFuncs = {ResponseType.Say: lambda nick, r: u'<{0}> {1}'.format(nick, r.Respon
 
 class LogSelf(PostProcessInterface):
 
-    priority = -1
+    priority = -100
 
     def execute(self, response):
         """

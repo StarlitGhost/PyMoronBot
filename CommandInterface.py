@@ -28,6 +28,7 @@ class CommandInterface(object):
     def shouldExecute(self, message):
         """
         @type message: IRCMessage
+        @rtype Boolean
         """
         if message.Type not in self.acceptedTypes:
             return False
@@ -39,5 +40,6 @@ class CommandInterface(object):
     def execute(self, message):
         """
         @type message: IRCMessage
+        @rtype IRCResponse | list[IRCResponse]
         """
         return IRCResponse(ResponseType.Say, '<command not yet implemented>', message.ReplyTo)

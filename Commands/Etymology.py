@@ -23,7 +23,7 @@ class Etymology(CommandInterface):
         word = message.Parameters
         
         webPage = WebUtils.fetchURL('http://www.etymonline.com/index.php?allowed_in_frame=0&search={0}'.format(word))
-        root = BeautifulSoup(webPage.Page)
+        root = BeautifulSoup(webPage.body)
         etymTitle = root.find('dt')
         etymDef = root.find('dd')
         

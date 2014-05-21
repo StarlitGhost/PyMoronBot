@@ -25,7 +25,7 @@ class Mtg(CommandInterface):
 
         webPage = WebUtils.fetchURL(searchTerm)
 
-        soup = BeautifulSoup(webPage.Page)
+        soup = BeautifulSoup(webPage.body)
 
         name = soup.find('div', {'id': 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_nameRow'})
         if name is None:

@@ -24,6 +24,6 @@ class Gif(CommandInterface):
 
         webPage = WebUtils.fetchURL(url)
 
-        link = webPage.Page
+        link = webPage.body
 
         return IRCResponse(ResponseType.Say, u"Random DB gif: {0}".format(link), message.ReplyTo)

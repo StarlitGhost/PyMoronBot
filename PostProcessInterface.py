@@ -25,6 +25,7 @@ class PostProcessInterface(object):
     def shouldExecute(self, response):
         """
         @type response: IRCResponse
+        @rtype Boolean
         """
         if response.Type in self.acceptedTypes:
             return True
@@ -32,5 +33,6 @@ class PostProcessInterface(object):
     def execute(self, response):
         """
         @type response: IRCResponse
+        @rtype IRCResponse
         """
         return response

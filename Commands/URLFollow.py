@@ -78,13 +78,13 @@ class URLFollow(CommandInterface):
         url = 'https://gdata.youtube.com/feeds/api/videos/{0}?v=2&key={1}'.format(videoID, self.youtubeKey)
         
         webPage = WebUtils.fetchURL(url)
-        webPage.Page = webPage.Page.decode('utf-8')
+        webPage.body = webPage.body.decode('utf-8')
         
-        titleMatch = re.search('<title>(?P<title>[^<]+?)</title>', webPage.Page)
+        titleMatch = re.search('<title>(?P<title>[^<]+?)</title>', webPage.body)
         
         if titleMatch:
-            lengthMatch = re.search("<yt:duration seconds='(?P<length>[0-9]+?)'/>", webPage.Page)
-            descMatch = re.search("<media:description type='plain'>(?P<desc>[^<]+?)</media:description>", webPage.Page)
+            lengthMatch = re.search("<yt:duration seconds='(?P<length>[0-9]+?)'/>", webPage.body)
+            descMatch = re.search("<media:description type='plain'>(?P<desc>[^<]+?)</media:description>", webPage.body)
             
             title = titleMatch.group('title')
             title = self.htmlParser.unescape(title)
@@ -136,7 +136,7 @@ class URLFollow(CommandInterface):
         if webPage is None:
             return
         
-        response = json.loads(webPage.Page)
+        response = json.loads(webPage.body)
         
         imageData = response['data']
 
@@ -144,11 +144,11 @@ class URLFollow(CommandInterface):
             url = 'https://api.imgur.com/3/gallery/{0}'.format(imgurID)
             webPage = WebUtils.fetchURL(url, headers)
             if webPage is not None:
-                imageData = json.loads(webPage.Page)['data']
+                imageData = json.loads(webPage.body)['data']
 
             if imageData['title'] is None:
                 webPage = WebUtils.fetchURL('http://imgur.com/{0}'.format(imgurID))
-                imageData['title'] = self.GetTitle(webPage.Page).replace(' - Imgur', '')
+                imageData['title'] = self.GetTitle(webPage.body).replace(' - Imgur', '')
                 if imageData['title'] == 'imgur: the simple image sharer':
                     imageData['title'] = None
         
@@ -176,7 +176,7 @@ class URLFollow(CommandInterface):
     def FollowTwitter(self, tweeter, tweetID, message):
         webPage = WebUtils.fetchURL('https://twitter.com/{0}/status/{1}'.format(tweeter, tweetID))
 
-        soup = BeautifulSoup(webPage.Page)
+        soup = BeautifulSoup(webPage.body)
 
         tweet = soup.find(class_='permalink-tweet')
         
@@ -202,7 +202,7 @@ class URLFollow(CommandInterface):
     def FollowSteam(self, steamAppId, message):
         webPage = WebUtils.fetchURL('http://store.steampowered.com/api/appdetails/?appids={0}&cc=US&l=english&v=1'.format(steamAppId))
 
-        response = json.loads(webPage.Page)
+        response = json.loads(webPage.body)
         if not response[steamAppId]['success']:
             return  # failure
 
@@ -270,7 +270,7 @@ class URLFollow(CommandInterface):
     @classmethod
     def getSteamPrice(cls, appId, region):
         webPage = WebUtils.fetchURL('http://store.steampowered.com/api/appdetails/?appids={0}&cc={1}&l=english&v=1'.format(appId, region))
-        response = json.loads(webPage.Page)
+        response = json.loads(webPage.body)
         if region == 'AU':
             response[appId]['data']['price_overview']['currency'] = 'AUD'
         return response[appId]['data']['price_overview']
@@ -278,7 +278,7 @@ class URLFollow(CommandInterface):
     def FollowKickstarter(self, ksID, message):
         webPage = WebUtils.fetchURL('https://www.kickstarter.com/projects/{0}/'.format(ksID))
 
-        soup = BeautifulSoup(webPage.Page)
+        soup = BeautifulSoup(webPage.body)
 
         data = []
 
@@ -340,14 +340,14 @@ class URLFollow(CommandInterface):
         twitchHeaders = [('Accept', 'application/vnd.twitchtv.v2+json')]
         webPage = WebUtils.fetchURL(u'https://api.twitch.tv/kraken/streams/{0}'.format(channel), twitchHeaders)
 
-        streamData = json.loads(webPage.Page)
+        streamData = json.loads(webPage.body)
 
         if 'stream' in streamData and streamData['stream'] is not None:
             chanData = streamData['stream']['channel']
             channelOnline = True
         elif 'error' not in streamData:
             webPage = WebUtils.fetchURL(u'https://api.twitch.tv/kraken/channels/{0}'.format(channel), twitchHeaders)
-            chanData = json.loads(webPage.Page)
+            chanData = json.loads(webPage.body)
 
         if len(chanData) > 0:
             if channelOnline:
@@ -372,9 +372,9 @@ class URLFollow(CommandInterface):
         if webPage is None:
             return
         
-        title = self.GetTitle(webPage.Page)
+        title = self.GetTitle(webPage.body)
         if title is not None:
-            return IRCResponse(ResponseType.Say, u'{0} (at {1})'.format(title, webPage.Domain), message.ReplyTo)
+            return IRCResponse(ResponseType.Say, u'{0} (at {1})'.format(title, webPage.domain), message.ReplyTo)
         
         return
 
