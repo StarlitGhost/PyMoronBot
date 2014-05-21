@@ -74,7 +74,7 @@ class ModuleHandler(object):
                     newResponse = post.execute(newResponse)
             except Exception:
                 # ^ dirty, but I don't want any responses to kill the bot, especially if I'm working on it live
-                print "Python Execution Error in '{0}': {1}".format(post.__name__, str(sys.exc_info()))
+                print "Python Execution Error in '{0}': {1}".format(post.__class__.__name__, str(sys.exc_info()))
                 traceback.print_tb(sys.exc_info()[2])
 
         return newResponse
@@ -93,7 +93,7 @@ class ModuleHandler(object):
                         d.addCallback(self.sendResponse)
             except Exception:
                 # ^ dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
-                print "Python Execution Error in '{0}': {1}".format(command.__name__, str(sys.exc_info()))
+                print "Python Execution Error in '{0}': {1}".format(command.__class__.__name__, str(sys.exc_info()))
                 traceback.print_tb(sys.exc_info()[2])
 
     def _load(self, name, category, categoryDict, categoryCaseMap):
