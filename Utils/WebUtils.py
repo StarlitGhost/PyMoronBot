@@ -62,7 +62,7 @@ def fetchURL(url, extraHeaders=None):
             reason = "We failed to reach the server, reason: {}".format(e.reason)
         elif hasattr(e, "code"):
             reason = "The server couldn't fulfill the request, code: {}".format(e.code)
-        print "{} *** ERROR: Fetch from \"{} \" failed: {}".format(today, url, reason)
+        print "{} *** ERROR: Fetch from \"{}\" failed: {}".format(today, url, reason)
 
 
 # mostly taken directly from Heufneutje's PyHeufyBot
@@ -103,7 +103,7 @@ def postURL(url, values, extraHeaders=None):
             reason = "We failed to reach the server, reason: {}".format(e.reason)
         elif hasattr(e, "code"):
             reason = "The server couldn't fulfill the request, code: {}".format(e.code)
-        print "{} *** ERROR: Post to \"{} \" failed: {}".format(today, url, reason)
+        print "{} *** ERROR: Post to \"{}\" failed: {}".format(today, url, reason)
 
 
 def shortenGoogl(url):
