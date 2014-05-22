@@ -121,6 +121,6 @@ class IRCMessage(object):
                 newMsg = newMsg.replace("$0", self.Parameters)
             elif len(self.ParameterList) >= 1:
                 newMsg = newMsg.replace(self.Parameters, "")
-                for i in range(len(self.ParameterList)):
-                    newMsg = newMsg.replace("${}".format(i+1), self.ParameterList[i])
+                for i, param in enumerate(self.ParameterList):
+                    newMsg = newMsg.replace("${}".format(i+1), param)
             return IRCMessage(self.Type, self.User.String, self.Channel, newMsg, bot)
