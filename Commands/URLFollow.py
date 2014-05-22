@@ -332,7 +332,7 @@ class URLFollow(CommandInterface):
             if duration is not None:
                 remaining = float(duration['data-hours-remaining'])
                 days = math.floor(remaining/24)
-                hours = remaining/24 - days
+                hours = remaining % 24
 
                 data.append('Duration: {0:.0f} days {1:.1f} hours to go'.format(days, hours))
 
@@ -400,7 +400,7 @@ class URLFollow(CommandInterface):
             title = self.htmlParser.unescape(title)
             
             if len(title) > 300:
-                title = title[:300] + "..."
+                title = title[:300].rsplit(' ', 1)[0] + " ..."
             
             return title
         

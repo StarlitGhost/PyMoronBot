@@ -6,3 +6,4 @@ storm==0.20
 ply==3.4
 enum34==1.0
 twitter==1.14.3
+requests==2.3.0
