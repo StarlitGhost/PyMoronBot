@@ -107,20 +107,3 @@ class IRCMessage(object):
 
             if len(self.ParameterList) == 1 and not self.ParameterList[0]:
                 self.ParameterList = []
-                
-    def aliasedMessage(self, bot):
-        if self.Command in bot.moduleHandler.commandAliases.keys():
-            alias = bot.moduleHandler.commandAliases[self.Command]
-            newMsg = re.sub(self.Command, " ".join(alias), self.MessageString, count=1)
-            if "$sender" in newMsg:
-                newMsg = newMsg.replace("$sender", self.User.Name)
-            if "$channel" in newMsg:
-                newMsg = newMsg.replace("$channel", self.Channel)
-            if "$0" in newMsg:
-                newMsg = newMsg.replace(self.Parameters, "")
-                newMsg = newMsg.replace("$0", self.Parameters)
-            elif len(self.ParameterList) >= 1:
-                newMsg = newMsg.replace(self.Parameters, "")
-                for i, param in enumerate(self.ParameterList):
-                    newMsg = newMsg.replace("${}".format(i+1), param)
-            return IRCMessage(self.Type, self.User.String, self.Channel, newMsg, bot)
