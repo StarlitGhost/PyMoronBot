@@ -42,7 +42,7 @@ class Alias(CommandInterface):
                         newMsg = newMsg.replace("${}+".format(i+1), " ".join(message.ParameterList[i:]))
                     else:
                         newMsg = newMsg.replace("${}".format(i+1), param)
-            return IRCMessage(message.Type, message.User.String, message.Channel, newMsg)
+            return IRCMessage(message.Type, message.User.String, message.Channel, newMsg, self.bot)
 
     def shouldExecute(self, message):
         return True
