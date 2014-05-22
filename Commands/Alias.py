@@ -15,7 +15,7 @@ class Alias(CommandInterface):
     triggers = ['alias']
     help = 'alias <alias> <command> <params> - aliases <alias> to the specified command and parameters\n' \
            'you can specify where parameters given to the alias should be inserted with $1, $2, $n. ' \
-           'The whole parameter string is $0.'
+           'The whole parameter string is $0. $sender and $channel can also be used.'
 
     def execute(self, message):
         """
