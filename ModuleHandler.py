@@ -21,7 +21,6 @@ class ModuleHandler(object):
 
         self.commands = {}
         self.commandCaseMapping = {}
-        self.commandAliases = {}
 
         self.postProcesses = {}
         self.postProcessCaseMapping = {}
