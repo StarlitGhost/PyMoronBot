@@ -115,7 +115,7 @@ class IRCMessage(object):
             if "$sender" in newMsg:
                 newMsg = newMsg.replace("$sender", self.User.Name)
             if "$channel" in newMsg:
-                newMsg = newMsg.replace("$channel", self.ChannelObj.Name)
+                newMsg = newMsg.replace("$channel", self.Channel)
             if "$0" in newMsg:
                 newMsg = newMsg.replace(self.Parameters, "")
                 newMsg = newMsg.replace("$0", self.Parameters)
