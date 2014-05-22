@@ -71,7 +71,7 @@ class Alias(CommandInterface):
                 return IRCResponse(ResponseType.Say,
                                    "'{}' is not a valid command!".format(message.ParameterList[1]),
                                    message.ReplyTo)
-            if message.ParameterList[0] in self.bot.moduleHandler.commandAliases:
+            if message.ParameterList[0] in self.aliases:
                 return IRCResponse(ResponseType.Say,
                                    "'{}' is already an alias!".format(message.ParameterList[0]),
                                    message.ReplyTo)
