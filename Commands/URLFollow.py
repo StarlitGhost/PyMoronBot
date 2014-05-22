@@ -56,7 +56,7 @@ class URLFollow(CommandInterface):
         @type url: unicode
         @type message: IRCMessage
         """
-        youtubeMatch = re.search(r'(youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#\?]+)', url)
+        youtubeMatch = re.search(r'(youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#\?]{11})', url)
         imgurMatch   = re.search(r'(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', url)
         twitterMatch = re.search(r'twitter.com/(?P<tweeter>[^/]+)/status(es)?/(?P<tweetID>[0-9]+)', url)
         steamMatch   = re.search(r'store.steampowered.com/app/(?P<steamAppID>[0-9]+)', url)
