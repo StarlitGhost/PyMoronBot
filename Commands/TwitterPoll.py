@@ -53,7 +53,8 @@ class TwitterPoll(CommandInterface):
         if len(message.ParameterList) == 0:  # no params, return list of follows
             if len(self.follows) == 0:
                 return IRCResponse(ResponseType.Say,
-                                   "I'm not following anyone right now, use {}twitter follow <user> to add some".format(self.bot.commandChar),
+                                   "I'm not following anyone right now, "
+                                   "use {}twitter follow <user> to add some people".format(self.bot.commandChar),
                                    message.ReplyTo)
             else:
                 return IRCResponse(ResponseType.Say,
