@@ -13,7 +13,7 @@ from IRCResponse import IRCResponse, ResponseType
 
 
 class EightBall(CommandInterface):
-    triggers = ['8ball']
+    triggers = ['8ball', 'eightball']
     help = '8ball (question) - swirls a magic 8-ball to give you the answer to your questions'
 
     def execute(self, message):
@@ -44,5 +44,5 @@ class EightBall(CommandInterface):
                    'Very doubtful']
 
         return IRCResponse(ResponseType.Say,
-                           'The Magic 8-ball says... {0}'.format(random.choice(answers)),
+                           'The Magic 8-ball says... {}'.format(random.choice(answers)),
                            message.ReplyTo)
