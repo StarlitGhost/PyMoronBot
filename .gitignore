@@ -45,3 +45,4 @@ Data/*.json
 parser.out
 parsetab.py
 PTVS/*
+*.db

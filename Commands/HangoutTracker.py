@@ -24,7 +24,14 @@ class HangoutTracker(CommandInterface):
     triggers = ['hangout', 'hangoot']
     help = 'hangout - gives you the last posted G+ hangout link'
 
-    hangoutDict = {}
+    def onLoad(self):
+        if 'HangoutTracker' not in self.bot.dataStore:
+            self.bot.dataStore['HangoutTracker'] = {}
+
+        self.hangoutDict = self.bot.dataStore['HangoutTracker']
+
+    def _syncHangoutDict(self):
+        self.bot.dataStore['HangoutTracker'] = self.hangoutDict
 
     def shouldExecute(self, message):
         """
@@ -41,6 +48,7 @@ class HangoutTracker(CommandInterface):
         if match:
             if message.ReplyTo not in self.hangoutDict:
                 self.hangoutDict[message.ReplyTo] = None
+                self._syncHangoutDict()
             if self.hangoutDict[message.ReplyTo] is None:
                 return IRCResponse(ResponseType.Say,
                                    'No hangouts posted here yet',
@@ -71,4 +79,7 @@ class HangoutTracker(CommandInterface):
         self.hangoutDict[message.ReplyTo].lastCode = match.group('code')
         self.hangoutDict[message.ReplyTo].lastUser = message.User.Name
         self.hangoutDict[message.ReplyTo].lastDate = datetime.datetime.utcnow()
+
+        self._syncHangoutDict()
+
         return

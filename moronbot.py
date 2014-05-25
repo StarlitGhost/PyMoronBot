@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import shelve
 import sys
 import platform
 import datetime
@@ -28,6 +29,12 @@ startTime = datetime.datetime.utcnow()
 class MoronBot(irc.IRCClient):
 
     def __init__(self):
+        # dataStore has to be before moduleHandler
+        dataStorePath = os.path.join('Data', cmdArgs.server)
+        if not os.path.exists(dataStorePath):
+            os.makedirs(dataStorePath)
+        self.dataStore = shelve.open(os.path.join(dataStorePath, 'shelve.db'))
+
         self.moduleHandler = ModuleHandler.ModuleHandler(self)
         self.moduleHandler.loadAll()
 
@@ -47,6 +54,10 @@ class MoronBot(irc.IRCClient):
         self.versionEnv = platform.platform()
 
         self.sourceURL = GlobalVars.source
+
+    def quit(self, message=''):
+        self.dataStore.close()
+        irc.IRCClient.quit(self, message)
 
     def signedOn(self):
         for channel in cmdArgs.channels:

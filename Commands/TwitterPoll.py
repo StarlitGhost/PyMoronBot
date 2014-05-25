@@ -29,11 +29,10 @@ class TwitterPoll(CommandInterface):
     runInThread = True
 
     def onLoad(self):
-        self.follows = {u'desertbus': datetime.datetime.utcnow(),
-                        u'official_pax': datetime.datetime.utcnow(),
-                        u'loadingreadyrun': datetime.datetime.utcnow(),
-                        u'lrrmtg': datetime.datetime.utcnow(),
-                        u'tyranicmoron': datetime.datetime.utcnow()}
+        if 'TwitterPoll' not in self.bot.dataStore:
+            self.bot.dataStore['TwitterPoll'] = {}
+
+        self.follows = self.bot.dataStore['TwitterPoll']
 
         bearer_token = self._get_access_token()
         self.twitter = Twitter(auth=OAuth2(bearer_token=bearer_token))
@@ -51,9 +50,10 @@ class TwitterPoll(CommandInterface):
         """
         @type message: IRCMessage
         """
-        # do the command stuff described in the help
-        if len(message.ParameterList) == 0:
-            return IRCResponse(ResponseType.Say, self.help, message.ReplyTo)
+        if len(message.ParameterList) == 0:  # no params, return list of follows
+            return IRCResponse(ResponseType.Say,
+                               'Currently following {}'.format(', '.join(self.follows)),
+                               message.ReplyTo)
 
         subCommand = message.ParameterList[0].lower()
 
@@ -86,8 +86,19 @@ class TwitterPoll(CommandInterface):
                                              message.ReplyTo))
             return responses
         else:
-            # TODO fetch latest tweet from specified user
-            pass
+            # fetch latest tweet from specified user
+            if not self._checkUserExists(message.ParameterList[0]):
+                return IRCResponse(ResponseType.Say, "'{}' is not a valid twitter user", message.ReplyTo)
+
+            tweet = self._latestTweet(message.ParameterList[0])
+            tweetText = StringUtils.unescapeXHTML(tweet['text'])
+            tweetText = re.sub('[\r\n]+', StringUtils.graySplitter, tweetText)
+            for url in tweet['entities']['urls']:
+                tweetText = tweetText.replace(url['url'], url['expanded_url'])
+
+            formatString = unicode(assembleFormattedText(A.normal[A.bold['@{0}>'], ' {1}']))
+            newTweet = formatString.format(tweet['user']['screen_name'], tweetText)
+            return IRCResponse(ResponseType.Say, newTweet, message.ReplyTo)
 
     def _follow(self, users):
         """
@@ -106,6 +117,9 @@ class TwitterPoll(CommandInterface):
                 else:
                     invalid.append(user)
 
+        if len(existing) > 0:
+            self._syncFollows()
+
         self._restartScanner()
 
         return new, existing, invalid
@@ -123,9 +137,15 @@ class TwitterPoll(CommandInterface):
             else:
                 nonexistent.append(user)
 
+        if len(removed) > 0:
+            self._syncFollows()
+
         self._restartScanner()
 
         return removed, nonexistent
+
+    def _syncFollows(self):
+        self.bot.dataStore['TwitterPoll'] = self.follows
 
     def _checkUserExists(self, user):
         try:
@@ -160,6 +180,7 @@ class TwitterPoll(CommandInterface):
                                                                         '%a %b %d %H:%M:%S +0000 %Y')
                     else:
                         self.follows[user] = tweetTimestamp
+                    self._syncFollows()
                     break
 
             if len(newTweets) > 0:
@@ -181,6 +202,11 @@ class TwitterPoll(CommandInterface):
                         self.bot.sendResponse(IRCResponse(ResponseType.Say,
                                                           newTweet,
                                                           channel))
+
+    def _latestTweet(self, user):
+        timeline = self.twitter.statuses.user_timeline(screen_name=user)
+        if len(timeline) > 0:
+            return timeline[0]
 
     def _get_access_token(self):
         """Obtain a bearer token."""
