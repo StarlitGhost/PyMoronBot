@@ -11,7 +11,7 @@ from urllib2 import Request, urlopen
 import datetime
 from twisted.internet import task, threads
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
-from twitter import Twitter, OAuth2, TwitterHTTPError
+from twitter import Twitter as tw, OAuth2, TwitterHTTPError
 
 from CommandInterface import CommandInterface
 from Data import api_keys
@@ -20,7 +20,7 @@ from IRCResponse import IRCResponse, ResponseType
 from Utils import StringUtils
 
 
-class TwitterPoll(CommandInterface):
+class Twitter(CommandInterface):
     triggers = ['twitter']
     help = 'twitter <user>, twitter follow <user>, twitter unfollow <user>\n' \
            '<user> - returns the latest tweet from the specified twitter user\n' \
@@ -35,7 +35,7 @@ class TwitterPoll(CommandInterface):
         self.follows = self.bot.dataStore['TwitterPoll']
 
         bearer_token = self._get_access_token()
-        self.twitter = Twitter(auth=OAuth2(bearer_token=bearer_token))
+        self.twitter = tw(auth=OAuth2(bearer_token=bearer_token))
 
         # start the thread that checks for new tweets
         self.scanner = task.LoopingCall(self._scanLoop)
