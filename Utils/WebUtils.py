@@ -100,6 +100,9 @@ def postURL(url, values, extraHeaders=None):
         for header in extraHeaders:
             headers[header] = extraHeaders[header]
 
+    # urlencode only take str objects, so encode our unicode values first
+    for k, v in values.iteritems():
+        values[k] = unicode(v).encode('utf-8')
     data = urlencode(values)
 
     try:
