@@ -94,7 +94,7 @@ class TwitterPoll(CommandInterface):
         else:
             # fetch latest tweet from specified user
             user = message.ParameterList[0]
-            if self._checkUserExists(user):
+            if not self._checkUserExists(user):
                 return IRCResponse(ResponseType.Say,
                                    "'{}' is not a valid twitter user".format(user),
                                    message.ReplyTo)
