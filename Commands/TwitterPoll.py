@@ -51,9 +51,14 @@ class TwitterPoll(CommandInterface):
         @type message: IRCMessage
         """
         if len(message.ParameterList) == 0:  # no params, return list of follows
-            return IRCResponse(ResponseType.Say,
-                               'Currently following {}'.format(', '.join(self.follows)),
-                               message.ReplyTo)
+            if len(self.follows) == 0:
+                return IRCResponse(ResponseType.Say,
+                                   "I'm not following anyone right now, "
+                                   "use {}twitter follow <user> to add some".format(self.bot.commandChar))
+            else:
+                return IRCResponse(ResponseType.Say,
+                                   'Currently following {}'.format(', '.join(self.follows)),
+                                   message.ReplyTo)
 
         subCommand = message.ParameterList[0].lower()
 
