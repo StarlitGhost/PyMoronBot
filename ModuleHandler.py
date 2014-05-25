@@ -22,6 +22,8 @@ class ModuleHandler(object):
         self.commands = {}
         self.commandCaseMapping = {}
 
+        self.mappedTriggers = {}
+
         self.postProcesses = {}
         self.postProcessCaseMapping = {}
 
@@ -124,11 +126,21 @@ class ModuleHandler(object):
         categoryDict.update({catListCaseMap[name]: constructedModule})
         categoryCaseMap.update({name: catListCaseMap[name]})
 
+        # map triggers to commands so we can call them via dict lookup
+        if hasattr(constructedModule, 'triggers'):
+            for trigger in constructedModule.triggers:
+                self.mappedTriggers[trigger] = constructedModule
+
         return True
 
     def _unload(self, name, category, categoryDict, categoryCaseMap):
         if name.lower() in categoryCaseMap.keys():
             properName = categoryCaseMap[name.lower()]
+
+            # unmap module triggers
+            if hasattr(categoryDict[properName], 'triggers'):
+                for trigger in categoryDict[properName].triggers:
+                    del self.mappedTriggers[trigger]
 
             categoryDict[properName].onUnload()
 
