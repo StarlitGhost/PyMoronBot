@@ -69,20 +69,23 @@ class Urban(CommandInterface):
         if word.lower() != message.Parameters.lower():
             word = "{0} (Contains '{0}')".format(word, message.Parameters)
 
-        responses = [IRCResponse(ResponseType.Say,
-                                 assembleFormattedText(A.normal[A.bold["{0}:"], " {1}"]).format(word, definition),
-                                 message.ReplyTo),
-                     IRCResponse(ResponseType.Say,
-                                 assembleFormattedText(A.normal[A.bold["Example(s):"], " {0}"]).format(example),
-                                 message.ReplyTo),
-                     IRCResponse(ResponseType.Say,
-                                 assembleFormattedText(A.normal["{0}",
+        defFormatString = unicode(assembleFormattedText(A.normal[A.bold["{0}:"], " {1}"]))
+        exampleFormatString = unicode(assembleFormattedText(A.normal[A.bold["Example(s):"], " {0}"]))
+        byFormatString = unicode(assembleFormattedText(A.normal["{0}",
                                                                 graySplitter,
                                                                 A.fg.lightGreen["+{1}"],
                                                                 A.fg.gray["/"],
                                                                 A.fg.lightRed["-{2}"],
                                                                 graySplitter,
-                                                                "More defs: {3}"]).format(author, up, down, url),
+                                                                "More defs: {3}"]))
+        responses = [IRCResponse(ResponseType.Say,
+                                 defFormatString.format(word, definition),
+                                 message.ReplyTo),
+                     IRCResponse(ResponseType.Say,
+                                 exampleFormatString.format(example),
+                                 message.ReplyTo),
+                     IRCResponse(ResponseType.Say,
+                                 byFormatString.format(author, up, down, url),
                                  message.ReplyTo)]
         
         return responses
