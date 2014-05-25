@@ -94,7 +94,7 @@ class TwitterPoll(CommandInterface):
         else:
             # fetch latest tweet from specified user
             user = message.ParameterList[0]
-            if self._checkUserExists(user) is not None:
+            if self._checkUserExists(user):
                 return IRCResponse(ResponseType.Say,
                                    "'{}' is not a valid twitter user".format(user),
                                    message.ReplyTo)
@@ -104,7 +104,7 @@ class TwitterPoll(CommandInterface):
                 return IRCResponse(ResponseType.Say,
                                    "'{}' is a valid twitter user, but has not made any tweets".format(user),
                                    message.ReplyTo)
-            
+
             tweetText = StringUtils.unescapeXHTML(tweet['text'])
             tweetText = re.sub('[\r\n]+', StringUtils.graySplitter, tweetText)
             for url in tweet['entities']['urls']:
