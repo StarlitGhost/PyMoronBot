@@ -31,7 +31,7 @@ class Alias(CommandInterface):
         """
         @type message: IRCMessage
         """
-        if message.Command not in self.triggers and message.Command in self.aliases:
+        if message.Command.lower() not in self.triggers and message.Command.lower() in self.aliases:
             newMessage = self._aliasedMessage(message)
             newCommand = newMessage.Command.lower()
             if newCommand in self.bot.moduleHandler.mappedTriggers:  # aliased command is a valid trigger
@@ -69,9 +69,8 @@ class Alias(CommandInterface):
                                "'{}' is not a valid command or alias!".format(message.ParameterList[1]),
                                message.ReplyTo)
 
-        newAlias = []
-        for word in message.ParameterList[1:]:
-            newAlias.append(word.lower())
+        newAlias = message.ParameterList[1:]
+        newAlias[0] = newAlias[0].lower()
         self._newAlias(message.ParameterList[0], newAlias)
 
         return IRCResponse(ResponseType.Say,
