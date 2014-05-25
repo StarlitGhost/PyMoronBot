@@ -100,7 +100,7 @@ class TwitterPoll(CommandInterface):
                                    message.ReplyTo)
 
             tweet = self._latestTweet(user)
-            if tweet['text'] is None:
+            if tweet is None:
                 return IRCResponse(ResponseType.Say,
                                    "'{}' is a valid twitter user, but has not made any tweets".format(user),
                                    message.ReplyTo)
