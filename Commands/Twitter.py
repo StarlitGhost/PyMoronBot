@@ -22,8 +22,9 @@ from Utils import StringUtils
 
 class Twitter(CommandInterface):
     triggers = ['twitter']
-    help = 'twitter <user>, twitter follow <user>, twitter unfollow <user>\n' \
-           '<user> - returns the latest tweet from the specified twitter user\n' \
+    help = 'twitter <user>/<hashtag>, twitter follow <user>, twitter unfollow <user>\n' \
+           '<user>/<hashtag> - returns the latest tweet from the specified twitter user, ' \
+           'or the latest tweet containing the specified hashtag\n' \
            'follow <user> - adds the specified twitter user to a list to be polled every few minutes for new tweets\n' \
            'unfollow <user> - removes the specified twitter user from the polling list'
     runInThread = True
@@ -92,24 +93,37 @@ class Twitter(CommandInterface):
                                              message.ReplyTo))
             return responses
         else:
-            # fetch latest tweet from specified user
-            user = message.ParameterList[0]
-            if not self._checkUserExists(user):
-                return IRCResponse(ResponseType.Say,
-                                   "'{}' is not a valid twitter user".format(user),
-                                   message.ReplyTo)
+            # fetch latest tweet from specified user or hashtag
+            query = message.ParameterList[0]
 
-            tweet = self._latestTweet(user)
-            if tweet is None:
-                return IRCResponse(ResponseType.Say,
-                                   "'{}' is a valid twitter user, but has not made any tweets".format(user),
-                                   message.ReplyTo)
+            if query.startswith('#'):
+                # hashtag search
+                tweet = self._searchTweets(query)
+                if tweet is not None:
+                    hashtagTweet = self._stringifyTweet(tweet)
+                    return IRCResponse(ResponseType.Say, hashtagTweet, message.ReplyTo)
+                else:
+                    return IRCResponse(ResponseType.Say,
+                                       'There are no recent tweets with hashtag {}'.format(query),
+                                       message.ReplyTo)
+            else:
+                if not self._checkUserExists(query):
+                    return IRCResponse(ResponseType.Say,
+                                       "'{}' is not a valid twitter user".format(query),
+                                       message.ReplyTo)
 
-            newTweet = self._stringifyTweet(tweet)
-            return IRCResponse(ResponseType.Say, newTweet, message.ReplyTo)
+                tweet = self._latestTweet(query)
+                if tweet is None:
+                    return IRCResponse(ResponseType.Say,
+                                       "'{}' is a valid twitter user, but has not made any tweets".format(query),
+                                       message.ReplyTo)
+
+                newTweet = self._stringifyTweet(tweet)
+                return IRCResponse(ResponseType.Say, newTweet, message.ReplyTo)
 
     def _follow(self, users):
         """
+        follow the specified twitter accounts
         @type users: list[unicode]
         """
         new = []
@@ -134,6 +148,7 @@ class Twitter(CommandInterface):
 
     def _unfollow(self, users):
         """
+        unfollow the specified twitter accounts
         @type users: list[unicode]
         """
         removed = []
@@ -153,9 +168,16 @@ class Twitter(CommandInterface):
         return removed, nonexistent
 
     def _syncFollows(self):
+        """
+        save the dict of followed users back to persistent storage
+        """
         self.bot.dataStore['TwitterPoll'] = self.follows
 
     def _checkUserExists(self, user):
+        """
+        checks if the given twitter account exists
+        @type user: unicode
+        """
         try:
             self.twitter.users.show(screen_name=user)
             return True
@@ -163,6 +185,9 @@ class Twitter(CommandInterface):
             return False
 
     def _restartScanner(self):
+        """
+        restart the timeline scanner with delays calculated from the number of followed users
+        """
         if self.scanner.running:
             self.scanner.stop()
         # * 2 here so we have some breathing room for multiple servers
@@ -171,9 +196,15 @@ class Twitter(CommandInterface):
         self.scanner.start(max(perTimelineLimit, globalLimit), now=False)
 
     def _scanLoop(self):
+        """
+        launches a new scan in its own thread each time it is called
+        """
         return threads.deferToThread(self._scanTwitter)
 
     def _scanTwitter(self):
+        """
+        checks each followed twitter account for new tweets and reports them to all channels the bot is in
+        """
         for user, lastTweetTimestamp in self.follows.iteritems():
             timeline = self.twitter.statuses.user_timeline(screen_name=user)
 
@@ -203,15 +234,33 @@ class Twitter(CommandInterface):
 
                     for channel, _ in self.bot.channels.iteritems():
                         self.bot.sendResponse(IRCResponse(ResponseType.Say,
-                                                          newTweet,
+                                                          u'Tweet! {}'.format(newTweet),
                                                           channel))
 
     def _latestTweet(self, user):
+        """
+        returns the latest tweet made by the specified twitter user
+        @type user: unicode
+        """
         timeline = self.twitter.statuses.user_timeline(screen_name=user)
         if len(timeline) > 0:
             return timeline[0]
 
+    def _searchTweets(self, query):
+        """
+        return the most recent tweet matching the specified query
+        @type query: unicode
+        """
+        searchResult = self.twitter.search.tweets(q=query)
+        tweets = searchResult['statuses']
+        if len(tweets) > 0:
+            return tweets[0]
+
     def _stringifyTweet(self, tweet):
+        """
+        turn a tweet object into a nice string for us to send to IRC
+        @type tweet: dict[str, T/str]
+        """
         retweet = None
         # get the original tweet if this is a retweet
         if 'retweeted_status' in tweet:
@@ -229,7 +278,7 @@ class Twitter(CommandInterface):
             user = retweet['user']['screen_name']
             tweetText = 'RT {}: {}'.format(tweet['user']['screen_name'], tweetText)
 
-        formatString = unicode(assembleFormattedText(A.normal['Tweet! ', A.bold['@{0}>'], ' {1}']))
+        formatString = unicode(assembleFormattedText(A.normal[A.bold['@{0}>'], ' {1}']))
         newTweet = formatString.format(user, tweetText)
         return newTweet
 
