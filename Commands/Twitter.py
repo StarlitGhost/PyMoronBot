@@ -9,6 +9,7 @@ import json
 import re
 from urllib2 import Request, urlopen
 import datetime
+from dateutil import parser
 from twisted.internet import task, threads
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 from twitter import Twitter as tw, OAuth2, TwitterHTTPError
@@ -210,13 +211,12 @@ class Twitter(CommandInterface):
 
             newTweets = []
             for tweet in timeline:
-                tweetTimestamp = datetime.datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
+                tweetTimestamp = parser.parse(tweet['created_at']).replace(tzinfo=None)
                 if tweetTimestamp > lastTweetTimestamp:
                     newTweets.append(tweet)
                 else:
                     if len(newTweets) > 0:
-                        self.follows[user] = datetime.datetime.strptime(newTweets[0]['created_at'],
-                                                                        '%a %b %d %H:%M:%S +0000 %Y')
+                        self.follows[user] = parser.parse(newTweets[0]['created_at']).replace(tzinfo=None)
                     else:
                         self.follows[user] = tweetTimestamp
                     self._syncFollows()
@@ -271,6 +271,12 @@ class Twitter(CommandInterface):
         tweetText = re.sub('[\r\n]+', StringUtils.graySplitter, tweetText)
         for url in tweet['entities']['urls']:
             tweetText = tweetText.replace(url['url'], url['expanded_url'])
+
+        timestamp = parser.parse(tweet['created_at'])
+        timeString = timestamp.strftime('%A, %Y-%m-%d %H:%M:%S %Z')
+        delta = datetime.datetime.utcnow() - timestamp.replace(tzinfo=None)
+        deltaString = StringUtils.deltaTimeToString(delta)
+        tweetText = u'{} (tweeted {}, {} ago)'.format(tweetText, timeString, deltaString)
 
         if retweet is None:
             user = tweet['user']['screen_name']
