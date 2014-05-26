@@ -62,14 +62,19 @@ def stripColours(msg):
 
 
 # mostly taken from dave_random's UnsafeBot (whose source is not generally accessible)
-def deltaTimeToString(timeDelta):
+def deltaTimeToString(timeDelta, resolution='m'):
     """
+    returns a string version of the given timedelta, with a resolution of minutes ('m') or seconds ('s')
     @type timeDelta: timedelta
+    @type resolution: str
     """
     d = OrderedDict()
     d['days'] = timeDelta.days
     d['hours'], rem = divmod(timeDelta.seconds, 3600)
-    d['minutes'], _ = divmod(rem, 60)  # replace _ with d['seconds'] to get seconds
+    if resolution == 'm' or resolution == 's':
+        d['minutes'], seconds = divmod(rem, 60)
+        if resolution == 's':
+            d['seconds'] = seconds
 
     def lex(durationWord, duration):
         if duration == 1:

@@ -30,10 +30,15 @@ class Chain(CommandInterface):
         chain = re.split(r'(?<!\\)\|', message.Parameters)
 
         response = None
+        extraVars = {}
 
         for link in chain:
+            link = link.strip()
             if response is not None:
                 link = link.replace('$output', response.Response)  # replace $output with output of previous command
+                extraVars.update(response.ExtraVars)
+                for var, value in extraVars.iteritems():
+                    link = re.sub(r'\$\b{}\b'.format(re.escape(var)), '{}'.format(value), link)
             else:
                 # replace $output with empty string if previous command had no output
                 # (or this is the first command in the chain, but for some reason has $output as a param)

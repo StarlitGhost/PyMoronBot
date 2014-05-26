@@ -17,6 +17,7 @@ class Alias(CommandInterface):
     help = 'alias <alias> <command/alias> <params> - aliases <alias> to the specified command/alias and parameters\n' \
            'you can specify where parameters given to the alias should be inserted with $1, $2, $n. ' \
            'The whole parameter string is $0. $sender and $channel can also be used.'
+    runInThread = True
            
     def onLoad(self):
         if 'Alias' not in self.bot.dataStore:
@@ -129,7 +130,7 @@ class Alias(CommandInterface):
         newMsg = newMsg.replace('$sender', message.User.Name)
         newMsg = newMsg.replace('$channel', message.Channel.Name)
 
-        if re.match(r'\$\d+\+?', newMsg):  # if the alias contains numbered param replacement points, replace them
+        if re.search(r'\$[0-9]+', newMsg):  # if the alias contains numbered param replacement points, replace them
             newMsg = newMsg.replace('$0',  ' '.join(message.ParameterList))
             for i, param in enumerate(message.ParameterList):
                 if newMsg.find("${}+".format(i+1)) != -1:
