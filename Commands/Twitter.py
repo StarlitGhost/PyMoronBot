@@ -227,7 +227,7 @@ class Twitter(CommandInterface):
             user = tweet['user']['screen_name']
         else:
             user = retweet['user']['screen_name']
-            tweetText = 'RT {}:'.format(tweet['user']['screen_name'])
+            tweetText = 'RT {}: {}'.format(tweet['user']['screen_name'], tweetText)
 
         formatString = unicode(assembleFormattedText(A.normal['Tweet! ', A.bold['@{0}>'], ' {1}']))
         newTweet = formatString.format(user, tweetText)
