@@ -105,13 +105,7 @@ class Twitter(CommandInterface):
                                    "'{}' is a valid twitter user, but has not made any tweets".format(user),
                                    message.ReplyTo)
 
-            tweetText = StringUtils.unescapeXHTML(tweet['text'])
-            tweetText = re.sub('[\r\n]+', StringUtils.graySplitter, tweetText)
-            for url in tweet['entities']['urls']:
-                tweetText = tweetText.replace(url['url'], url['expanded_url'])
-
-            formatString = unicode(assembleFormattedText(A.normal[A.bold['@{0}>'], ' {1}']))
-            newTweet = formatString.format(tweet['user']['screen_name'], tweetText)
+            newTweet = self._stringifyTweet(tweet)
             return IRCResponse(ResponseType.Say, newTweet, message.ReplyTo)
 
     def _follow(self, users):
@@ -205,13 +199,8 @@ class Twitter(CommandInterface):
                     if tweet['in_reply_to_screen_name'] is not None:
                         continue
 
-                    tweetText = StringUtils.unescapeXHTML(tweet['text'])
-                    tweetText = re.sub('[\r\n]+', StringUtils.graySplitter, tweetText)
-                    for url in tweet['entities']['urls']:
-                        tweetText = tweetText.replace(url['url'], url['expanded_url'])
+                    newTweet = self._stringifyTweet(tweet)
 
-                    formatString = unicode(assembleFormattedText(A.normal['Tweet! ', A.bold['@{0}>'], ' {1}']))
-                    newTweet = formatString.format(tweet['user']['screen_name'], tweetText)
                     for channel, _ in self.bot.channels.iteritems():
                         self.bot.sendResponse(IRCResponse(ResponseType.Say,
                                                           newTweet,
@@ -221,6 +210,28 @@ class Twitter(CommandInterface):
         timeline = self.twitter.statuses.user_timeline(screen_name=user)
         if len(timeline) > 0:
             return timeline[0]
+
+    def _stringifyTweet(self, tweet):
+        retweet = None
+        # get the original tweet if this is a retweet
+        if 'retweeted_status' in tweet:
+            retweet = tweet
+            tweet = retweet['retweeted_status']
+
+        tweetText = StringUtils.unescapeXHTML(tweet['text'])
+        tweetText = re.sub('[\r\n]+', StringUtils.graySplitter, tweetText)
+        for url in tweet['entities']['urls']:
+            tweetText = tweetText.replace(url['url'], url['expanded_url'])
+
+        if retweet is None:
+            user = tweet['user']['screen_name']
+        else:
+            user = retweet['user']['screen_name']
+            tweetText = 'RT {}:'.format(tweet['user']['screen_name'])
+
+        formatString = unicode(assembleFormattedText(A.normal['Tweet! ', A.bold['@{0}>'], ' {1}']))
+        newTweet = formatString.format(user, tweetText)
+        return newTweet
 
     def _get_access_token(self):
         """Obtain a bearer token."""
