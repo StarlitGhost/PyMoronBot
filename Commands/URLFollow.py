@@ -27,6 +27,10 @@ class URLFollow(CommandInterface):
     graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
     def onLoad(self):
+        self.handledExternally = {}
+        """@type : dict[str, list[str]]"""
+        # dict of regex patterns not to follow. populated by other modules so they can handle them themselves
+
         self.youtubeKey = load_key(u'YouTube')
         self.imgurClientID = load_key(u'imgur Client ID')
 
@@ -48,6 +52,11 @@ class URLFollow(CommandInterface):
         match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.MessageString, re.IGNORECASE)
         if not match:
             return
+
+        for module, patterns in self.handledExternally.iteritems():
+            for pattern in patterns:
+                if re.search(pattern, message.MessageString):
+                    return  # url will be handled by another module
 
         return self.DispatchToFollows(match.group('url'), message)
 

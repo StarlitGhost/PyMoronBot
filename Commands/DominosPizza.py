@@ -19,6 +19,17 @@ class DominosPizza(CommandInterface):
         self.trackers = {}
         """@type : dict[str, TrackingDetails]"""
 
+        self.regex = r'www\.dominos\.co\.uk/checkout/pizzatracker\.aspx\?id=(?P<orderID>[a-zA-Z0-9]+)'
+
+        commands = self.bot.moduleHandler.commands
+        if 'URLFollow' in commands:
+            commands['URLFollow'].handledExternally['DominosPizza'] = [self.regex]
+
+    def onUnload(self):
+        commands = self.bot.moduleHandler.commands
+        if 'URLFollow' in commands:
+            del commands['URLFollow'].handledExternally['DominosPizza']
+
     def shouldExecute(self, message):
         """
         @type message: IRCMessage
@@ -30,8 +41,7 @@ class DominosPizza(CommandInterface):
         """
         @type message: IRCMessage
         """
-        match = re.search(r'www\.dominos\.co\.uk/checkout/pizzatracker\.aspx\?id=(?P<orderID>[a-zA-Z0-9]+)',
-                          message.MessageString)
+        match = re.search(self.regex, message.MessageString)
 
         if not match:
             return
