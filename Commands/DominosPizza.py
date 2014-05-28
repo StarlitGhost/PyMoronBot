@@ -84,18 +84,43 @@ class DominosPizza(CommandInterface):
 
         trackURL = u'http://www.dominos.co.uk/checkout/pizzaTrackeriFrame.aspx?id={}'.format(orderID)
         page = WebUtils.fetchURL(trackURL)
-        root = BeautifulSoup(page.body)
-        step = int(re.search(r'(?P<step>[0-9]+)', root.find('img')['alt']).group('step'))
-        if step > trackingDetails.step:
-            trackingDetails.step = step
-            self.bot.sendResponse(IRCResponse(ResponseType.Say,
-                                              steps[step-1].format(trackingDetails.orderer),
-                                              trackingDetails.channel.Name))
 
-        if step == 6:
-            trackingDetails.tracker.stop()
+        if page is not None:
+            root = BeautifulSoup(page.body)
+            stepImg = root.find('img')
+            if stepImg is not None and 'alt' in stepImg:
+                stepImgAlt = stepImg['alt']
+                stepMatch = re.search(r'^Step (?P<step>[0-9]+)$', stepImgAlt)
+
+                if stepMatch:
+                    step = int(stepMatch.group('step'))
+                    if step > trackingDetails.step:
+                        trackingDetails.step = step
+                        self.bot.sendResponse(IRCResponse(ResponseType.Say,
+                                                          steps[step-1].format(trackingDetails.orderer),
+                                                          trackingDetails.channel.Name))
+
+                    if step == 6:
+                        self._stopPizzaTracker(orderID)
+
+                    return
+
+        # if we reach here the tracking page was invalid in some way
+        self.bot.sendResponse(IRCResponse(ResponseType.Say,
+                                          u"The pizza tracking page linked by {} "
+                                          u"had some kind of error, tracking stopped".format(trackingDetails.orderer),
+                                          trackingDetails.channel.Name))
+        self._stopPizzaTracker(orderID)
+
+    def _stopPizzaTracker(self, orderID):
+        """
+        @type orderID: str
+        """
+        if orderID in self.trackers:
+            self.trackers[orderID].tracker.stop()
             del self.trackers[orderID]
-
+            return True
+        return False
 
 class TrackingDetails(object):
     def __init__(self, orderer, channel, tracker):
