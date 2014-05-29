@@ -46,7 +46,7 @@ class HangoutTracker(CommandInterface):
         @type message: IRCMessage
         """
         match = re.search('^hango+?u?t$', message.Command, re.IGNORECASE)
-        if match or ((message.Type == 'JOIN') and (message.User.Name = 'Emily[iOS]')):
+        if match or ((message.Type == 'JOIN') and (message.User.Name == 'Emily[iOS]')):
             if message.ReplyTo not in self.hangoutDict:
                 self.hangoutDict[message.ReplyTo] = None
                 self._syncHangoutDict()
