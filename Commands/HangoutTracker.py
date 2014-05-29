@@ -23,6 +23,7 @@ class Data(object):
 class HangoutTracker(CommandInterface):
     triggers = ['hangout', 'hangoot']
     help = 'hangout - gives you the last posted G+ hangout link'
+    acceptedTypes = ['PRIVMSG','ACTION','JOIN']
 
     def onLoad(self):
         if 'HangoutTracker' not in self.bot.dataStore:
@@ -45,7 +46,7 @@ class HangoutTracker(CommandInterface):
         @type message: IRCMessage
         """
         match = re.search('^hango+?u?t$', message.Command, re.IGNORECASE)
-        if (match or ((message.Type == 'JOIN') and (message.User.name = 'Emily[iOS]'))):
+        if match or ((message.Type == 'JOIN') and (message.User.Name = 'Emily[iOS]')):
             if message.ReplyTo not in self.hangoutDict:
                 self.hangoutDict[message.ReplyTo] = None
                 self._syncHangoutDict()
