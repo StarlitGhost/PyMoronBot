@@ -27,8 +27,12 @@ class Instantiate(Function):
         if message.Type != 'PRIVMSG':
             return
             
+        if message.Type == 'JOIN':
+            if message.User.Name in ['Emily[iOS]']
+        
         match = re.search('^hango+?u?t$', message.Command, re.IGNORECASE)
-        if match:
+        # If \hangouts is called or Emily[iOS] joins the Channel, Trigger Output.
+        if (match or ((message.Type == 'JOIN') and (message.User.Name == 'Emily[iOS]'))):
             if message.ReplyTo not in self.hangoutDict:
                 self.hangoutDict[message.ReplyTo] = None
             if self.hangoutDict[message.ReplyTo] is None:
