@@ -26,10 +26,7 @@ class Instantiate(Function):
     def GetResponse(self, message):
         if message.Type != 'PRIVMSG':
             return
-            
-        if message.Type == 'JOIN':
-            if message.User.Name in ['Emily[iOS]']
-        
+
         match = re.search('^hango+?u?t$', message.Command, re.IGNORECASE)
         # If \hangouts is called or Emily[iOS] joins the Channel, Trigger Output.
         if (match or ((message.Type == 'JOIN') and (message.User.Name == 'Emily[iOS]'))):
