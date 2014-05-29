@@ -26,8 +26,9 @@ class DominosPizza(CommandInterface):
             commands['URLFollow'].handledExternally['DominosPizza'] = [self.regex]
 
     def onUnload(self):
+        self._stopAllPizzaTrackers()
         commands = self.bot.moduleHandler.commands
-        if 'URLFollow' in commands:
+        if 'URLFollow' in commands and 'DominosPizza' in commands['URLFollow'].handledExternally:
             del commands['URLFollow'].handledExternally['DominosPizza']
 
     def shouldExecute(self, message):
@@ -88,7 +89,7 @@ class DominosPizza(CommandInterface):
         if page is not None:
             root = BeautifulSoup(page.body)
             stepImg = root.find('img')
-            if stepImg is not None and 'alt' in stepImg:
+            if stepImg is not None and stepImg.has_attr('alt'):
                 stepImgAlt = stepImg['alt']
                 stepMatch = re.search(r'^Step (?P<step>[0-9]+)$', stepImgAlt)
 
@@ -117,10 +118,15 @@ class DominosPizza(CommandInterface):
         @type orderID: str
         """
         if orderID in self.trackers:
-            self.trackers[orderID].tracker.stop()
+            if self.trackers[orderID].tracker.running:
+                self.trackers[orderID].tracker.stop()
             del self.trackers[orderID]
             return True
         return False
+
+    def _stopAllPizzaTrackers(self):
+        for orderID in self.trackers.keys():
+            self._stopPizzaTracker(orderID)
 
 class TrackingDetails(object):
     def __init__(self, orderer, channel, tracker):
