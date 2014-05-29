@@ -40,7 +40,7 @@ class Instantiate(Function):
             
             timeDiff = datetime.datetime.utcnow() - hangout.lastDate
             url = 'https://talkgadget.google.com/hangouts/{0}'.format(hangout.lastCode)
-            byLine = 'first posted {0} ago by {1}'.format(self.strfdelta(timeDiff, '{days} day(s) {hours} hour(s) {minutes} minute(s)'), hangout.lastUser)
+            byLine = 'first posted {0} ago'.format(self.strfdelta(timeDiff, '{days} day(s) {hours} hour(s) {minutes} minute(s)'))
             
             response = 'Last hangout posted: {0} ({1})'.format(url, byLine)
             
