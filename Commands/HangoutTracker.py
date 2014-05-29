@@ -45,7 +45,7 @@ class HangoutTracker(CommandInterface):
         @type message: IRCMessage
         """
         match = re.search('^hango+?u?t$', message.Command, re.IGNORECASE)
-        if match:
+        if (match or ((message.Type == 'JOIN') and (message.User.name = 'Emily[iOS]'))):
             if message.ReplyTo not in self.hangoutDict:
                 self.hangoutDict[message.ReplyTo] = None
                 self._syncHangoutDict()
@@ -58,7 +58,7 @@ class HangoutTracker(CommandInterface):
 
             timeDiff = datetime.datetime.utcnow() - hangout.lastDate
             url = 'https://talkgadget.google.com/hangouts/_/{0}'.format(hangout.lastCode)
-            byLine = 'first linked {0} ago by {1}'.format(StringUtils.deltaTimeToString(timeDiff), hangout.lastUser)
+            byLine = 'first linked {0} ago'.format(StringUtils.deltaTimeToString(timeDiff))
 
             response = 'Last hangout linked: {0} ({1})'.format(url, byLine)
 
