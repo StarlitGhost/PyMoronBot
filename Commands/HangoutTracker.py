@@ -61,7 +61,10 @@ class HangoutTracker(CommandInterface):
             url = 'https://talkgadget.google.com/hangouts/_/{0}'.format(hangout.lastCode)
             byLine = 'first linked {0} ago'.format(StringUtils.deltaTimeToString(timeDiff))
 
-            response = 'Last hangout linked: {0} ({1})'.format(url, byLine)
+            if ((message.Type == 'JOIN') and (message.User.Name == 'Emily[iOS]')):
+                response = 'Welcome Back, Lady Emily.  Here\'s the !hangout for your streaming pleasure: {0} ({1})'.format(url, byLine)
+            else:
+                response = 'Last hangout linked: {0} ({1})'.format(url, byLine)
 
             return IRCResponse(ResponseType.Say, response, message.ReplyTo)
 
