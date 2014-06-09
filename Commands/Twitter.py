@@ -18,7 +18,7 @@ from CommandInterface import CommandInterface
 from Data import api_keys
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-from Utils import StringUtils
+from Utils import StringUtils, WebUtils
 
 
 class Twitter(CommandInterface):
@@ -285,6 +285,7 @@ class Twitter(CommandInterface):
             tweetText = 'RT {}: {}'.format(tweet['user']['screen_name'], tweetText)
             
         link = u'https://twitter.com/{}/status/{}'.format(tweet['user']['screen_name'], tweet['id_str'])
+        link = WebUtils.shortenGoogl(link)
 
         formatString = unicode(assembleFormattedText(A.normal[A.bold['@{0}>'], ' {1} {2}']))
         newTweet = formatString.format(user, tweetText, link)
