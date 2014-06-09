@@ -283,9 +283,11 @@ class Twitter(CommandInterface):
         else:
             user = retweet['user']['screen_name']
             tweetText = 'RT {}: {}'.format(tweet['user']['screen_name'], tweetText)
+            
+        link = u'https://twitter.com/{}/status/{}'.format(tweet['user']['screen_name'], tweet['id_str'])
 
-        formatString = unicode(assembleFormattedText(A.normal[A.bold['@{0}>'], ' {1}']))
-        newTweet = formatString.format(user, tweetText)
+        formatString = unicode(assembleFormattedText(A.normal[A.bold['@{0}>'], ' {1} {2}']))
+        newTweet = formatString.format(user, tweetText, link)
         return newTweet
 
     def _get_access_token(self):
