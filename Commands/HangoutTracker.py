@@ -33,6 +33,7 @@ class HangoutTracker(CommandInterface):
 
     def _syncHangoutDict(self):
         self.bot.dataStore['HangoutTracker'] = self.hangoutDict
+        self.bot.dataStore.sync()
 
     def shouldExecute(self, message):
         """
