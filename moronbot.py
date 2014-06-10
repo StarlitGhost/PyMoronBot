@@ -33,7 +33,7 @@ class MoronBot(irc.IRCClient):
         dataStorePath = os.path.join('Data', cmdArgs.server)
         if not os.path.exists(dataStorePath):
             os.makedirs(dataStorePath)
-        self.dataStore = shelve.open(os.path.join(dataStorePath, 'shelve.db'))
+        self.dataStore = shelve.open(os.path.join(dataStorePath, 'shelve.db'), protocol=2, writeback=True)
 
         self.moduleHandler = ModuleHandler.ModuleHandler(self)
         self.moduleHandler.loadAll()
@@ -276,6 +276,7 @@ class MoronBot(irc.IRCClient):
                 message.User.Name in GlobalVars.admins):
             global restarting
             restarting = True
+            self.dataStore.close()
             self.quit(message='restarting')
             return
 
