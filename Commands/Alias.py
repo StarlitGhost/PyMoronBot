@@ -119,6 +119,7 @@ class Alias(CommandInterface):
 
     def _syncAliases(self):
         self.bot.dataStore['Alias'] = self.aliases
+        self.bot.dataStore.sync()
 
     def _aliasedMessage(self, message):
         if message.Command not in self.aliases:
