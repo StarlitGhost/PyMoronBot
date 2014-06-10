@@ -173,6 +173,7 @@ class Twitter(CommandInterface):
         save the dict of followed users back to persistent storage
         """
         self.bot.dataStore['TwitterPoll'] = self.follows
+        self.bot.dataStore.sync()
 
     def _checkUserExists(self, user):
         """
