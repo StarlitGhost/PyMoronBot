@@ -129,7 +129,10 @@ class Alias(CommandInterface):
         newMsg = u'{0}{1}'.format(self.bot.commandChar, ' '.join(alias))
 
         newMsg = newMsg.replace('$sender', message.User.Name)
-        newMsg = newMsg.replace('$channel', message.Channel.Name)
+        if message.Channel is not None:
+            newMsg = newMsg.replace('$channel', message.Channel.Name)
+        else:
+            newMsg = newMsg.replace('$channel', message.User.Name)
 
         if re.search(r'\$[0-9]+', newMsg):  # if the alias contains numbered param replacement points, replace them
             newMsg = newMsg.replace('$0',  ' '.join(message.ParameterList))
