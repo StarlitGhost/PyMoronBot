@@ -42,7 +42,7 @@ class NegativeSidesException(Exception):
 class Roll(CommandInterface):
     triggers = ['roll', 'rollv']
     help = 'roll(v) - dice roller, \'rollv\' outputs every roll. supported operators are NdN, dN, + - * / ( ) #comments\n' \
-           'example usage: rollv 5d6 + ((5d(2d10)) - d10) * (d20 / 5) #unnecessarily complicated roll\n'
+           'example usage: rollv 5d6 + ((5d(2d10)) - d10) * (d20 / 5) #unnecessarily complicated roll\n' \
            'output: User rolled: [5d6: 3,1,5,4,4 (17) | 2d10: 5,3 (8) | 5d8: 5,1,3,7,2 (18) | 1d10: 7 (7) | 1d20: 4 (4)] 17'
 
     # noinspection PyUnusedLocal
