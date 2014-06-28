@@ -67,7 +67,10 @@ class ModuleHandler(object):
                 print "Python Execution Error sending responses '{0}': {1}".format(responses, str(sys.exc_info()))
                 traceback.print_tb(sys.exc_info()[2])
 
-    def postProcess(self, response=IRCResponse):
+    def postProcess(self, response):
+        """
+        @type response: IRCResponse
+        """
         newResponse = response
         for post in sorted(self.postProcesses.values(), key=operator.attrgetter('priority'), reverse=True):
             try:

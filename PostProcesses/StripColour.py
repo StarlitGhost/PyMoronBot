@@ -16,7 +16,7 @@ class StripColour(PostProcessInterface):
         """
         @type response: IRCResponse
         """
-        if super(StripColour, self).shouldExecute(response):
+        if PostProcessInterface.shouldExecute(self, response):
             channel = self.bot.getChannel(response.Target)
             if channel is not None and 'c' in channel.Modes:
                 # strip formatting if colours are blocked on the channel
