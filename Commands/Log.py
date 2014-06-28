@@ -16,16 +16,18 @@ from CommandInterface import CommandInterface
 import GlobalVars
 
 
-logFuncs = {'PRIVMSG': lambda m: u'<{0}> {1}'.format(m.User.Name, m.MessageString),
-            'ACTION': lambda m: u'*{0} {1}*'.format(m.User.Name, m.MessageString),
-            'NOTICE': lambda m: u'[{0}] {1}'.format(m.User.Name, m.MessageString),
-            'JOIN': lambda m: u' >> {0} ({1}@{2}) joined {3}'.format(m.User.Name, m.User.User, m.User.Hostmask, m.ReplyTo),
-            'NICK': lambda m: u'{0} is now known as {1}'.format(m.User.Name, m.MessageString),
-            'PART': lambda m: u' << {0} ({1}@{2}) left {3}{4}'.format(m.User.Name, m.User.User, m.User.Hostmask, m.ReplyTo, m.MessageString),
-            'QUIT': lambda m: u' << {0} ({1}@{2}) quit{3}'.format(m.User.Name, m.User.User, m.User.Hostmask, m.MessageString),
-            'KICK': lambda m: u'!<< {0} was kicked by {1}{2}'.format(m.Kickee, m.User.Name, m.MessageString),
-            'TOPIC': lambda m: u'# {0} set the topic to: {1}'.format(m.User.Name, m.MessageString),
-            'MODE': lambda m: u'# {0} sets mode: {1}{2} {3}'.format(m.User.Name, m.ModeOperator, m.Modes, ' '.join(m.ModeArgs))}
+logFuncs = {
+    'PRIVMSG': lambda m: u'<{0}> {1}'.format(m.User.Name, m.MessageString),
+    'ACTION': lambda m: u'*{0} {1}*'.format(m.User.Name, m.MessageString),
+    'NOTICE': lambda m: u'[{0}] {1}'.format(m.User.Name, m.MessageString),
+    'JOIN': lambda m: u' >> {0} ({1}@{2}) joined {3}'.format(m.User.Name, m.User.User, m.User.Hostmask, m.ReplyTo),
+    'NICK': lambda m: u'{0} is now known as {1}'.format(m.User.Name, m.MessageString),
+    'PART': lambda m: u' << {0} ({1}@{2}) left {3}{4}'.format(m.User.Name, m.User.User, m.User.Hostmask, m.ReplyTo, m.MessageString),
+    'QUIT': lambda m: u' << {0} ({1}@{2}) quit{3}'.format(m.User.Name, m.User.User, m.User.Hostmask, m.MessageString),
+    'KICK': lambda m: u'!<< {0} was kicked by {1}{2}'.format(m.Kickee, m.User.Name, m.MessageString),
+    'TOPIC': lambda m: u'# {0} set the topic to: {1}'.format(m.User.Name, m.MessageString),
+    'MODE': lambda m: u'# {0} sets mode: {1}{2} {3}'.format(m.User.Name, m.ModeOperator, m.Modes, ' '.join(m.ModeArgs))
+}
 
 
 def log(text, target):

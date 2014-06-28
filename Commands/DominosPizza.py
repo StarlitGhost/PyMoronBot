@@ -128,6 +128,7 @@ class DominosPizza(CommandInterface):
         for orderID in self.trackers.keys():
             self._stopPizzaTracker(orderID)
 
+
 class TrackingDetails(object):
     def __init__(self, orderer, channel, tracker):
         """
