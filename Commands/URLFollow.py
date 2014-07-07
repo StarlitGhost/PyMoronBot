@@ -331,6 +331,9 @@ class URLFollow(CommandInterface):
         findState = soup.find(id='main_content')
         if 'Project-state-canceled' in findState['class']:
             data.append(assembleFormattedText(A.normal[A.fg.red['Cancelled']]))
+        
+        elif 'Project-state-suspended' in findState['class']:
+            data.append(assembleFormattedText(A.normal[A.fg.yellow['Suspended']]))
             
         elif 'Project-state-failed' in findState['class']:
             data.append(assembleFormattedText(A.normal[A.fg.red['Failed']]))
