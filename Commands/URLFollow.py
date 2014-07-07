@@ -333,7 +333,7 @@ class URLFollow(CommandInterface):
             data.append(assembleFormattedText(A.normal[A.fg.red['Cancelled']]))
         
         elif 'Project-state-suspended' in findState['class']:
-            data.append(assembleFormattedText(A.normal[A.fg.yellow['Suspended']]))
+            data.append(assembleFormattedText(A.normal[A.fg.blue['Suspended']]))
             
         elif 'Project-state-failed' in findState['class']:
             data.append(assembleFormattedText(A.normal[A.fg.red['Failed']]))
