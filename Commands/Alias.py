@@ -97,7 +97,7 @@ class Alias(CommandInterface):
     def _aliases(self, message):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
-                               "Current aliases: {}".format(', '.join(self.aliases.keys())),
+                               "Current aliases: {}".format(', '.join(sorted(self.aliases.keys()))),
                                message.ReplyTo)
         elif message.ParameterList[0] in self.aliases:
             return IRCResponse(ResponseType.Say,
