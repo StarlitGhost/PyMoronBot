@@ -63,7 +63,7 @@ class Sed(CommandInterface):
     @classmethod
     def match(cls, message):
         """Returns (search, replace, flags) if message is a replacement pattern, otherwise None"""
-        if not message.startswith('s/') or not message.startswith('S/'):
+        if not (message.startswith('s/') or message.startswith('S/')):
             return
         parts = re.split(r'(?<!\\)/', message)
         if len(parts) not in (3, 4):
