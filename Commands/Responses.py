@@ -114,6 +114,56 @@ class Responses(CommandInterface):
             ducktape.talkwords = ducktapeTalkwords
             self.responses.add(ducktape)
 
+            '''Responds randomly to various animal sounds'''
+            def animalMatch(Message):
+                woofMatch = re.search('^([w|W][o|O|0]{2,}[f|F])$')
+                squeakMatch = re.search('^([s|S|5][q|Q][u|U][e|E|3][a|A|4][k|K])$')
+                mooMatch = re.search('^([m|M][o|O|0]{2,})$')
+                tweetMatch = re.search('^([t|T][w|W][e|E|3]{2,}[t|T])$')
+                neighMatch = re.search('^([n|N][e|E|3][i|I|1]{1,}[g|G][h|H])$')
+                if (woofMatch is not None):
+                    animal = "dog"
+                elif (squeakMatch is not None):
+                    animal = "mouse"
+                elif (mooMatch is not None):
+                    animal = "cow"
+                elif (birdMatch is not None):
+                    animal = "bird"
+                elif (neighMatch is not None):
+                    animal = "horse"
+                else:
+                    animal = None
+                return animal
+            
+            if (animalMatch is not None):
+                randomChance = random.randint(1,20)
+                    if (randomChance == 1):
+                        ''' User Critically Failed '''
+                        return [IRCResponse(ResponseType.Say,
+                                            'You critically fail at being a ' + animal + '.'),
+                                            chatMessage.ReplyTo]
+                    
+                    elif ((randomChance >= 2) and (randomChance <= 8)):
+                        ''' User Is Not A [animal] '''
+                        return [IRCResponse(ResponseType.Say,
+                                            'You are not a ' + animal + '.',
+                                            chatMessage.ReplyTo)]
+                    elif ((dogRandomChance >= 9) and (dogRandomChance <= 14)):
+                        '''User Might Be A [animal] '''
+                        return [IRCResponse(ResponseType.Say,
+                                            'You /might/ be a ' + animal + '.',
+                                            chatMessage.ReplyTo)]
+                    elif ((dogRandoMChance >= 15) and (dogRandomChance <= 20)):
+                        ''' User IS A [animal] '''
+                        return [IRCResponse(ResponseType.Say,
+                                            'You are DEFINITELY a ' + animal + '.',
+                                            chatMessage.ReplyTo)]
+                    else:
+                        ''' Roll is outside of bounds, Magic! '''
+                        return [IRCResponse(ResponseType.Say,
+                                            'You are clearly a Magician rolling out of bounds like that.',
+                                            chatMessage.ReplyTo)]
+
             '''Responds to boops'''
 
             def boopMatch(message):
