@@ -115,22 +115,45 @@ class Responses(CommandInterface):
             self.responses.add(ducktape)
 
             '''Responds randomly to various animal sounds'''
-            def animalMatch(Message):
-                woofMatch = re.search('^([w|W][o|O|0]{2,}[f|F])$')
-                squeakMatch = re.search('^([s|S|5][q|Q][u|U][e|E|3][a|A|4][k|K])$')
-                mooMatch = re.search('^([m|M][o|O|0]{2,})$')
-                tweetMatch = re.search('^([t|T][w|W][e|E|3]{2,}[t|T])$')
-                neighMatch = re.search('^([n|N][e|E|3][i|I|1]{1,}[g|G][h|H])$')
+            def animalMatch(message):
+                woofMatch = re.search('^([w|W][o|O|0]{2,}[f|F])$', message, re.IGNORECASE)
+                squeakMatch = re.search('^([s|S|5][q|Q][u|U][e|E|3][a|A|4][k|K])$', message, re.IGNORECASE)
+                mooMatch = re.search('^([m|M][o|O|0]{2,})$', message, re.IGNORECASE)
+                tweetMatch = re.search('^([t|T][w|W][e|E|3]{2,}[t|T])$', message, re.IGNORECASE)
+                cawMatch = re.search('^([c|C][a|A|4][w|W]{1,})$', message, re.IGNORECASE)
+                neighMatch = re.search('^([n|N][e|E|3][i|I|1]{1,}[g|G][h|H])$', message, re.IGNORECASE)
+                ribbitMatch = re.search('^([r|R][i|I|1][b|B]{2,}[i|I|1]{1,}[t|T])$', message, re.IGNOECASE)
+                bloopMatch = re.search('^([b|B][l|L][o|O|0]{2,}[p|P])$', message, re.IGNORECASE)
+                oinkMatch = re.search('^([o|O|0][i|I|1][n|N][k|K]{1,})$', message, re.IGNORECASE)
+                honkMatch = re.search('^([h|H][o|O|0]{1,}[n|N][k|K])$', message, re.IGNORECASE)
+                hissMatch = re.search('^([h|H][i|I|1][s|S|5]{2,})$', message, re.IGNORECASE)
+                roarMatch = re.search('^([r|R][o|O|0]{1,}[a|A|4][r|R])$', message, re.IGNORECASE)
+                howlMatch = re.search('^([h|H][o|O|0][w|W]{1,}[l|L])$', message, re.IGNORECASE)
+                awoooMatch = re.search('^([a|A|4][w|W][o|O|0]{3,})$', message, re.IGNORECASE)
                 if (woofMatch is not None):
                     animal = "dog"
                 elif (squeakMatch is not None):
                     animal = "mouse"
                 elif (mooMatch is not None):
                     animal = "cow"
-                elif (birdMatch is not None):
+                elif ((tweetMatch is not None) or (cawMatch is not None)):
                     animal = "bird"
                 elif (neighMatch is not None):
                     animal = "horse"
+                elif (ribbitMatch is not None):
+                    animal = "frog"
+                elif (bloopMatch is not None):
+                    animal = "fish"
+                elif (oinkMatch is not None):
+                    animal = "pig"
+                elif (honkMatch is not None):
+                    animal = "goose"
+                elif (hissMatch is not None):
+                    animal = "snake"
+                elif (roarMatch is not None):
+                    animal = "lion"
+                elif ((howlMatch is not None) or (awoooMatch is not None)):
+                    animal = "wolf"
                 else:
                     animal = None
                 return animal
