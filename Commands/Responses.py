@@ -116,14 +116,14 @@ class Responses(CommandInterface):
             '''Responds randomly to various animal sounds'''
             def animalMatch(message):
                 matchDict = {
-                    r'w[o0]{2,}f': 'dog',
+                    r'(w[o0]{2,}f|r+u+f{2,})': 'puppeh',
                     r'[s5]qu[e3][a4]k': 'mouse',
                     r'm[o0]{2,}': 'cow',
                     r'(tw[e3]{2,}t|c[a4]+w+)': 'bird',
                     r'n[e3]+[i1]+gh': 'horse',
                     r'r[i1]+b{2,}[i1]+t': 'frog',
                     r'bl[o0]{2,}p': 'fish',
-                    r'[o0]+[i1]+n+k+': 'pig',
+                    r'[o0]+[i1]+n+k+': 'piggy',
                     r'h[o0]+n+k+': 'goose',
                     r'h[i1]+[s5]{2,}': 'snake',
                     r'r+[o0]+[a4]+r+': 'lion',
