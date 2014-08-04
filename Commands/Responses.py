@@ -96,7 +96,6 @@ class Responses(CommandInterface):
                                              "IT'S FINE, EVERYTHING IS FINE",
                                              "([^a-zA-Z]|^)everything('?s| is) fine([^a-zA-Z]|$)"))
 
-
             #This one needs to mess with the object to work right.
             '''Responds to DuctTape being a dick in minecraft'''
             def ducktapeMatch(message):
@@ -104,10 +103,10 @@ class Responses(CommandInterface):
                 self.ductMatch = re.search('([^a-zA-Z]|^)(?P<duc>duc[kt]tape)([^a-zA-Z]|$)', message, re.IGNORECASE)
                 return match and self.ductMatch
 
-            def ducktapeTalkwords(chatMessage):
+            def ducktapeTalkwords(message):
                 return [IRCResponse(ResponseType.Say,
                                     'Just saying, %s is a dick in Minecraft' % self.ductMatch.group('duc'),
-                                    chatMessage.ReplyTo)]
+                                    message.ReplyTo)]
 
             ducktape = MobroResponse('ducktape', '', '')
             ducktape.match = ducktapeMatch
@@ -116,81 +115,71 @@ class Responses(CommandInterface):
 
             '''Responds randomly to various animal sounds'''
             def animalMatch(message):
-                woofMatch = re.search('^([w|W][o|O|0]{2,}[f|F])$', message, re.IGNORECASE)
-                squeakMatch = re.search('^([s|S|5][q|Q][u|U][e|E|3][a|A|4][k|K])$', message, re.IGNORECASE)
-                mooMatch = re.search('^([m|M][o|O|0]{2,})$', message, re.IGNORECASE)
-                tweetMatch = re.search('^([t|T][w|W][e|E|3]{2,}[t|T])$', message, re.IGNORECASE)
-                cawMatch = re.search('^([c|C][a|A|4][w|W]{1,})$', message, re.IGNORECASE)
-                neighMatch = re.search('^([n|N][e|E|3][i|I|1]{1,}[g|G][h|H])$', message, re.IGNORECASE)
-                ribbitMatch = re.search('^([r|R][i|I|1][b|B]{2,}[i|I|1]{1,}[t|T])$', message, re.IGNOECASE)
-                bloopMatch = re.search('^([b|B][l|L][o|O|0]{2,}[p|P])$', message, re.IGNORECASE)
-                oinkMatch = re.search('^([o|O|0][i|I|1][n|N][k|K]{1,})$', message, re.IGNORECASE)
-                honkMatch = re.search('^([h|H][o|O|0]{1,}[n|N][k|K])$', message, re.IGNORECASE)
-                hissMatch = re.search('^([h|H][i|I|1][s|S|5]{2,})$', message, re.IGNORECASE)
-                roarMatch = re.search('^([r|R][o|O|0]{1,}[a|A|4][r|R])$', message, re.IGNORECASE)
-                howlMatch = re.search('^([h|H][o|O|0][w|W]{1,}[l|L])$', message, re.IGNORECASE)
-                awoooMatch = re.search('^([a|A|4][w|W][o|O|0]{3,})$', message, re.IGNORECASE)
-                if (woofMatch is not None):
-                    animal = "dog"
-                elif (squeakMatch is not None):
-                    animal = "mouse"
-                elif (mooMatch is not None):
-                    animal = "cow"
-                elif ((tweetMatch is not None) or (cawMatch is not None)):
-                    animal = "bird"
-                elif (neighMatch is not None):
-                    animal = "horse"
-                elif (ribbitMatch is not None):
-                    animal = "frog"
-                elif (bloopMatch is not None):
-                    animal = "fish"
-                elif (oinkMatch is not None):
-                    animal = "pig"
-                elif (honkMatch is not None):
-                    animal = "goose"
-                elif (hissMatch is not None):
-                    animal = "snake"
-                elif (roarMatch is not None):
-                    animal = "lion"
-                elif ((howlMatch is not None) or (awoooMatch is not None)):
-                    animal = "wolf"
+                matchDict = {
+                    'w[o0]{2,}f': 'dog',
+                    '[s5]qu[e3][a4]k': 'mouse',
+                    'm[o0]{2,}': 'cow',
+                    '(tw[e3]{2,}t|c[a4]+w+)': 'bird',
+                    'n[e3]+[i1]+gh': 'horse',
+                    'r[i1]+b{2,}[i1]+t': 'ribbit',
+                    'bl[o0]{2,}p': 'fish',
+                    '[o0]+[i1]+n+k+': 'pig',
+                    'h[o0]+n+k+': 'goose',
+                    'h[i1]+[s5]{2,}': 'snake',
+                    'r+[o0]+[a4]+r+': 'lion',
+                    '(h[o0]+w+l+|[a4]+w[o0]{3,})': 'wolf',
+                }
+
+                self.animal = None
+                for match, animal in matchDict.iteritems():
+                    if re.match('^{}[^\sa-z]+$'.format(match), message.MessageString, re.IGNORECASE):
+                        self.animal = animal
+                        return True
+
+                return False
+
+            def animalTalkwords(message):
+                randomChance = random.randint(1, 20)
+                if randomChance == 1:
+                    ''' User Critically Failed '''
+                    return [IRCResponse(ResponseType.Say,
+                                        'You critically fail at being a {}.'.format(self.animal),
+                                        message.ReplyTo)]
+
+                elif randomChance <= 8:
+                    ''' User Is Not A [animal] '''
+                    return [IRCResponse(ResponseType.Say,
+                                        'You are not a {}.'.format(self.animal),
+                                        message.ReplyTo)]
+                elif randomChance <= 14:
+                    '''User Might Be A [animal] '''
+                    return [IRCResponse(ResponseType.Say,
+                                        'You /might/ be a {}.'.format(self.animal),
+                                        message.ReplyTo)]
+                elif randomChance <= 19:
+                    ''' User Is A [animal] '''
+                    return [IRCResponse(ResponseType.Say,
+                                        'You are DEFINITELY a {}.'.format(self.animal),
+                                        message.ReplyTo)]
+                elif randomChance == 20:
+                    ''' User Is A Critical [animal] '''
+                    return [IRCResponse(ResponseType.Say,
+                                        'You are a CRITICAL {}!'.format(self.animal),
+                                        message.ReplyTo)]
                 else:
-                    animal = None
-                return animal
-            
-            if (animalMatch is not None):
-                randomChance = random.randint(1,20)
-                    if (randomChance == 1):
-                        ''' User Critically Failed '''
-                        return [IRCResponse(ResponseType.Say,
-                                            'You critically fail at being a ' + animal + '.'),
-                                            chatMessage.ReplyTo]
-                    
-                    elif ((randomChance >= 2) and (randomChance <= 8)):
-                        ''' User Is Not A [animal] '''
-                        return [IRCResponse(ResponseType.Say,
-                                            'You are not a ' + animal + '.',
-                                            chatMessage.ReplyTo)]
-                    elif ((dogRandomChance >= 9) and (dogRandomChance <= 14)):
-                        '''User Might Be A [animal] '''
-                        return [IRCResponse(ResponseType.Say,
-                                            'You /might/ be a ' + animal + '.',
-                                            chatMessage.ReplyTo)]
-                    elif ((dogRandoMChance >= 15) and (dogRandomChance <= 20)):
-                        ''' User IS A [animal] '''
-                        return [IRCResponse(ResponseType.Say,
-                                            'You are DEFINITELY a ' + animal + '.',
-                                            chatMessage.ReplyTo)]
-                    else:
-                        ''' Roll is outside of bounds, Magic! '''
-                        return [IRCResponse(ResponseType.Say,
-                                            'You are clearly a Magician rolling out of bounds like that.',
-                                            chatMessage.ReplyTo)]
+                    ''' Roll is outside of bounds, Magic! '''
+                    return [IRCResponse(ResponseType.Say,
+                                        'You are clearly a Magician rolling out of bounds like that.',
+                                        message.ReplyTo)]
+
+            animalResponse = MobroResponse('animal', '', '')
+            animalResponse.match = animalMatch
+            animalResponse.talkwords = animalTalkwords
+            self.responses.add(animalResponse)
 
             '''Responds to boops'''
-
             def boopMatch(message):
-                match = re.search('([^a-zA-Z]|^)b[o0][o0]+ps?([^a-zA-Z]|$)', message, re.IGNORECASE)
+                match = re.search('(^|[^a-z]+)b[o0]{2,}ps?([^a-z]+|$)', message, re.IGNORECASE)
                 return match
 
             def boopTalkwords(message):
@@ -255,7 +244,7 @@ class Responses(CommandInterface):
                     "http://i.imgur.com/CqTlFaX.gif",   # snow leopard boops a cat, then flees
                 ]
                 return [IRCResponse(ResponseType.Say,
-                                    'Boop! %s' % random.choice(boops),
+                                    'Boop! {}'.format(random.choice(boops)),
                                     message.ReplyTo)]
 
             boop = MobroResponse('boop', '', '', ResponseType.Say, True, 120, True)
