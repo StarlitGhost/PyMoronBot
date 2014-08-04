@@ -116,23 +116,23 @@ class Responses(CommandInterface):
             '''Responds randomly to various animal sounds'''
             def animalMatch(message):
                 matchDict = {
-                    'w[o0]{2,}f': 'dog',
-                    '[s5]qu[e3][a4]k': 'mouse',
-                    'm[o0]{2,}': 'cow',
-                    '(tw[e3]{2,}t|c[a4]+w+)': 'bird',
-                    'n[e3]+[i1]+gh': 'horse',
-                    'r[i1]+b{2,}[i1]+t': 'ribbit',
-                    'bl[o0]{2,}p': 'fish',
-                    '[o0]+[i1]+n+k+': 'pig',
-                    'h[o0]+n+k+': 'goose',
-                    'h[i1]+[s5]{2,}': 'snake',
-                    'r+[o0]+[a4]+r+': 'lion',
-                    '(h[o0]+w+l+|[a4]+w[o0]{3,})': 'wolf',
+                    r'w[o0]{2,}f': 'dog',
+                    r'[s5]qu[e3][a4]k': 'mouse',
+                    r'm[o0]{2,}': 'cow',
+                    r'(tw[e3]{2,}t|c[a4]+w+)': 'bird',
+                    r'n[e3]+[i1]+gh': 'horse',
+                    r'r[i1]+b{2,}[i1]+t': 'frog',
+                    r'bl[o0]{2,}p': 'fish',
+                    r'[o0]+[i1]+n+k+': 'pig',
+                    r'h[o0]+n+k+': 'goose',
+                    r'h[i1]+[s5]{2,}': 'snake',
+                    r'r+[o0]+[a4]+r+': 'lion',
+                    r'(h[o0]+w+l+|[a4]+w[o0]{3,})': 'wolf',
                 }
 
                 self.animal = None
                 for match, animal in matchDict.iteritems():
-                    if re.search('^{}[^\sa-z]+$'.format(match), message, re.IGNORECASE):
+                    if re.search(r'^{}([^\sa-z]+)?$'.format(match), message, re.IGNORECASE):
                         self.animal = animal
                         return True
 
@@ -143,28 +143,28 @@ class Responses(CommandInterface):
                 if randomChance == 1:
                     ''' User Critically Failed '''
                     return [IRCResponse(ResponseType.Say,
-                                        'You critically fail at being a {}.'.format(self.animal),
+                                        '{} critically fails at being a {}'.format(message.User.Name, self.animal),
                                         message.ReplyTo)]
 
                 elif randomChance <= 8:
                     ''' User Is Not A [animal] '''
                     return [IRCResponse(ResponseType.Say,
-                                        'You are not a {}.'.format(self.animal),
+                                        '{} is not a {}'.format(message.User.Name, self.animal),
                                         message.ReplyTo)]
                 elif randomChance <= 14:
                     '''User Might Be A [animal] '''
                     return [IRCResponse(ResponseType.Say,
-                                        'You /might/ be a {}.'.format(self.animal),
+                                        '{} /might/ be a {}'.format(message.User.Name, self.animal),
                                         message.ReplyTo)]
                 elif randomChance <= 19:
                     ''' User Is A [animal] '''
                     return [IRCResponse(ResponseType.Say,
-                                        'You are DEFINITELY a {}.'.format(self.animal),
+                                        '{} is DEFINITELY a {}'.format(message.User.Name, self.animal),
                                         message.ReplyTo)]
                 elif randomChance == 20:
                     ''' User Is A Critical [animal] '''
                     return [IRCResponse(ResponseType.Say,
-                                        'You are a CRITICAL {}!'.format(self.animal),
+                                        '{} is a CRITICAL {}!'.format(message.User.Name, self.animal),
                                         message.ReplyTo)]
                 else:
                     ''' Roll is outside of bounds, Magic! '''
@@ -172,7 +172,7 @@ class Responses(CommandInterface):
                                         'You are clearly a Magician rolling out of bounds like that.',
                                         message.ReplyTo)]
 
-            animalResponse = MobroResponse('animal', '', '')
+            animalResponse = MobroResponse('animal', '', '', seconds=0)
             animalResponse.match = animalMatch
             animalResponse.talkwords = animalTalkwords
             self.responses.add(animalResponse)
@@ -247,7 +247,7 @@ class Responses(CommandInterface):
                                     'Boop! {}'.format(random.choice(boops)),
                                     message.ReplyTo)]
 
-            boop = MobroResponse('boop', '', '', ResponseType.Say, True, 120, True)
+            boop = MobroResponse('boop', '', '', seconds=120)
             boop.match = boopMatch
             boop.talkwords = boopTalkwords
             self.responses.add(boop)
