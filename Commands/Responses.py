@@ -293,6 +293,10 @@ class Responses(CommandInterface):
                         enabled.append(name)
                     else:
                         disabled.append(name)
+                        
+                enabled = sorted(enabled)
+                disabled = sorted(disabled)
+                
                 return [IRCResponse(ResponseType.Say,
                                     'Enabled responses: {}'.format(', '.join(enabled)),
                                     message.ReplyTo),
