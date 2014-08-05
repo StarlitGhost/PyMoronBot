@@ -280,10 +280,26 @@ class Responses(CommandInterface):
             match = re.search('^responses?$', message.Command, re.IGNORECASE)
             if not match:
                 return
-            enableds = []
-            for param in message.ParameterList:
-                enableds.append(self.responses.toggle(param, message))
-            return enableds
+            if len(message.ParameterList) > 0:
+                enableds = []
+                for param in message.ParameterList:
+                    enableds.append(self.responses.toggle(param, message))
+                return enableds
+            else:
+                enabled = []
+                disabled = []
+                for name, response in self.responses.dict.iteritems():
+                    if response.enabled:
+                        enabled.append(name)
+                    else:
+                        disabled.append(name)
+                return [IRCResponse(ResponseType.Say,
+                                    'Enabled responses: {}'.format(', '.join(enabled)),
+                                    message.ReplyTo),
+                        IRCResponse(ResponseType.Say,
+                                    'Disabled responses: {}'.format(', '.join(disabled)),
+                                    message.ReplyTo)]
+                
         else:
             triggers = []
             for response in self.responses.dict:
