@@ -144,28 +144,28 @@ class Responses(CommandInterface):
                 if randomChance == 1:
                     ''' User Critically Failed '''
                     return [IRCResponse(ResponseType.Say,
-                                        '{} critically fails at being a {}'.format(message.User.Name, self.animal).'.',
+                                        '{} critically fails at being a {}.'.format(message.User.Name, self.animal),
                                         message.ReplyTo)]
 
                 elif randomChance <= 8:
                     ''' User Is Not A [animal] '''
                     return [IRCResponse(ResponseType.Say,
-                                        '{} is not a {}'.format(message.User.Name, self.animal).'.',
+                                        '{} is not a {}.'.format(message.User.Name, self.animal),
                                         message.ReplyTo)]
                 elif randomChance <= 14:
                     '''User Might Be A [animal] '''
                     return [IRCResponse(ResponseType.Say,
-                                        '{} /might/ be a {}'.format(message.User.Name, self.animal).'.',
+                                        '{} /might/ be a {}.'.format(message.User.Name, self.animal),
                                         message.ReplyTo)]
                 elif randomChance <= 19:
                     ''' User Is A [animal] '''
                     return [IRCResponse(ResponseType.Say,
-                                        '{} is DEFINITELY a {}'.format(message.User.Name, self.animal).'.',
+                                        '{} is DEFINITELY a {}.'.format(message.User.Name, self.animal),
                                         message.ReplyTo)]
                 elif randomChance == 20:
                     ''' User Is A Critical [animal] '''
                     return [IRCResponse(ResponseType.Say,
-                                        '{} is a CRITICAL {}!'.format(message.User.Name, self.animal).'.',
+                                        '{} is a CRITICAL {}!'.format(message.User.Name, self.animal),
                                         message.ReplyTo)]
                 else:
                     ''' Roll is outside of bounds, Magic! '''
