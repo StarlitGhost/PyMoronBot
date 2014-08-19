@@ -131,6 +131,7 @@ class Responses(CommandInterface):
                     r'(bl[e3]{2,}p\s+bl[o0]{2,}p)': 'droid',
                     r'(y[a4]r{2,})': 'pirate',
                     r'(qu[a4]{1,}ck)': 'duck',
+                    r'(wh[o0]{1,})': 'owl',
                 }
 
                 self.animal = None
