@@ -147,48 +147,48 @@ class Responses(CommandInterface):
                     ''' User Critically Failed '''
                     if (self.animal == 'droid'):
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is DEFINITELY NOT the Droid you are looking for'.format(message.User.Name),
+                                            '{} is DEFINITELY NOT the Droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} critically fails at being a {}'.format(message.User.Name, self.animal),
+                                            '{} critically fails at being a {}.'.format(message.User.Name, self.animal),
                                             message.ReplyTo)]
 
                 elif randomChance <= 8:
                     ''' User Is Not A [animal] '''
                     if (self.animal == 'droid'):
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is not the Droid you are looking for'.format(message.User.Name),
+                                            '{} is not the Droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is not a {}'.format(message.User.Name, self.animal),
+                                            '{} is not a {}.'.format(message.User.Name, self.animal),
                                             message.ReplyTo)]
                 elif randomChance <= 14:
                     '''User Might Be A [animal] '''
                     if (self.animal == 'droid'):
                         return [IRCResponse(ResponseType.Say,
-                                            '{} might be the Droid you are looking for'.format(message.User.Name),
+                                            '{} might be the Droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} /might/ be a {}'.format(message.User.Name, self.animal),
+                                            '{} /might/ be a {}.'.format(message.User.Name, self.animal),
                                             message.ReplyTo)]
                 elif randomChance <= 19:
                     ''' User Is A [animal] '''
                     if (self.animal == 'droid'):
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is the Droid you are looking for'.format(message.User.Name),
+                                            '{} is the Droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is DEFINITELY a {}'.format(message.User.Name, self.animal),
+                                            '{} is DEFINITELY a {}.'.format(message.User.Name, self.animal),
                                             message.ReplyTo)]
                 elif randomChance == 20:
                     ''' User Is A Critical [animal] '''
                     if (self.animal == 'droid'):
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is DEFINITELY the Droid you are looking for'.format(message.User.Name),
+                                            '{} is DEFINITELY the Droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
