@@ -128,7 +128,7 @@ class Responses(CommandInterface):
                     r'h[i1]+[s5]{2,}': 'snake',
                     r'r+[o0]+[a4]+r+': 'lion',
                     r'(h[o0]+w+l+|[a4]+w[o0]{3,})': 'wolf',
-                    r'(bl[e3]{2,}+p bl[o0]{2,}p)': 'droid',
+                    r'(bl[e3]{2,}p\s+bl[o0]{2,}p)': 'droid',
                 }
 
                 self.animal = None
@@ -142,7 +142,7 @@ class Responses(CommandInterface):
             def animalTalkwords(message):
                 randomChance = random.randint(1, 20)
                 if (message.User.Name == 'Emily'):
-                    randomChance = random.randint(1,25)
+                    randomChance = random.randint(1, 25)
                 if randomChance == 1:
                     ''' User Critically Failed '''
                     if (self.animal == 'droid'):
@@ -151,7 +151,7 @@ class Responses(CommandInterface):
                                             message.ReplyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} critically fails at being a {}'.format(message.User.Name, self.animal).,
+                                            '{} critically fails at being a {}'.format(message.User.Name, self.animal),
                                             message.ReplyTo)]
 
                 elif randomChance <= 8:
