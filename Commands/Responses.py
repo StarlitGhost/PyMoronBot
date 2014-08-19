@@ -113,6 +113,32 @@ class Responses(CommandInterface):
             ducktape.talkwords = ducktapeTalkwords
             self.responses.add(ducktape)
 
+            '''Responds randomly to various animal sounds'''
+            def animalMatch(message):
+                matchDict = {
+                    r'(w[o0]{2,}f|r+u+f{2,}|[a4]rf)': 'puppeh',
+                    r'[s5]qu[e3][a4]k': 'mouse',
+                    r'm[o0]{2,}': 'cow',
+                    r'(tw[e3]{2,}t|c[a4]+w+)': 'bird',
+                    r'n[e3]+[i1]+gh': 'horse',
+                    r'r[i1]+b{2,}[i1]+t': 'frog',
+                    r'bl[o0]{2,}p': 'fish',
+                    r'[o0]+[i1]+n+k+': 'piggy',
+                    r'h[o0]+n+k+': 'goose',
+                    r'h[i1]+[s5]{2,}': 'snake',
+                    r'r+[o0]+[a4]+r+': 'lion',
+                    r'(h[o0]+w+l+|[a4]+w[o0]{3,})': 'wolf',
+                    r'(bl[e3]{2,}+p bl[o0]{2,}p)': 'droid',
+                }
+
+                self.animal = None
+                for match, animal in matchDict.iteritems():
+                    if re.search(r'^{}([^\sa-z]+)?$'.format(match), message, re.IGNORECASE):
+                        self.animal = animal
+                        return True
+
+                return False
+
             def animalTalkwords(message):
                 randomChance = random.randint(1, 20)
                 if (message.User.Name == 'Emily'):
