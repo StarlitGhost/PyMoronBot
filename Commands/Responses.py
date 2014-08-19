@@ -127,8 +127,10 @@ class Responses(CommandInterface):
                     r'h[o0]+n+k+': 'goose',
                     r'h[i1]+[s5]{2,}': 'snake',
                     r'r+[o0]+[a4]+r+': 'lion',
-                    r'(h[o0]+w+l+|[a4]+w[o0]{3,})': 'wolf',
+                    r'(h[o0]+w+l+|[a4]+w[o0]{3,}|[a4]o{2,})': 'wolf',
                     r'(bl[e3]{2,}p\s+bl[o0]{2,}p)': 'droid',
+                    r'(y[a4]r{2,})': 'pirate',
+                    r'(qu[a4]{1,}ck)': 'duck',
                 }
 
                 self.animal = None
