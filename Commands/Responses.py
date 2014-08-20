@@ -127,11 +127,11 @@ class Responses(CommandInterface):
                     r'h[o0]+n+k+': 'goose',
                     r'h[i1]+[s5]{2,}': 'snake',
                     r'r+[o0]+[a4]+r+': 'lion',
-                    r'(h[o0]+w+l+|[a4]+w[o0]{3,}|[a4]o{2,})': 'wolf',
-                    r'(bl[e3]{2,}p\s+bl[o0]{2,}p)': 'droid',
-                    r'(y[a4]r{2,})': 'pirate',
-                    r'(qu[a4]{1,}ck)': 'duck',
-                    r'(wh[o0]{1,})': 'owl',
+                    r'(h[o0]+w+l+|[a4]+w?[o0]{2,})': 'wolf',
+                    r'bl[e3]{2,}p\s+bl[o0]{2,}p': 'droid',
+                    r'y?[a4]r{2,})': 'pirate',
+                    r'qu[a4]+ck': 'duck',
+                    r'wh[o0]{2,}': 'owl',
                 }
 
                 self.animal = None
@@ -144,11 +144,11 @@ class Responses(CommandInterface):
 
             def animalTalkwords(message):
                 randomChance = random.randint(1, 20)
-                if (message.User.Name == 'Emily'):
+                if message.User.Name == 'Emily':
                     randomChance = random.randint(1, 25)
                 if randomChance == 1:
                     ''' User Critically Failed '''
-                    if (self.animal == 'droid'):
+                    if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
                                             '{} is DEFINITELY NOT the Droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
@@ -159,7 +159,7 @@ class Responses(CommandInterface):
 
                 elif randomChance <= 8:
                     ''' User Is Not A [animal] '''
-                    if (self.animal == 'droid'):
+                    if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
                                             '{} is not the Droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
@@ -169,7 +169,7 @@ class Responses(CommandInterface):
                                             message.ReplyTo)]
                 elif randomChance <= 14:
                     '''User Might Be A [animal] '''
-                    if (self.animal == 'droid'):
+                    if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
                                             '{} might be the Droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
@@ -179,11 +179,11 @@ class Responses(CommandInterface):
                                             message.ReplyTo)]
                 elif randomChance <= 19:
                     ''' User Is A [animal] '''
-                    if (self.animal == 'droid'):
+                    if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
                                             '{} is the Droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
-                    elif (self.animal == 'puppeh'):
+                    elif self.animal == 'puppeh':
                         return [IRCResponse(ResponseType.Say,
                                             '{} is such doge. wow.'.format(message.User.Name),
                                             message.ReplyTo)]
@@ -193,7 +193,7 @@ class Responses(CommandInterface):
                                             message.ReplyTo)]
                 elif randomChance == 20:
                     ''' User Is A Critical [animal] '''
-                    if (self.animal == 'droid'):
+                    if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
                                             '{} is DEFINITELY the Droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
