@@ -19,7 +19,7 @@ class Down(CommandInterface):
             return IRCResponse(ResponseType.Say, "You didn't give a URL! Usage: {0}".format(self.help), message.ReplyTo)
 
         url = message.Parameters
-        if url.startsWith("https://"):
+        if url.startswith("https://"):
             url = url[8:]
 
         webPage = WebUtils.fetchURL('http://www.downforeveryoneorjustme.com/{0}'.format(url))
