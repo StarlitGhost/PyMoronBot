@@ -141,7 +141,7 @@ class URLFollow(CommandInterface):
         else:
             url = 'https://api.imgur.com/3/image/{0}'.format(imgurID)
 
-        headers = {'Authorization': 'Client-ID {0}'.format(self.imgurClientID)}
+        headers = [('Authorization': 'Client-ID {0}'.format(self.imgurClientID))]
         
         webPage = WebUtils.fetchURL(url, headers)
         
