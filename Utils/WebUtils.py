@@ -59,7 +59,7 @@ def fetchURL(url, extraHeaders=None):
     if extraHeaders:
         for header in extraHeaders:
             # For whatever reason headers are defined in a different way in opener than they are in a normal urlopen
-            headers.append((header, extraHeaders[header]))
+            headers.append(header)
     try:
         opener = build_opener()
         opener.addheaders = headers
