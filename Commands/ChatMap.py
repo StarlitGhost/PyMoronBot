@@ -79,12 +79,14 @@ class ChatMap(CommandInterface):
 
         year = ''.join(message.ParameterList[1:])
         if not StringUtils.isNumber(year):
-            return 'the desert bus year should only be numeric (1-7)'
+            return 'the desert bus year should only be numeric (1-8)'
 
         year = int(year)
 
-        if not -1 < year < 8:
-            return 'the desert bus year should only be for valid years (1 -> 7)'
+        if year >= 2010:
+            year -= 2006
+        if not 4 <= year <= 8:
+            return 'the desert bus year should only be for valid years (4 -> 8)'
 
         db = create_database("mysql://{0}:{1}@{2}:{3}/{4}".format(self.chatMapDB['User'],
                                                                   self.chatMapDB['Password'],
