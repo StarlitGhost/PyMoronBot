@@ -38,7 +38,7 @@ class Sed(CommandInterface):
         """
         @type message: IRCMessage
         """
-        if message.Command.lower() == 'sed':
+        if message.Command.lower() in self.triggers:
             match = self.match(message.Parameters)
         else:
             match = self.match(message.MessageString)
