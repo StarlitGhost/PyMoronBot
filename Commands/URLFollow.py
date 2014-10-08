@@ -18,6 +18,7 @@ from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
 class URLFollow(CommandInterface):
+    triggers = ['urlfollow', 'follow']
     acceptedTypes = ['PRIVMSG', 'ACTION']
     help = 'automatic function that follows urls and grabs information about the resultant webpage'
     runInThread = True
@@ -49,7 +50,10 @@ class URLFollow(CommandInterface):
         """
         @type message: IRCMessage
         """
-        match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.MessageString, re.IGNORECASE)
+        if message.Command.lower() in self.triggers:
+            match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.Parameters, re.IGNORECASE)
+        else:
+            match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.MessageString, re.IGNORECASE)
         if not match:
             return
 
