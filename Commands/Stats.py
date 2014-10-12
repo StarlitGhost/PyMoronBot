@@ -19,7 +19,5 @@ class Command(CommandInterface):
         @type message: IRCMessage
         """
         return IRCResponse(ResponseType.Say,
-                           'sss: http://www.moronic-works.co.uk/ | '
-                           #'pisg: http://silver.amazon.fooproject.net/pisg/desertbus.html | '
                            'pisg: http://pisg.michael-wheeler.org/desertbus.html',
                            message.ReplyTo)
