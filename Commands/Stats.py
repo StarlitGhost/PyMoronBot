@@ -10,7 +10,7 @@ from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
 
 
-class Command(CommandInterface):
+class Stats(CommandInterface):
     triggers = ['stats']
     help = 'stats - Responds with a link to the chat stats webpage(s)'
 
