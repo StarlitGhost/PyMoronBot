@@ -19,5 +19,5 @@ class Stats(CommandInterface):
         @type message: IRCMessage
         """
         return IRCResponse(ResponseType.Say,
-                           'pisg: http://pisg.michael-wheeler.org/desertbus.html',
+                           'pisg: http://pisg.michael-wheeler.org/desertbus.html | Add your aliases here https://github.com/TheSkorm/pisg-config/blob/master/pisg.cfg (or ask someone with a GitHub account)',
                            message.ReplyTo)
