@@ -431,6 +431,6 @@ class MobroResponseDict(object):
         self.dict[mbr.name] = mbr
 
     def toggle(self, name, chatMessage=IRCMessage):
-        if name in self.dict:
+        if name.lower() in self.dict:
             return self.dict[name.lower()].toggle(chatMessage)
         return
