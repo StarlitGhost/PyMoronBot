@@ -22,6 +22,9 @@ class IRCResponse(object):
             self.Response = unicode(response, 'utf-8')
         except TypeError:  # Already utf-8?
             self.Response = response
-        self.Target = target
+        try:
+            self.Target = unicode(target, 'utf-8')
+        except TypeError:  # Already utf-8?
+            self.Target = target
 
         self.ExtraVars = extraVars
