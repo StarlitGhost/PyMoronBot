@@ -43,6 +43,12 @@ class Chain(CommandInterface):
                 # replace $output with empty string if previous command had no output
                 # (or this is the first command in the chain, but for some reason has $output as a param)
                 link = link.replace('$output', '')
+            
+            link = link.replace('$sender', message.User.Name)
+            if message.Channel is not None:
+                link = link.replace('$channel', message.Channel.Name)
+            else:
+                link = link.replace('$channel', message.User.Name)
 
             # build a new message out of this 'link' in the chain
             inputMessage = IRCMessage(message.Type, message.User.String, message.Channel,
