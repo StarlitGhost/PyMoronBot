@@ -101,7 +101,7 @@ class Sed(CommandInterface):
             if new != message.MessageString:
                 newMessage = copy.copy(message)
                 newMessage.MessageString = new
-                self.storeMessage(newMessage, channel, False)
+                self.storeMessage(newMessage, False)
                 return newMessage
 
         return None
