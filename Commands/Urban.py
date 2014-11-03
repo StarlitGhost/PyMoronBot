@@ -37,8 +37,6 @@ class Urban(CommandInterface):
         webPage = WebUtils.fetchURL(url)
 
         soup = BeautifulSoup(webPage.body)
-        # replace link tags with their contents
-        [a.unwrap() for a in soup.find_all('a')]
 
         box = soup.find('div', {'class': 'box'})
 
@@ -48,6 +46,9 @@ class Urban(CommandInterface):
         graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
         word = box.find('a', {'class': 'word'}).text.strip()
+        
+        # replace link tags with their contents
+        [a.unwrap() for a in box.find_all('a')]
 
         # 2014-01-28 really, urban dictionary? 'definition' to 'meaning'? what an important change!
         definition = box.find('div', {'class': 'meaning'})
