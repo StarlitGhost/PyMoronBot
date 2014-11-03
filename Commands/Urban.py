@@ -63,7 +63,7 @@ class Urban(CommandInterface):
 
         author = box.find('div', {'class': 'contributor'}).text.strip().replace('\n', ' ')
 
-        counts = box.find('div', {'class': 'thumbs-counts'}).find_all('span', {'class': 'count'})
+        counts = box.find('div', {'class': 'def-footer'}).find_all('span', {'class': 'count'})
         up = counts[0].text
         down = counts[1].text
 
