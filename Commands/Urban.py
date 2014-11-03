@@ -47,7 +47,7 @@ class Urban(CommandInterface):
 
         graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
-        word = box.find('div', {'class': 'word'}).text.strip()
+        word = box.find('a', {'class': 'word'}).text.strip()
 
         # 2014-01-28 really, urban dictionary? 'definition' to 'meaning'? what an important change!
         definition = box.find('div', {'class': 'meaning'})
