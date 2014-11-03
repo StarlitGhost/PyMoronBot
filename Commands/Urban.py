@@ -48,10 +48,10 @@ class Urban(CommandInterface):
         word = defn['word']
         
         definition = defn['definition']
-        definition = graySplitter.join([s.strip() for s in definition.text.strip().split('\n')])
+        definition = graySplitter.join([s.strip() for s in definition.strip().split('\r\n')])
 
         example = defn['example']
-        example = graySplitter.join([s.strip() for s in example.text.strip().split('\n')])
+        example = graySplitter.join([s.strip() for s in example.strip().split('\r\n')])
 
         author = defn['author']
 
