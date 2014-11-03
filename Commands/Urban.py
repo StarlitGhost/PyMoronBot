@@ -6,6 +6,7 @@ Created on Jan 24, 2014
 """
 
 import urllib
+import json
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
