@@ -57,7 +57,12 @@ class Flip(CommandInterface):
             u"'": u',',
             u'"': u'„',
             u'!': u'¡',
-            u'?': u'¿'
+            u'?': u'¿',
+            u'<': u'>',
+            u'(': u')',
+            u'[': u']',
+            u'_': u'‾',
+            u'/': u'\\'
         }
         # Create and append the inverse dictionary
         table.update({v: k for k,v in table.iteritems()})
