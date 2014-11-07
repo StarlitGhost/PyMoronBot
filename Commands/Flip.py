@@ -50,7 +50,7 @@ class Flip(CommandInterface):
             u'5': u'5',
             u'6': u'9',
             u'7': u'Ɫ',
-            u'8': u'B',
+            u'8': u'8',
             u'9': u'6',
             u'.': u'˙',
             u',': u"'",
