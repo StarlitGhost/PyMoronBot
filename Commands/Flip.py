@@ -61,7 +61,7 @@ class Flip(CommandInterface):
         }
         # Create and append the inverse dictionary
         table.update({v: k for k,v in table.iteritems()})
-        self.translation = maketrans(u''.join(table.keys()), u''.join(table.values()))
+        self.translation = {ord(k): v for k,v in table.iteritems()}
 
     def execute(self, message):
         """
