@@ -23,7 +23,6 @@ class Sed(CommandInterface):
     historySize = 20
 
     def onLoad(self):
-        #TODO: make these per-channel
         self.messages = {}
         self.unmodifiedMessages = {}
 
