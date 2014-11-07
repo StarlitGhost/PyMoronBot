@@ -17,7 +17,7 @@ class Flip(CommandInterface):
     def onLoad(self):
         table = {
             u'a': u'ɐ',    u'A': u'∀',
-            u'b': u'q',    u'B': u'8',
+            u'b': u'q',    u'B': u'ᗺ',
             u'c': u'ɔ',    u'C': u'Ↄ',
             u'd': u'p',    u'D': u'◖',
             u'e': u'ǝ',    u'E': u'Ǝ',
@@ -43,8 +43,8 @@ class Flip(CommandInterface):
             u'y': u'ʎ',    u'Y': u'⅄',
             u'z': u'z',    u'Z': u'Z',
             u'0': u'0',
-            u'1': u'1',
-            u'2': u'2',
+            u'1': u'⇂',
+            u'2': u'ᘔ',
             u'3': u'Ɛ',
             u'4': u'ᔭ',
             u'5': u'5',
@@ -61,6 +61,7 @@ class Flip(CommandInterface):
             u'<': u'>',
             u'(': u')',
             u'[': u']',
+            u'{': u'}',
             u'_': u'‾',
         }
         # Create and append the inverse dictionary
