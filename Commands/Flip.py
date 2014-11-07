@@ -8,6 +8,7 @@ from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
 
+from string import maketrans
 
 class Flip(CommandInterface):
     triggers = ['flip']
