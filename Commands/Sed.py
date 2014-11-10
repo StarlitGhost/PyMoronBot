@@ -75,6 +75,7 @@ class Sed(CommandInterface):
         return search, replace, flags
 
     def substitute(self, search, replace, flags, channel):
+        # Apparently re.sub understands escape sequences in the replacement string; strip all but the backreferences
         replace = replace.replace('\\', '\\\\')
         replace = re.sub(r'\\([1-9][0-9]?([^0-9]|$))', r'\1', replace)
         
