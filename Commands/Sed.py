@@ -93,7 +93,7 @@ class Sed(CommandInterface):
             if 'v' in flags:
                 subFlags |= re.VERBOSE
 
-            replace = replace.replace(r'\', r'\\')
+            replace = replace.replace('\\', '\\\\')
             replace = re.sub(r'\\([1-9][0-9]?)', '\1', replace)
 
             new = re.sub(search, replace, message.MessageString, count, subFlags)
