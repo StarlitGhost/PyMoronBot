@@ -76,7 +76,7 @@ class Sed(CommandInterface):
 
     def substitute(self, search, replace, flags, channel):
         replace = replace.replace('\\', '\\\\')
-        replace = re.sub(r'\\([1-9][0-9]?)', r'\1', replace)
+        replace = re.sub(r'\\([1-9][0-9]?([^0-9]|$))', r'\1', replace)
         
         if channel not in self.messages:
             self.messages[channel] = []
