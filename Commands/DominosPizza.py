@@ -77,7 +77,7 @@ class DominosPizza(CommandInterface):
         steps = [u"{}'s pizza order has been placed",
                  u"{}'s pizza is being prepared",
                  u"{}'s pizza is in the oven",
-                 u"{}'s pizza is in quality control",
+                 u"{}'s pizza is sitting on a shelf, waiting for a driver",
                  u"{}'s pizza is out for delivery",
                  u"{}'s pizza has been delivered! Tracking stopped"]
 
