@@ -45,7 +45,7 @@ class Sed(CommandInterface):
 
         if match:
             search, replace, flags, text = match
-            response = self.substitute(search, replace, flags, text, message.ReplyTo)
+            response = self.substitute(search, replace, flags, text, message, message.ReplyTo)
 
             if response is not None:
                 responseType = ResponseType.Say
@@ -79,7 +79,7 @@ class Sed(CommandInterface):
             text = ''
         return search, replace, flags, text
 
-    def substitute(self, search, replace, flags, text, channel):
+    def substitute(self, search, replace, flags, text, inputMessage, channel):
         # Apparently re.sub understands escape sequences in the replacement string; strip all but the backreferences
         replace = replace.replace('\\', '\\\\')
         replace = re.sub(r'\\([1-9][0-9]?([^0-9]|$))', r'\1', replace)
@@ -104,7 +104,7 @@ class Sed(CommandInterface):
         if 'c' in flags:
             new = re.sub(search, replace, text, count, subFlags)
             if new != text:
-                newMessage = copy.copy(message)
+                newMessage = copy.copy(inputMessage)
                 newMessage.MessageString = new
                 self.storeMessage(newMessage, False)
                 return newMessage
