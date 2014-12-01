@@ -1,4 +1,17 @@
 PyMoronBot
 ==========
 
-Rewrite of MoronBot's core and functions in Python.
+A modular IRC bot, written in Python.
+Initially a language port/rewrite of [MoronBot](https://github.com/MatthewCox/MoronBot/), but now somewhat diverged.
+
+Features
+--------
+*
+
+Installation Instructions
+-------------------------
+<>
+
+Running the Bot
+---------------
+<>
