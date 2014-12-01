@@ -19,7 +19,7 @@ class Sed(CommandInterface):
     
     historySize = 20
     
-    help = 's/search/replacement/flags - matches sed-like regex replacement patterns and attempts to execute them on the latest matching line from the last {}\n'\
+    help = 's/search/replacement/[flags] [input for c flag] - matches sed-like regex replacement patterns and attempts to execute them on the latest matching line from the last {}\n'\
            'flags are g (global), i (case-insensitive), o (only user messages), v (verbose, ignores whitespace), c (chained)\n'\
            'Example usage: "I\'d eat some tacos" -> s/some/all the/ -> "I\'d eat all the tacos"'.format(historySize)
 
