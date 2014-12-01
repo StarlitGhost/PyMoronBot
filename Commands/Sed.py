@@ -103,13 +103,17 @@ class Sed(CommandInterface):
 
         if 'c' in flags:
             new = re.sub(search, replace, text, count, subFlags)
+            
+            newMessage = copy.copy(inputMessage)
+            
             if new != text:
-                newMessage = copy.copy(inputMessage)
                 newMessage.MessageString = new
                 self.storeMessage(newMessage, False)
-                return newMessage
             else:
-                return None
+                newMessage.MessageString = text
+                self.storeMessage(newMessage, False)
+            
+            return newMessage
 
         for message in reversed(messages):
             new = re.sub(search, replace, message.MessageString, count, subFlags)
