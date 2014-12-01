@@ -74,7 +74,7 @@ class Sed(CommandInterface):
         else:
             flags = ''
         if len(parts) >= 4:
-            text = ' '.join('/'.join(parts[3]).split(' ')[1:])
+            text = ' '.join('/'.join(parts[3:]).split(' ')[1:])
         else:
             text = ''
         return search, replace, flags, text
