@@ -96,7 +96,7 @@ class IRCMessage(object):
                 self.Parameters = u' '.join(self.MessageList[2:])
             else:
                 self.Parameters = u' '.join(self.MessageList[1:])
-        elif re.match('{}[:,]'.format(re.escape(bot.nickname)), self.MessageList[0], re.IGNORECASE):
+        elif re.match('{}[:,]?'.format(re.escape(bot.nickname)), self.MessageList[0], re.IGNORECASE):
             if len(self.MessageList) > 1:
                 self.Command = self.MessageList[1]
                 self.Parameters = u' '.join(self.MessageList[2:])
