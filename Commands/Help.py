@@ -16,12 +16,20 @@ class Help(CommandInterface):
         moduleHandler = self.bot.moduleHandler
 
         if len(message.ParameterList) > 0:
-            if message.ParameterList[0].lower() in moduleHandler.commandCaseMapping:
+            if message.ParameterList[0].lower() in moduleHandler.mappedTriggers:
+                func = moduleHandler.commands[moduleHandler.mappedTriggers[message.ParameterList[0].lower()]]
+                if isinstance(func.help, basestring):
+                    return IRCResponse(ResponseType.Say, func.help, message.ReplyTo)
+                else:
+                    return IRCResponse(ResponseType.Say, func.help(message), message.ReplyTo)
+
+            elif message.ParameterList[0].lower() in moduleHandler.commandCaseMapping:
                 func = moduleHandler.commands[moduleHandler.commandCaseMapping[message.ParameterList[0].lower()]]
                 if isinstance(func.help, basestring):
                     return IRCResponse(ResponseType.Say, func.help, message.ReplyTo)
                 else:
                     return IRCResponse(ResponseType.Say, func.help(message), message.ReplyTo)
+
             else:
                 return IRCResponse(ResponseType.Say,
                                    '"{0}" not found, try "{1}" without parameters '
