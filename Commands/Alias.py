@@ -14,11 +14,21 @@ import GlobalVars
 
 class Alias(CommandInterface):
     triggers = ['alias', 'unalias', 'aliases']
-    help = 'alias <alias> <command/alias> <params> - aliases <alias> to the specified command/alias and parameters\n' \
-           'you can specify where parameters given to the alias should be inserted with $1, $2, $n. ' \
-           'The whole parameter string is $0. $sender and $channel can also be used.'
     runInThread = True
-           
+    
+    def help(self, message):
+        """
+        @type message: IRCMessage
+        """
+        helpDict = {
+            u"alias":   u"alias <alias> <command/alias> <params> - aliases <alias> to the specified command/alias and parameters\n" \
+                        u"you can specify where parameters given to the alias should be inserted with $1, $2, $n. " \
+                        u"The whole parameter string is $0. $sender and $channel can also be used.",
+            u"unalias": u"unalias <alias> - deletes the alias <alias>",
+            u"aliases": u"aliases [<alias>] - lists all defined aliases, or the contents of the specified alias"
+        }
+        return helpDict[message.ParameterList[0]]
+    
     def onLoad(self):
         if 'Alias' not in self.bot.dataStore:
             self.bot.dataStore['Alias'] = {}
@@ -57,17 +67,17 @@ class Alias(CommandInterface):
 
         if message.ParameterList[0] in self.bot.moduleHandler.mappedTriggers:
             return IRCResponse(ResponseType.Say,
-                               "'{}' is already a command!".format(message.ParameterList[0]),
+                               u"'{}' is already a command!".format(message.ParameterList[0]),
                                message.ReplyTo)
         if message.ParameterList[0] in self.aliases:
             return IRCResponse(ResponseType.Say,
-                               "'{}' is already an alias!".format(message.ParameterList[0]),
+                               u"'{}' is already an alias!".format(message.ParameterList[0]),
                                message.ReplyTo)
 
         if message.ParameterList[1] not in self.bot.moduleHandler.mappedTriggers \
                 and message.ParameterList[1] not in self.aliases:
             return IRCResponse(ResponseType.Say,
-                               "'{}' is not a valid command or alias!".format(message.ParameterList[1]),
+                               u"'{}' is not a valid command or alias!".format(message.ParameterList[1]),
                                message.ReplyTo)
 
         newAlias = message.ParameterList[1:]
@@ -75,8 +85,8 @@ class Alias(CommandInterface):
         self._newAlias(message.ParameterList[0], newAlias)
 
         return IRCResponse(ResponseType.Say,
-                           "Created a new alias '{}' for '{}'.".format(message.ParameterList[0],
-                                                                       ' '.join(message.ParameterList[1:])),
+                           u"Created a new alias '{}' for '{}'.".format(message.ParameterList[0],
+                                                                        u' '.join(message.ParameterList[1:])),
                            message.ReplyTo)
 
     def _unalias(self, message):
@@ -88,25 +98,25 @@ class Alias(CommandInterface):
 
         if message.ParameterList[0] not in self.aliases:
             return IRCResponse(ResponseType.Say,
-                               "I don't have an alias called '{}'".format(message.ParameterList[0]),
+                               u"I don't have an alias called '{}'".format(message.ParameterList[0]),
                                message.ReplyTo)
 
         self._delAlias(message.ParameterList[0])
-        return IRCResponse(ResponseType.Say, "Deleted alias '{}'".format(message.ParameterList[0]), message.ReplyTo)
+        return IRCResponse(ResponseType.Say, u"Deleted alias '{}'".format(message.ParameterList[0]), message.ReplyTo)
 
     def _aliases(self, message):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
-                               "Current aliases: {}".format(', '.join(sorted(self.aliases.keys()))),
+                               u"Current aliases: {}".format(u', '.join(sorted(self.aliases.keys()))),
                                message.ReplyTo)
         elif message.ParameterList[0] in self.aliases:
             return IRCResponse(ResponseType.Say,
-                               "'{}' is aliased to: {}".format(message.ParameterList[0],
-                                                            ' '.join(self.aliases[message.ParameterList[0]])),
+                               u"'{}' is aliased to: {}".format(message.ParameterList[0],
+                                                                u' '.join(self.aliases[message.ParameterList[0]])),
                                message.ReplyTo)
         else:
             return IRCResponse(ResponseType.Say,
-                               "'{}' is not a recognized alias".format(message.ParameterList[0]),
+                               u"'{}' is not a recognized alias".format(message.ParameterList[0]),
                                message.ReplyTo)
 
     def _newAlias(self, alias, command):
@@ -135,13 +145,13 @@ class Alias(CommandInterface):
             newMsg = newMsg.replace('$channel', message.User.Name)
 
         if re.search(r'\$[0-9]+', newMsg):  # if the alias contains numbered param replacement points, replace them
-            newMsg = newMsg.replace('$0',  ' '.join(message.ParameterList))
+            newMsg = newMsg.replace('$0',  u' '.join(message.ParameterList))
             for i, param in enumerate(message.ParameterList):
-                if newMsg.find("${}+".format(i+1)) != -1:
-                    newMsg = newMsg.replace("${}+".format(i+1), " ".join(message.ParameterList[i:]))
+                if newMsg.find(u"${}+".format(i+1)) != -1:
+                    newMsg = newMsg.replace(u"${}+".format(i+1), u" ".join(message.ParameterList[i:]))
                 else:
-                    newMsg = newMsg.replace("${}".format(i+1), param)
+                    newMsg = newMsg.replace(u"${}".format(i+1), param)
         else:  # if there are no numbered replacement points, append the full parameter list instead
-            newMsg += ' {}'.format(' '.join(message.ParameterList))
+            newMsg += u' {}'.format(u' '.join(message.ParameterList))
 
         return IRCMessage(message.Type, message.User.String, message.Channel, newMsg, self.bot)
