@@ -17,11 +17,11 @@ class Help(CommandInterface):
 
         if len(message.ParameterList) > 0:
             if message.ParameterList[0].lower() in moduleHandler.mappedTriggers:
-                func = moduleHandler.commands[moduleHandler.mappedTriggers[message.ParameterList[0].lower()]]
-                if isinstance(func.help, basestring):
-                    return IRCResponse(ResponseType.Say, func.help, message.ReplyTo)
+                funcHelp = moduleHandler.mappedTriggers[message.ParameterList[0].lower()].help
+                if isinstance(funcHelp, basestring):
+                    return IRCResponse(ResponseType.Say, funcHelp, message.ReplyTo)
                 else:
-                    return IRCResponse(ResponseType.Say, func.help(message), message.ReplyTo)
+                    return IRCResponse(ResponseType.Say, funcHelp(message), message.ReplyTo)
 
             elif message.ParameterList[0].lower() in moduleHandler.commandCaseMapping:
                 func = moduleHandler.commands[moduleHandler.commandCaseMapping[message.ParameterList[0].lower()]]
