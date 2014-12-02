@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import ServerInfo
 from enum import Enum
+import re
 
 
 class TargetTypes(Enum):
@@ -95,9 +96,10 @@ class IRCMessage(object):
                 self.Parameters = u' '.join(self.MessageList[2:])
             else:
                 self.Parameters = u' '.join(self.MessageList[1:])
-        elif self.MessageList[0] == bot.nickname and len(self.MessageList) > 1:
-            self.Command = self.MessageList[1]
-            self.Parameters = u' '.join(self.MessageList[2:])
+        elif re.match('{}[:,]'.format(re.escape(bot.nickname)), self.MessageList[0], re.IGNORECASE):
+            if len(self.MessageList) > 1:
+                self.Command = self.MessageList[1]
+                self.Parameters = u' '.join(self.MessageList[2:])
 
         if self.Parameters.strip():
             self.ParameterList = self.Parameters.split(' ')
