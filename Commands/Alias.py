@@ -55,9 +55,6 @@ class Alias(CommandInterface):
             newCommand = newMessage.Command.lower()
             if newCommand in self.bot.moduleHandler.mappedTriggers:  # aliased command is a valid trigger
                 return self.bot.moduleHandler.mappedTriggers[newCommand].execute(newMessage)
-            elif newCommand in self.aliases:  # command is an alias of another alias
-                newMessage = self._aliasedMessage(message)
-                return self.execute(newMessage)
 
         if message.Command.lower() == 'alias':
             return self._alias(message)
@@ -75,15 +72,10 @@ class Alias(CommandInterface):
 
         if message.ParameterList[0].lower() in self.bot.moduleHandler.mappedTriggers:
             return IRCResponse(ResponseType.Say,
-                               u"'{}' is already a command!".format(message.ParameterList[0].lower()),
-                               message.ReplyTo)
-        if message.ParameterList[0].lower() in self.aliases:
-            return IRCResponse(ResponseType.Say,
-                               u"'{}' is already an alias!".format(message.ParameterList[0].lower()),
+                               u"'{}' is already a command or alias!".format(message.ParameterList[0].lower()),
                                message.ReplyTo)
 
-        if message.ParameterList[1].lower() not in self.bot.moduleHandler.mappedTriggers \
-                and message.ParameterList[1].lower() not in self.aliases:
+        if message.ParameterList[1].lower() not in self.bot.moduleHandler.mappedTriggers:
             return IRCResponse(ResponseType.Say,
                                u"'{}' is not a valid command or alias!".format(message.ParameterList[1].lower()),
                                message.ReplyTo)
