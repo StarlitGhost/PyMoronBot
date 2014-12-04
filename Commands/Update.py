@@ -10,10 +10,8 @@ from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
 import GlobalVars
 
-import re
-
 import subprocess
-
+import os
 
 class Update(CommandInterface):
     triggers = ['update']
