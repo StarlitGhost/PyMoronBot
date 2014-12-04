@@ -96,6 +96,11 @@ class Responses(CommandInterface):
                                              "IT'S FINE, EVERYTHING IS FINE",
                                              "([^a-zA-Z]|^)everything('?s| is) fine([^a-zA-Z]|$)"))
 
+            """Responds to traditional assertions."""
+            self.responses.add(MobroResponse('tradition',
+                                             'As is tradition.',
+                                             '([^a-zA-Z]|^)as is tradition([^a-zA-Z]|$)'))
+
             #This one needs to mess with the object to work right.
             '''Responds to DuctTape being a dick in minecraft'''
             def ducktapeMatch(message):
