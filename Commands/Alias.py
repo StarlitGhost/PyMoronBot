@@ -36,6 +36,10 @@ class Alias(CommandInterface):
         self.aliases = self.bot.dataStore['Alias']
         for alias in self.aliases:
             self.bot.moduleHandler.mappedTriggers[alias] = self
+            
+    def onUnload(self):
+        for alias in self.aliases:
+            del self.bot.moduleHandler.mappedTriggers[alias]
 
     def shouldExecute(self, message):
         if message.Command.lower() in self.bot.moduleHandler.mappedTriggers:
@@ -55,11 +59,11 @@ class Alias(CommandInterface):
                 newMessage = self._aliasedMessage(message)
                 return self.execute(newMessage)
 
-        if message.Command == 'alias':
+        if message.Command.lower() == 'alias':
             return self._alias(message)
-        elif message.Command == 'unalias':
+        elif message.Command.lower() == 'unalias':
             return self._unalias(message)
-        elif message.Command == 'aliases':
+        elif message.Command.lower() == 'aliases':
             return self._aliases(message)
 
     def _alias(self, message):
@@ -69,27 +73,27 @@ class Alias(CommandInterface):
         if len(message.ParameterList) <= 1:
             return IRCResponse(ResponseType.Say, 'Alias what?', message.ReplyTo)
 
-        if message.ParameterList[0] in self.bot.moduleHandler.mappedTriggers:
+        if message.ParameterList[0].lower() in self.bot.moduleHandler.mappedTriggers:
             return IRCResponse(ResponseType.Say,
-                               u"'{}' is already a command!".format(message.ParameterList[0]),
+                               u"'{}' is already a command!".format(message.ParameterList[0].lower()),
                                message.ReplyTo)
-        if message.ParameterList[0] in self.aliases:
+        if message.ParameterList[0].lower() in self.aliases:
             return IRCResponse(ResponseType.Say,
-                               u"'{}' is already an alias!".format(message.ParameterList[0]),
+                               u"'{}' is already an alias!".format(message.ParameterList[0].lower()),
                                message.ReplyTo)
 
-        if message.ParameterList[1] not in self.bot.moduleHandler.mappedTriggers \
-                and message.ParameterList[1] not in self.aliases:
+        if message.ParameterList[1].lower() not in self.bot.moduleHandler.mappedTriggers \
+                and message.ParameterList[1].lower() not in self.aliases:
             return IRCResponse(ResponseType.Say,
-                               u"'{}' is not a valid command or alias!".format(message.ParameterList[1]),
+                               u"'{}' is not a valid command or alias!".format(message.ParameterList[1].lower()),
                                message.ReplyTo)
 
         newAlias = message.ParameterList[1:]
         newAlias[0] = newAlias[0].lower()
-        self._newAlias(message.ParameterList[0], newAlias)
+        self._newAlias(message.ParameterList[0].lower(), newAlias)
 
         return IRCResponse(ResponseType.Say,
-                           u"Created a new alias '{}' for '{}'.".format(message.ParameterList[0],
+                           u"Created a new alias '{}' for '{}'.".format(message.ParameterList[0].lower(),
                                                                         u' '.join(message.ParameterList[1:])),
                            message.ReplyTo)
 
@@ -100,27 +104,27 @@ class Alias(CommandInterface):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say, 'Unalias what?', message.ReplyTo)
 
-        if message.ParameterList[0] not in self.aliases:
+        if message.ParameterList[0].lower() not in self.aliases:
             return IRCResponse(ResponseType.Say,
-                               u"I don't have an alias called '{}'".format(message.ParameterList[0]),
+                               u"I don't have an alias called '{}'".format(message.ParameterList[0].lower()),
                                message.ReplyTo)
 
-        self._delAlias(message.ParameterList[0])
-        return IRCResponse(ResponseType.Say, u"Deleted alias '{}'".format(message.ParameterList[0]), message.ReplyTo)
+        self._delAlias(message.ParameterList[0].lower())
+        return IRCResponse(ResponseType.Say, u"Deleted alias '{}'".format(message.ParameterList[0].lower()), message.ReplyTo)
 
     def _aliases(self, message):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
                                u"Current aliases: {}".format(u', '.join(sorted(self.aliases.keys()))),
                                message.ReplyTo)
-        elif message.ParameterList[0] in self.aliases:
+        elif message.ParameterList[0].lower() in self.aliases:
             return IRCResponse(ResponseType.Say,
-                               u"'{}' is aliased to: {}".format(message.ParameterList[0],
-                                                                u' '.join(self.aliases[message.ParameterList[0]])),
+                               u"'{}' is aliased to: {}".format(message.ParameterList[0].lower(),
+                                                                u' '.join(self.aliases[message.ParameterList[0].lower()])),
                                message.ReplyTo)
         else:
             return IRCResponse(ResponseType.Say,
-                               u"'{}' is not a recognized alias".format(message.ParameterList[0]),
+                               u"'{}' is not a recognized alias".format(message.ParameterList[0].lower()),
                                message.ReplyTo)
 
     def _newAlias(self, alias, command):
@@ -138,10 +142,10 @@ class Alias(CommandInterface):
         self.bot.dataStore.sync()
 
     def _aliasedMessage(self, message):
-        if message.Command not in self.aliases:
+        if message.Command.lower() not in self.aliases:
             return
 
-        alias = self.aliases[message.Command]
+        alias = self.aliases[message.Command.lower()]
         newMsg = u'{0}{1}'.format(self.bot.commandChar, ' '.join(alias))
 
         newMsg = newMsg.replace('$sender', message.User.Name)
