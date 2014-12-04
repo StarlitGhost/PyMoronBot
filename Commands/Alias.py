@@ -125,10 +125,12 @@ class Alias(CommandInterface):
 
     def _newAlias(self, alias, command):
         self.aliases[alias] = command
+        self.bot.moduleHandler.mappedTriggers[alias] = self
         self._syncAliases()
 
     def _delAlias(self, alias):
         del self.aliases[alias]
+        del self.bot.moduleHandler.mappedTriggers[alias]
         self._syncAliases()
 
     def _syncAliases(self):
