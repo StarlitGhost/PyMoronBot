@@ -34,9 +34,13 @@ class Alias(CommandInterface):
             self.bot.dataStore['Alias'] = {}
 
         self.aliases = self.bot.dataStore['Alias']
+        for alias in self.aliases:
+            self.bot.moduleHandler.mappedTriggers[alias] = self
 
     def shouldExecute(self, message):
-        return True
+        if message.Command.lower() in self.bot.moduleHandler.mappedTriggers:
+            return True
+        return False
 
     def execute(self, message):
         """
@@ -121,10 +125,12 @@ class Alias(CommandInterface):
 
     def _newAlias(self, alias, command):
         self.aliases[alias] = command
+        self.bot.moduleHandler.mappedTriggers[alias] = self
         self._syncAliases()
 
     def _delAlias(self, alias):
         del self.aliases[alias]
+        del self.bot.moduleHandler.mappedTriggers[alias]
         self._syncAliases()
 
     def _syncAliases(self):
