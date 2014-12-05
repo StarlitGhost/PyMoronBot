@@ -13,7 +13,7 @@ import GlobalVars
 
 
 class Alias(CommandInterface):
-    triggers = ['alias', 'unalias', 'aliases']
+    triggers = ['alias', 'unalias', 'aliases', 'aliashelp']
     runInThread = True
     
     def help(self, message):
