@@ -12,6 +12,7 @@ import GlobalVars
 
 import subprocess
 import os
+import sys
 
 class Update(CommandInterface):
     triggers = ['update']
@@ -41,7 +42,7 @@ class Update(CommandInterface):
         if returnCode != 0:
             return IRCResponse(ResponseType.Say,
                                'Merge after update failed, please merge manually',
-                               message.replyTo)
+                               message.ReplyTo)
 
         subprocess.check_call([os.path.join(os.path.dirname(sys.executable), 'pip'), 'install', '-r', 'requirements.txt'])
         
