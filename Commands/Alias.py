@@ -39,10 +39,8 @@ class Alias(CommandInterface):
             if command in self.aliasHelpDict:
                 return self.aliasHelpDict[command]
             else:
-                return IRCResponse(ResponseType.Say,
-                                   u"'{}' is an alias for: {}"
-                                   .format(command, u' '.join(self.aliases[command])),
-                                   message.ReplyTo)
+                return u"'{}' is an alias for: {}".format(command, u" ".join(self.aliases[command]))
+
     
     def onLoad(self):
         if 'Alias' not in self.bot.dataStore:
