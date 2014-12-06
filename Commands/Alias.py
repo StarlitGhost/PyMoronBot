@@ -198,7 +198,8 @@ class Alias(CommandInterface):
     def _delAlias(self, alias):
         del self.aliases[alias]
         del self.bot.moduleHandler.mappedTriggers[alias]
-        del self.aliasHelpDict[alias]
+        if alias in self.aliasHelpDict:
+            del self.aliasHelpDict[alias]
         self._syncAliases()
 
     def _setAliasHelp(self, alias, aliasHelp):
