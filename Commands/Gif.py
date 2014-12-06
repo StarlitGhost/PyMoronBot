@@ -20,7 +20,7 @@ class Gif(CommandInterface):
         """
         @type message: IRCMessage
         """
-        url = "http://greywool.com/desertbus/gifs/random.php"
+        url = "http://greywool.com/desertbus/7/gifs/random.php"
 
         webPage = WebUtils.fetchURL(url)
 
