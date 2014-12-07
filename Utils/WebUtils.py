@@ -52,20 +52,21 @@ class URLResponse(object):
 def fetchURL(url, extraHeaders=None):
     """
     @type url: unicode
-    @type extraHeaders: dict
+    @type extraHeaders: list[tuple]
     @rtype: URLResponse
     """
     headers = [("User-agent", "Mozilla/5.0")]
     if extraHeaders:
         for header in extraHeaders:
-            # For whatever reason headers are defined in a different way in opener than they are in a normal urlopen
+            # For whatever reason headers are defined in a different way in opener than they are
+            # in a normal urlopen
             headers.append(header)
     try:
         opener = build_opener()
         opener.addheaders = headers
         response = opener.open(url)
         responseHeaders = response.info().dict
-        print '{0} headers: {1}'.format(urlparse(response.geturl()).hostname, responseHeaders)
+        print '{} headers: {}'.format(urlparse(response.geturl()).hostname, responseHeaders)
         pageType = responseHeaders["content-type"]
 
         # Make sure we don't download any unwanted things
@@ -134,14 +135,14 @@ def shortenGoogl(url):
     @type url: unicode
     @rtype: unicode
     """
-    post = '{{"longUrl": "{0}"}}'.format(url)
+    post = '{{"longUrl": "{}"}}'.format(url)
 
     googlKey = load_key(u'goo.gl')
 
     if googlKey is None:
         return "[goo.gl API key not found]"
 
-    apiURL = 'https://www.googleapis.com/urlshortener/v1/url?key={0}'.format(googlKey)
+    apiURL = 'https://www.googleapis.com/urlshortener/v1/url?key={}'.format(googlKey)
 
     headers = {"Content-Type": "application/json"}
 
@@ -160,7 +161,7 @@ def googleSearch(query):
     @rtype: dict[unicode, T]
     """
     googleAPI = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q='
-    webPage = fetchURL('{0}{1}'.format(googleAPI, quote(query)))
+    webPage = fetchURL('{}{}'.format(googleAPI, quote(query)))
     j = json.loads(webPage.body)
     return j
 
@@ -185,5 +186,5 @@ def pasteEE(data, description, expire):
         if jsonResult["status"] == "success":
             return jsonResult["paste"]["link"]
         elif jsonResult["status"] == "error":
-            return u"An error occurred while posting to Paste.ee, code: {}, reason: {}".format(jsonResult["errorcode"],
-                                                                                               jsonResult["error"])
+            return u"An error occurred while posting to Paste.ee, code: {}, reason: {}"\
+                .format(jsonResult["errorcode"], jsonResult["error"])

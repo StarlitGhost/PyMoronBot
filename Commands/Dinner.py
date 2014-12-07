@@ -16,13 +16,14 @@ from bs4 import BeautifulSoup
 
 class Dinner(CommandInterface):
     triggers = ['dinner']
-    help = 'dinner (meat/veg/drink) - asks WhatTheFuckShouldIMakeForDinner.com what you should make for dinner'
+    help = 'dinner (meat/veg/drink) - asks WhatTheFuckShouldIMakeForDinner.com' \
+           ' what you should make for dinner'
     
     def execute(self, message):
         """
         @type message: IRCMessage
         """
-        wtfsimfd = "http://whatthefuckshouldimakefordinner.com/{0}"
+        wtfsimfd = "http://whatthefuckshouldimakefordinner.com/{}"
 
         options = {'meat': 'index.php', 'veg': 'veg.php', 'drink': 'drinks.php'}
 
@@ -31,7 +32,8 @@ class Dinner(CommandInterface):
             option = message.ParameterList[0]
 
         if option in options:
-            webPage = WebUtils.fetchURL(wtfsimfd.format(options[option]))
+            headers = [("Accept", "text/html")]
+            webPage = WebUtils.fetchURL(wtfsimfd.format(options[option]), headers)
 
             soup = BeautifulSoup(webPage.body)
 
@@ -39,11 +41,11 @@ class Dinner(CommandInterface):
             item = soup.find('a')
             link = WebUtils.shortenGoogl(item['href'])
 
-            return IRCResponse(ResponseType.Say, u"{0}... {1} {2}".format(phrase, item.text, link), message.ReplyTo)
+            return IRCResponse(ResponseType.Say,
+                               u"{}... {} {}".format(phrase, item.text, link),
+                               message.ReplyTo)
 
         else:
-            error = u"'{0}' is not a recognized dinner type, please choose one of {1}".format(option,
-                                                                                              u'/'.join(options.keys()))
-            return IRCResponse(ResponseType.Say,
-                               error,
-                               message.ReplyTo)
+            error = u"'{}' is not a recognized dinner type, please choose one of {}"\
+                .format(option, u'/'.join(options.keys()))
+            return IRCResponse(ResponseType.Say, error, message.ReplyTo)
