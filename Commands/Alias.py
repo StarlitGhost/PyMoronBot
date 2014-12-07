@@ -41,18 +41,18 @@ class Alias(CommandInterface):
             else:
                 return u"'{}' is an alias for: {}".format(command, u" ".join(self.aliases[command]))
 
-    
     def onLoad(self):
         if 'Alias' not in self.bot.dataStore:
-            self.bot.dataStore['Alias'] = {}
+            self.bot.dataStore['Alias'] = {
+                'Aliases': {},
+                'Help': {}
+            }
 
-        self.aliases = self.bot.dataStore['Alias']
+        self.aliases = self.bot.dataStore['Alias']['Aliases']
         for alias in self.aliases:
             self.bot.moduleHandler.mappedTriggers[alias] = self
 
-        if 'AliasHelp' not in self.bot.dataStore:
-            self.bot.dataStore['AliasHelp'] = {}
-        self.aliasHelpDict = self.bot.dataStore['AliasHelp']
+        self.aliasHelpDict = self.bot.dataStore['Alias']['Help']
             
     def onUnload(self):
         for alias in self.aliases:
@@ -207,8 +207,8 @@ class Alias(CommandInterface):
         self._syncAliases()
 
     def _syncAliases(self):
-        self.bot.dataStore['Alias'] = self.aliases
-        self.bot.dataStore['AliasHelp'] = self.aliasHelpDict
+        self.bot.dataStore['Alias']['Aliases'] = self.aliases
+        self.bot.dataStore['Alias']['Help'] = self.aliasHelpDict
         self.bot.dataStore.sync()
 
     def _aliasedMessage(self, message):
