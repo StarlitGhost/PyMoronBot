@@ -5,6 +5,9 @@ from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 import GlobalVars
 
+import sys
+import traceback
+
 
 class ModuleLoader(CommandInterface):
     triggers = ['load', 'reload', 'unload',
@@ -88,6 +91,7 @@ class ModuleLoader(CommandInterface):
                 except Exception, x:
                     exceptions.append(commandNameCaseMap[commandName])
                     print x.args
+                    traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions
 
@@ -121,6 +125,7 @@ class ModuleLoader(CommandInterface):
             except Exception, x:
                 exceptions.append(postProcessNameCaseMap[postProcessName])
                 print x.args
+                traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions
 
@@ -148,6 +153,7 @@ class ModuleLoader(CommandInterface):
             except Exception, x:
                 exceptions.append(commandNameCaseMap[commandName])
                 print x.args
+                traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions
 
@@ -175,5 +181,6 @@ class ModuleLoader(CommandInterface):
             except Exception, x:
                 exceptions.append(postProcessNameCaseMap[postProcessName])
                 print x.args
+                traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions
