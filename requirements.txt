@@ -9,3 +9,5 @@ twitter>=1.14.3
 requests>=2.3.0
 pytimeparse>=1.1.0
 mysql-python>=1.2.5
+pycrypto>=2.6.1
+pyasn1>=0.1.7
