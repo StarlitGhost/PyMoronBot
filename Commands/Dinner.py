@@ -32,8 +32,7 @@ class Dinner(CommandInterface):
             option = message.ParameterList[0]
 
         if option in options:
-            headers = [("Accept", "text/html")]
-            webPage = WebUtils.fetchURL(wtfsimfd.format(options[option]), headers)
+            webPage = WebUtils.fetchURL(wtfsimfd.format(options[option]))
 
             soup = BeautifulSoup(webPage.body)
 

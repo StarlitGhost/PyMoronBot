@@ -55,7 +55,7 @@ def fetchURL(url, extraHeaders=None):
     @type extraHeaders: list[tuple]
     @rtype: URLResponse
     """
-    headers = [("User-agent", "Mozilla/5.0")]
+    headers = [("User-agent", "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0")]
     if extraHeaders:
         for header in extraHeaders:
             # For whatever reason headers are defined in a different way in opener than they are
