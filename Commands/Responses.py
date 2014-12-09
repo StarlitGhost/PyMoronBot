@@ -149,9 +149,20 @@ class Responses(CommandInterface):
                 return False
 
             def animalTalkwords(message):
+                # Specific user animals
+                if self.animal == 'cow' and message.User.Name.lower() == 'neo-gabi':
+                    return [IRCResponse(ResponseType.Do,
+                                        'points at {0}, and says "{0} was the cow all along!"'
+                                        .format(message.user.Name),
+                                        message.ReplyTo)]
+
                 randomChance = random.randint(1, 20)
+
+                # Emily Bonus
                 if message.User.Name == 'Emily':
                     randomChance = random.randint(1, 25)
+
+                # General user animals
                 if randomChance == 1:
                     ''' User Critically Failed '''
                     if self.animal == 'droid':
