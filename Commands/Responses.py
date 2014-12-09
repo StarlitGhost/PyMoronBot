@@ -153,7 +153,7 @@ class Responses(CommandInterface):
                 if self.animal == 'cow' and message.User.Name.lower() == 'neo-gabi':
                     return [IRCResponse(ResponseType.Do,
                                         'points at {0}, and says "{0} was the cow all along!"'
-                                        .format(message.user.Name),
+                                        .format(message.User.Name),
                                         message.ReplyTo)]
 
                 randomChance = random.randint(1, 20)
