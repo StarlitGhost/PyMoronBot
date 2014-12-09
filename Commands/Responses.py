@@ -137,6 +137,7 @@ class Responses(CommandInterface):
                     r'y?[a4]r{2,}': 'pirate',
                     r'qu[a4]+ck': 'duck',
                     r'wh[o0]{2,}': 'owl',
+                    r'br+a+i+n+s+': 'zombie'
                 }
 
                 self.animal = None
