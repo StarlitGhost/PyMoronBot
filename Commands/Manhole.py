@@ -21,7 +21,7 @@ class Manhole(CommandInterface):
         self.manhole = makeService({
             "namespace": {"bot": self.bot},
             "passwd": os.path.join("Data", "manhole.passwd"),
-            "telnetPort": "4141",
+            "telnetPort": None,
             "sshPort": "4040"
         })
         self.manhole.startService()
