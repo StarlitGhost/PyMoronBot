@@ -63,7 +63,7 @@ class HangoutTracker(CommandInterface):
             byLine = 'first linked {0} ago'.format(StringUtils.deltaTimeToString(timeDiff))
 
             if ((message.Type == 'JOIN') and (message.User.Name == 'Emily[iOS]')):
-                response = 'Welcome Back, Lady Emily.  Here\'s the !hangout for your streaming pleasure: {0} ({1})'.format(url, byLine)
+                response = 'Welcome Back, Lady Emily.  Here\'s the hangout for your streaming pleasure: http://bit.ly/DBHangoutReloaded'
             else:
                 response = 'Last hangout linked: {0} ({1})'.format(url, byLine)
 
