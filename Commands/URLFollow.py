@@ -126,7 +126,10 @@ class URLFollow(CommandInterface):
                 if len(description) > 150:
                     description = description[:147] + u'...'
                 
-            return IRCResponse(ResponseType.Say, self.graySplitter.join([title, length, description]), message.ReplyTo)
+            return IRCResponse(ResponseType.Say,
+                               self.graySplitter.join([title, length, description]),
+                               message.ReplyTo,
+                               {'urlfollowURL': 'http://youtu.be/{}'.format(videoID)})
         
         return
     
@@ -191,7 +194,10 @@ class URLFollow(CommandInterface):
                 data.append(u'Size: {0:,d}kb'.format(int(imageData['size'])/1024))
         data.append(u'Views: {0:,d}'.format(imageData['views']))
         
-        return IRCResponse(ResponseType.Say, self.graySplitter.join(data), message.ReplyTo)
+        return IRCResponse(ResponseType.Say,
+                           self.graySplitter.join(data),
+                           message.ReplyTo,
+                           {'urlfollowURL': '[nope, imgur is too hard. also, pointless?]'})
 
     def FollowTwitter(self, tweeter, tweetID, message):
         webPage = WebUtils.fetchURL('https://twitter.com/{0}/status/{1}'.format(tweeter, tweetID))
@@ -217,7 +223,10 @@ class URLFollow(CommandInterface):
 
         formatString = unicode(assembleFormattedText(A.normal[A.bold['{0}:'], ' {1}']))
 
-        return IRCResponse(ResponseType.Say, formatString.format(user, text), message.ReplyTo)
+        return IRCResponse(ResponseType.Say,
+                           formatString.format(user, text),
+                           message.ReplyTo,
+                           {'urlfollowURL': 'https://twitter.com/{}/status/{}'.format(tweeter, tweetID)})
 
     def FollowSteam(self, steamAppId, message):
         webPage = WebUtils.fetchURL('http://store.steampowered.com/api/appdetails/?appids={0}&cc=US&l=english&v=1'.format(steamAppId))
@@ -285,7 +294,10 @@ class URLFollow(CommandInterface):
                 description = u'{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
             data.append(description)
 
-        return IRCResponse(ResponseType.Say, self.graySplitter.join(data), message.ReplyTo)
+        return IRCResponse(ResponseType.Say,
+                           self.graySplitter.join(data),
+                           message.ReplyTo,
+                           {'urlfollowURL': 'http://store.steampowered.com/app/{}'.format(steamAppId)})
 
     @classmethod
     def getSteamPrice(cls, appId, region):
@@ -296,7 +308,7 @@ class URLFollow(CommandInterface):
         return response[appId]['data']['price_overview']
 
     def FollowKickstarter(self, ksID, message):
-        webPage = WebUtils.fetchURL('https://www.kickstarter.com/projects/{0}/'.format(ksID))
+        webPage = WebUtils.fetchURL('https://www.kickstarter.com/projects/{}/'.format(ksID))
 
         soup = BeautifulSoup(webPage.body)
 
@@ -355,7 +367,10 @@ class URLFollow(CommandInterface):
 
                 data.append('Duration: {0:.0f} days {1:.1f} hours to go'.format(days, hours))
 
-        return IRCResponse(ResponseType.Say, self.graySplitter.join(data), message.ReplyTo)
+        return IRCResponse(ResponseType.Say,
+                           self.graySplitter.join(data),
+                           message.ReplyTo,
+                           {'urlfollowURL': 'https://www.kickstarter.com/projects/{}/'.format(ksID)})
 
     def FollowTwitch(self, channel, message):
         # Heavily based on Didero's DideRobot code for the same
@@ -390,7 +405,10 @@ class URLFollow(CommandInterface):
             else:
                 channelInfo += assembleFormattedText(A.normal[A.fg.red[' (Offline)']])
 
-            return IRCResponse(ResponseType.Say, channelInfo, message.ReplyTo)
+            return IRCResponse(ResponseType.Say,
+                               channelInfo,
+                               message.ReplyTo,
+                               {'urlfollowURL': 'https://twitch.tv/{}'.format(channel)})
     
     def FollowStandard(self, url, message):
         webPage = WebUtils.fetchURL(url)
@@ -403,7 +421,10 @@ class URLFollow(CommandInterface):
         
         title = self.GetTitle(webPage.body)
         if title is not None:
-            return IRCResponse(ResponseType.Say, u'{0} (at {1})'.format(title, webPage.domain), message.ReplyTo)
+            return IRCResponse(ResponseType.Say,
+                               u'{0} (at {1})'.format(title, webPage.domain),
+                               message.ReplyTo,
+                               {'urlfollowURL': url})
         
         return
 
