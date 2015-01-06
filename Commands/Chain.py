@@ -34,6 +34,7 @@ class Chain(CommandInterface):
 
         for link in chain:
             link = link.strip()
+            link = link.decode('string_escape')
             if response is not None:
                 link = link.replace('$output', response.Response)  # replace $output with output of previous command
                 extraVars.update(response.ExtraVars)
