@@ -34,7 +34,7 @@ class Chain(CommandInterface):
 
         for link in chain:
             link = link.strip()
-            link = re.sub(r'\\(.)', r'\1', link)
+            link = re.sub(r'\\\|', r'|', link)
             if response is not None:
                 link = link.replace('$output', response.Response)  # replace $output with output of previous command
                 extraVars.update(response.ExtraVars)
