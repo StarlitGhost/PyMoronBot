@@ -314,9 +314,9 @@ class URLFollow(CommandInterface):
 
         data = []
 
-        title = soup.find(class_='title')
+        title = soup.find(class_='NS_projects__header')
         if title is not None:
-            creator = soup.find(id='name')
+            creator = soup.find(attrs={'data-modal-class': 'modal_project_by'})
             if creator is not None:
                 data.append(unicode(assembleFormattedText(A.normal['{0}',
                                                                    A.fg.gray[' by '],
