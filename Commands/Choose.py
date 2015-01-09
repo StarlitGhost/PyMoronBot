@@ -30,4 +30,6 @@ class Choose(CommandInterface):
         else:
             options = message.Parameters.split()
 
-        return IRCResponse(ResponseType.Say, random.choice(options).strip(), message.ReplyTo)
+        choice = random.choice(options).strip()
+
+        return IRCResponse(ResponseType.Say, choice, message.ReplyTo, {'chooseChoice': choice})
