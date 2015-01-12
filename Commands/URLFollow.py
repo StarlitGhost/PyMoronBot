@@ -4,6 +4,7 @@ import HTMLParser
 import json
 import math
 import re
+import time
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -209,6 +210,12 @@ class URLFollow(CommandInterface):
         user = tweet.find(class_='username').text
 
         tweetText = tweet.find(class_='tweet-text')
+        
+        tweetTimeText = tweet.find(class_='client-and-actions').text
+        try:
+            tweetTimeText = time.strftime('%Y/%m/%d %H:%M', time.strptime(tweetTimeText, '%I:%M %p - %d %b %Y'))
+        except ValueError:
+            pass
 
         links = tweetText.find_all('a', {'data-expanded-url': True})
         for link in links:
@@ -221,10 +228,10 @@ class URLFollow(CommandInterface):
         text = StringUtils.unescapeXHTML(tweetText.text)
         text = re.sub('[\r\n]+', self.graySplitter, text)
 
-        formatString = unicode(assembleFormattedText(A.normal[A.bold['{0}:'], ' {1}']))
+        formatString = unicode(assembleFormattedText(A.normal[A.fg.gray['[{0}]'], A.bold[' {1}:'], ' {2}']))
 
         return IRCResponse(ResponseType.Say,
-                           formatString.format(user, text),
+                           formatString.format(tweetTimeText, user, text),
                            message.ReplyTo,
                            {'urlfollowURL': 'https://twitter.com/{}/status/{}'.format(tweeter, tweetID)})
 
