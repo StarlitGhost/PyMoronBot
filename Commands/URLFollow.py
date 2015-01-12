@@ -211,7 +211,7 @@ class URLFollow(CommandInterface):
 
         tweetText = tweet.find(class_='tweet-text')
         
-        tweetTimeText = tweet.find(class_='client-and-actions').text
+        tweetTimeText = tweet.find(class_='client-and-actions').text.strip()
         try:
             tweetTimeText = time.strftime('%Y/%m/%d %H:%M', time.strptime(tweetTimeText, '%I:%M %p - %d %b %Y'))
         except ValueError:
