@@ -37,8 +37,8 @@ class GPSLookup(CommandInterface):
 
             url = "http://dev.virtualearth.net/REST/v1/Locations?q={0}&key={1}".format(urllib.quote_plus(message.Parameters), self.api_key)
 
-            j = WebUtils.fetchURL(url)
-            result = json.loads(j)
+            page = WebUtils.fetchURL(url)
+            result = json.loads(page.body)
 
             if result['resourceSets'][0]['estimatedTotal'] == 0:
                 print result
