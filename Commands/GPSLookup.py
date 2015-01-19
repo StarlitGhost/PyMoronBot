@@ -19,7 +19,7 @@ from Utils import WebUtils
 class GPSLookup(CommandInterface):
     triggers = ['gps', 'gpslookup']
     help = "gps(lookup) <address> - Uses Microsoft's Bing Maps geocoding API to " \
-           "lookup GPS coordinates for the given address. Must be used over PM"
+           "lookup GPS coordinates for the given address"
 
     def onLoad(self):
         self.api_key = load_key(u'Bing Maps')
@@ -28,9 +28,6 @@ class GPSLookup(CommandInterface):
         """
         @type message: IRCMessage
         """
-        if message.User.Name != message.ReplyTo:
-            return IRCResponse(ResponseType.Say, "GPS Lookup must be done via PM", message.ReplyTo)
-        
         if len(message.ParameterList) > 0:
             if self.api_key is None:
                 return IRCResponse(ResponseType.Say, "[Bing Maps API key not found]", message.ReplyTo)
