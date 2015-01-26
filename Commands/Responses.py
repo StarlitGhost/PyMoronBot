@@ -139,7 +139,8 @@ class Responses(CommandInterface):
                     r'wh[o0]{2,}': 'owl',
                     r'br+a+i+n+s+': 'zombie',
                     r'ba+w+k': 'chicken',
-                    r'ba{2,}': 'sheep'
+                    r'ba{2,}': 'sheep',
+                    r'(blub(\s+)?)+': 'deep one',
                 }
 
                 self.animal = None
