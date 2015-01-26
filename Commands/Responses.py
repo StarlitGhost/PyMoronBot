@@ -138,7 +138,8 @@ class Responses(CommandInterface):
                     r'qu[a4]+ck': 'duck',
                     r'wh[o0]{2,}': 'owl',
                     r'br+a+i+n+s+': 'zombie',
-                    r'ba+w+k': 'chicken'
+                    r'ba+w+k': 'chicken',
+                    r'ba{2,}': 'sheep'
                 }
 
                 self.animal = None
