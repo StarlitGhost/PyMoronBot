@@ -15,8 +15,19 @@ import os
 import sys
 
 class Update(CommandInterface):
-    triggers = ['update']
-    help = 'update - pulls the latest code from GitHub'
+    triggers = ['update', 'updatelibs']
+    
+    def help(self, message):
+        """
+        @type message: IRCMessage
+        """
+        helpDict = {
+            u"update": u"update - pulls the latest code from GitHub",
+            u"updatelibs": u"updatelibs - updates the libraries used by the bot (not implemented yet, does the same as update)"}
+            
+        command = message.ParameterList[0].lower()
+        if command in helpDict:
+            return helpDict[command]
 
     def execute(self, message):
         """
