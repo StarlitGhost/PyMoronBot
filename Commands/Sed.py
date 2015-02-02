@@ -103,12 +103,13 @@ class Sed(CommandInterface):
             subFlags |= re.VERBOSE
 
         if 'c' in flags:
+            newMessage = copy.copy(inputMessage)
+            
             try:
                 new = re.sub(search, replace, text, count, subFlags)
             except sre_constants.error as e:
-                return "[Regex Error in Sed pattern: {}]".format(e.message)
-            
-            newMessage = copy.copy(inputMessage)
+                newMessage.MessageString = "[Regex Error in Sed pattern: {}]".format(e.message)
+                return newMessage
             
             if new != text:
                 newMessage.MessageString = new
@@ -123,7 +124,9 @@ class Sed(CommandInterface):
             try:
                 new = re.sub(search, replace, message.MessageString, count, subFlags)
             except sre_constants.error as e:
-                return "Regex Error in Sed pattern: {}".format(e.message)
+                newMessage = copy.copy(inputMessage)
+                newMessage.MessageString = "[Regex Error in Sed pattern: {}]".format(e.message)
+                return newMessage
 
             new = new[:300]
 
