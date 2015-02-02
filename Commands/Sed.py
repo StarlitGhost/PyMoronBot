@@ -7,6 +7,7 @@ Created on Feb 14, 2014
 
 import copy
 import re
+import sre_constants
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -102,7 +103,10 @@ class Sed(CommandInterface):
             subFlags |= re.VERBOSE
 
         if 'c' in flags:
-            new = re.sub(search, replace, text, count, subFlags)
+            try:
+                new = re.sub(search, replace, text, count, subFlags)
+            except sre_constants.error as e:
+                return "[Regex Error in Sed pattern: {}]".format(e.message)
             
             newMessage = copy.copy(inputMessage)
             
@@ -116,7 +120,10 @@ class Sed(CommandInterface):
             return newMessage
 
         for message in reversed(messages):
-            new = re.sub(search, replace, message.MessageString, count, subFlags)
+            try:
+                new = re.sub(search, replace, message.MessageString, count, subFlags)
+            except sre_constants.error as e:
+                return "Regex Error in Sed pattern: {}".format(e.message)
 
             new = new[:300]
 
