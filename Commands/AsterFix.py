@@ -44,14 +44,15 @@ class AsterFix(CommandInterface):
         else:
             self.storeMessage(message)
 
-        lastMessage = self.messages[message.User.Name].MessageString.split()
-        likelyChanges = difflib.get_close_matches(change, lastMessage, 5, 0.5)
+        lastMessage = self.messages[message.User.Name]
+        lastMessageList = lastMessage.MessageString.split()
+        likelyChanges = difflib.get_close_matches(change, lastMessageList, 5, 0.5)
         likelyChanges = filter((lambda word: word != change), likelyChanges)
 
         if likelyChanges:
             target = likelyChanges[0]
 
-            response = " ".join([change if word == target else word for word in lastMessage])
+            response = " ".join([change if word == target else word for word in lastMessageList])
 
             return IRCResponse(lastMessage.ResponseType, response, message.ReplyTo)
 
