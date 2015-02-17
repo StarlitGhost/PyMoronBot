@@ -46,7 +46,12 @@ class AsterFix(CommandInterface):
             return
 
         lastMessage = self.messages[message.User.Name]
-        lastMessageList = lastMessage.MessageString.split()
+        lastMessageList = lastMessage.MessageList
+        
+        # Skip 1-word messages, as it just leads to direct repetition
+        if len(lastMessageList) <= 1:
+            return
+        
         likelyChanges = difflib.get_close_matches(change, lastMessageList, 5, 0.5)
         likelyChanges = filter((lambda word: word != change), likelyChanges)
 
