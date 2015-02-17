@@ -52,10 +52,14 @@ class AsterFix(CommandInterface):
 
         if likelyChanges:
             target = likelyChanges[0]
-
             response = " ".join([change if word == target else word for word in lastMessageList])
 
-            return IRCResponse(lastMessage.ResponseType, response, message.ReplyTo)
+            if lastMessage.Type == 'ACTION':
+                responseType = ResponseType.Do
+            else:
+                responseType = ResponseType.Say
+
+            return IRCResponse(responseType, response, message.ReplyTo)
 
     def storeMessage(self, message):
         self.messages[message.User.Name] = message
