@@ -43,6 +43,7 @@ class AsterFix(CommandInterface):
             change = changeMatch.group('change')
         else:
             self.storeMessage(message)
+            return
 
         lastMessage = self.messages[message.User.Name]
         lastMessageList = lastMessage.MessageString.split()
