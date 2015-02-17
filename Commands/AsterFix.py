@@ -56,4 +56,4 @@ class AsterFix(CommandInterface):
             return IRCResponse(lastMessage.ResponseType, response, message.ReplyTo)
 
     def storeMessage(self, message):
-        self.messages[message.User.Name] = message.MessageString
+        self.messages[message.User.Name] = message
