@@ -9,7 +9,7 @@ import difflib
 import re
 
 from IRCMessage import IRCMessage
-from IRCResponse import IRCResponse
+from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
 
 
