@@ -38,7 +38,7 @@ class AsterFix(CommandInterface):
         else:
             messageString = message.MessageString
 
-        changeMatch = re.match(r"^\*(?P<change>[^\s*]+)$", messageString)
+        changeMatch = re.match(r"^(\*(?P<change>[^\s*]+)|(?P<change>[^\s*]+)\*)$", messageString)
         if changeMatch:
             change = changeMatch.group('change')
         else:
