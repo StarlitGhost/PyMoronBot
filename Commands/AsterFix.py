@@ -57,7 +57,11 @@ class AsterFix(CommandInterface):
 
         if likelyChanges:
             target = likelyChanges[0]
-            response = " ".join([change if word == target else word for word in lastMessageList])
+            responseList = [change if word == target else word for word in lastMessageList]
+            response = " ".join(responseList)
+            
+            # Store the modified message so it can be aster-fixed again
+            self.messages[message.User.Name].MessageList = responseList
 
             if lastMessage.Type == 'ACTION':
                 responseType = ResponseType.Do
