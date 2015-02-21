@@ -141,6 +141,7 @@ class Responses(CommandInterface):
                     r'ba+w+k': 'chicken',
                     r'ba{2,}': 'sheep',
                     r'(blub(\s+)?)+': 'deep one',
+                    r'bu*z{2,}': 'bee',
                 }
 
                 self.animal = None
