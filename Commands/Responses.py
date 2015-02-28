@@ -173,6 +173,10 @@ class Responses(CommandInterface):
                         return [IRCResponse(ResponseType.Say,
                                             '{} is DEFINITELY NOT the Droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
+                    elif self.animal == 'goose':
+                        return [IRCResponse(ResponseType.Say,
+                                            '{} is a clown!'.format(message.User.Name),
+                                            message.ReplyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
                                             '{} critically fails at being a {}.'.format(message.User.Name, self.animal),
