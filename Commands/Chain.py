@@ -36,6 +36,10 @@ class Chain(CommandInterface):
             link = link.strip()
             link = re.sub(r'\\\|', r'|', link)
             if response is not None:
+                if hasattr(response, '__iter__'):
+                    return IRCResponse(ResponseType.Say,
+                                       u"Chain Error: segment before '{}' returned a list".format(link),
+                                       message.ReplyTo)
                 link = link.replace('$output', response.Response)  # replace $output with output of previous command
                 extraVars.update(response.ExtraVars)
                 for var, value in extraVars.iteritems():
