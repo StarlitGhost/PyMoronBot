@@ -87,11 +87,11 @@ class Alias(CommandInterface):
     def _alias(self, message):
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say,
-                               'Only my admins may create new aliases!',
+                               u"Only my admins may create new aliases!",
                                message.ReplyTo)
 
         if len(message.ParameterList) <= 1:
-            return IRCResponse(ResponseType.Say, 'Alias what?', message.ReplyTo)
+            return IRCResponse(ResponseType.Say, u"Alias what?", message.ReplyTo)
 
         if message.ParameterList[0].lower() in self.aliases:
             return IRCResponse(ResponseType.Say,
@@ -118,17 +118,17 @@ class Alias(CommandInterface):
         return IRCResponse(ResponseType.Say,
                            u"Created a new alias '{}' for '{}'."
                            .format(message.ParameterList[0].lower(),
-                                   u' '.join(message.ParameterList[1:])),
+                                   u" ".join(message.ParameterList[1:])),
                            message.ReplyTo)
 
     def _unalias(self, message):
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say,
-                               'Only my admins may delete aliases!',
+                               u"Only my admins may delete aliases!",
                                message.ReplyTo)
 
         if len(message.ParameterList) == 0:
-            return IRCResponse(ResponseType.Say, 'Unalias what?', message.ReplyTo)
+            return IRCResponse(ResponseType.Say, u"Unalias what?", message.ReplyTo)
 
         if message.ParameterList[0].lower() not in self.aliases:
             return IRCResponse(ResponseType.Say,
@@ -145,13 +145,13 @@ class Alias(CommandInterface):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
                                u"Current aliases: {}"
-                               .format(u', '.join(sorted(self.aliases.keys()))),
+                               .format(u", ".join(sorted(self.aliases.keys()))),
                                message.ReplyTo)
         elif message.ParameterList[0].lower() in self.aliases:
             return IRCResponse(ResponseType.Say,
                                u"'{}' is aliased to: {}"
                                .format(message.ParameterList[0].lower(),
-                                       u' '.join(self.aliases[message.ParameterList[0].lower()])),
+                                       u" ".join(self.aliases[message.ParameterList[0].lower()])),
                                message.ReplyTo)
         else:
             return IRCResponse(ResponseType.Say,
@@ -162,12 +162,12 @@ class Alias(CommandInterface):
     def _aliasHelp(self, message):
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say,
-                               'Only my admins may set alias help text!',
+                               u"Only my admins may set alias help text!",
                                message.ReplyTo)
 
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
-                               "Set the help text for what alias to what?",
+                               u"Set the help text for what alias to what?",
                                message.ReplyTo)
 
         if message.ParameterList[0].lower() not in self.aliases:
@@ -178,7 +178,7 @@ class Alias(CommandInterface):
 
         if len(message.ParameterList) == 1:
             return IRCResponse(ResponseType.Say,
-                               "You didn't give me any help text to set for {}!"
+                               u"You didn't give me any help text to set for {}!"
                                .format(message.ParameterList[0].lower()),
                                message.ReplyTo)
 
@@ -216,25 +216,41 @@ class Alias(CommandInterface):
             return
 
         alias = self.aliases[message.Command.lower()]
-        newMsg = u'{0}{1}'.format(self.bot.commandChar, ' '.join(alias))
+        newMsg = u"{0}{1}".format(self.bot.commandChar, ' '.join(alias))
 
-        newMsg = newMsg.replace('$sender', message.User.Name)
+        newMsg = newMsg.replace("$sender", message.User.Name)
         if message.Channel is not None:
-            newMsg = newMsg.replace('$channel', message.Channel.Name)
+            newMsg = newMsg.replace("$channel", message.Channel.Name)
         else:
-            newMsg = newMsg.replace('$channel', message.User.Name)
+            newMsg = newMsg.replace("$channel", message.User.Name)
+
+        paramList = [self._mangleReplacementPoints(param) for param in message.ParameterList]
 
         # if the alias contains numbered param replacement points, replace them
         if re.search(r'\$[0-9]+', newMsg):
-            newMsg = newMsg.replace('$0',  u' '.join(message.ParameterList))
-            for i, param in enumerate(message.ParameterList):
+            newMsg = newMsg.replace("$0",  u" ".join(paramList))
+            for i, param in enumerate(paramList):
                 if newMsg.find(u"${}+".format(i+1)) != -1:
                     newMsg = newMsg.replace(u"${}+".format(i+1),
-                                            u" ".join(message.ParameterList[i:]))
+                                            u" ".join(paramList[i:]))
                 else:
                     newMsg = newMsg.replace(u"${}".format(i+1), param)
         # if there are no numbered replacement points, append the full parameter list instead
         else:
-            newMsg += u' {}'.format(u' '.join(message.ParameterList))
+            newMsg += u" {}".format(u" ".join(paramList))
+
+        newMsg = self._unmangleReplacementPoints(newMsg)
 
         return IRCMessage(message.Type, message.User.String, message.Channel, newMsg, self.bot)
+
+    @staticmethod
+    def _mangleReplacementPoints(string):
+        # Replace alias replacement points with something that should never show up in messages/responses
+        string = re.sub(r'\$([\w]+)', r'@D\1@', string)
+        return string
+
+    @staticmethod
+    def _unmangleReplacementPoints(string):
+        # Replace the mangled replacement points with unmangled ones
+        string = re.sub(r'@D([\w]+)@', r'$\1', string)
+        return string
