@@ -310,6 +310,7 @@ class Responses(CommandInterface):
                     "http://i.imgur.com/SkBaRNR.gif",   # horse and cat boop and then facerub on the wall of a stable
                     "http://i.imgur.com/kc4SQIz.gifv",  # dog boops itself, paws ensue
                     "http://i.imgur.com/ddiNHHz.jpg",   # cartoon wolf boop, pass it on!
+                    "http://i.imgur.com/6QPFAkO.gifv",  # monkey flings itself between trees, messing with a bunch of tiger cubs
                 ]
                 return [IRCResponse(ResponseType.Say,
                                     'Boop! {}'.format(random.choice(boops)),
