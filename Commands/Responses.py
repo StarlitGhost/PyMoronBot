@@ -171,7 +171,7 @@ class Responses(CommandInterface):
                     ''' User Critically Failed '''
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is DEFINITELY NOT the Droid you are looking for.'.format(message.User.Name),
+                                            '{} is DEFINITELY NOT the droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
                     elif self.animal == 'goose':
                         return [IRCResponse(ResponseType.Say,
@@ -186,7 +186,7 @@ class Responses(CommandInterface):
                     ''' User Is Not A [animal] '''
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is not the Droid you are looking for.'.format(message.User.Name),
+                                            '{} is not the droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
@@ -196,7 +196,7 @@ class Responses(CommandInterface):
                     '''User Might Be A [animal] '''
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} might be the Droid you are looking for.'.format(message.User.Name),
+                                            '{} might be the droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
@@ -206,7 +206,7 @@ class Responses(CommandInterface):
                     ''' User Is A [animal] '''
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is the Droid you are looking for.'.format(message.User.Name),
+                                            '{} is the droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
                     elif self.animal == 'puppeh':
                         return [IRCResponse(ResponseType.Say,
@@ -220,7 +220,7 @@ class Responses(CommandInterface):
                     ''' User Is A Critical [animal] '''
                     if self.animal == 'droid':
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is DEFINITELY the Droid you are looking for.'.format(message.User.Name),
+                                            '{} is DEFINITELY the droid you are looking for.'.format(message.User.Name),
                                             message.ReplyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
@@ -229,7 +229,7 @@ class Responses(CommandInterface):
                 else:
                     ''' Roll is outside of bounds, Magic! '''
                     return [IRCResponse(ResponseType.Say,
-                                        'You are clearly a Magician rolling out of bounds like that.',
+                                        'You are clearly a magician rolling out of bounds like that!',
                                         message.ReplyTo)]
 
             animalResponse = MobroResponse('animal', '', '', seconds=0)
@@ -239,7 +239,7 @@ class Responses(CommandInterface):
 
             '''Responds to boops'''
             def boopMatch(message):
-                match = re.search('(^|[^a-z]+)b[o0]{2,}ps?([^a-z]+|$)', message, re.IGNORECASE)
+                match = re.search('(^|[^\w])b[o0]{2,}ps?([^\w]|$)', message, re.IGNORECASE)
                 return match
 
             def boopTalkwords(message):
