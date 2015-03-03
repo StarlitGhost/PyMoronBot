@@ -23,7 +23,9 @@ class UnbalancedBracesException(Exception):
 
 class Sub(CommandInterface):
     triggers = ['sub']
-    help = "sub <text with subcommands> - fill this out when I figure out how best to explain it"
+    help = "sub <text> - executes nested commands in <text> and replaces the commands with their output\n" \
+           "syntax: text {command params} more text {command {command params} {command params}}\n" \
+           "example: .sub Some {rainbow magical} {flip topsy-turvy} text"
     runInThread = True
 
     def execute(self, message):
