@@ -22,7 +22,7 @@ from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 # - multiple fetch types beyond the current random, eg reddit sort types (top rated, hot, best, etc)
 class RedditImage(CommandInterface):
     triggers = ['redditimage']
-    help = ""
+    help = "redditimage <subreddit> - fetches a random image from the specified subreddit"
     runInThread = True
 
     def onLoad(self):
