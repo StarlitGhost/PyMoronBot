@@ -22,7 +22,7 @@ class Choose(CommandInterface):
         """
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
-                               "You didn't give me any options to choose from! {0}".format(help),
+                               "You didn't give me any options to choose from! {}".format(self.help),
                                message.ReplyTo)
 
         if ',' in message.Parameters:
