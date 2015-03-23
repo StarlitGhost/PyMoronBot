@@ -436,14 +436,14 @@ class URLFollow(CommandInterface):
         return
 
     def GetTitle(self, webpage):
-        match = re.search('<title\s*>\s*(?P<title>.*?)</title\s*>', webpage, re.IGNORECASE | re.DOTALL)
-        if match:
-            title = match.group('title')
+        soup = BeautifulSoup(webpage)
+        title = soup.title
+        if title:
+            title = title.text
             title = title.decode('utf-8')
-            title = re.sub('(\n|\r)+', '', title)
+            title = re.sub('[\r\n]+', '', title)
             title = title.strip()
             title = re.sub('\s+', ' ', title)
-            title = re.sub('<[^<]+?>', '', title)
             title = self.htmlParser.unescape(title)
             
             if len(title) > 300:
