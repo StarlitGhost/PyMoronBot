@@ -17,7 +17,7 @@ class AsterFix(CommandInterface):
     triggers = ['asterfix']
     acceptedTypes = ['PRIVMSG', 'ACTION']
 
-    help = '*<fix> - looks for similar text in your last message and attempts to replace the most likely candidate'
+    help = '**<fix> - looks for similar text in your last message and attempts to replace the most likely candidate'
 
     def onLoad(self):
         self.messages = {}
@@ -38,7 +38,7 @@ class AsterFix(CommandInterface):
         else:
             messageString = message.MessageString
 
-        changeMatch = re.match(r"^(?P<change>(\*[^\s*]+)|([^\s*]+)\*)$", messageString)
+        changeMatch = re.match(r"^(?P<change>(\*\*[^\s*]+)|([^\s*]+)\*\*)$", messageString)
         if changeMatch:
             change = changeMatch.group('change').strip('*')
         else:
