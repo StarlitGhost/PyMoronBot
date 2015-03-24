@@ -254,7 +254,8 @@ class URLFollow(CommandInterface):
         data.append(name)
 
         # genres
-        data.append(u'Genres: ' + ', '.join([genre['description'] for genre in appData['genres']]))
+        if 'genres' in appData:
+            data.append(u'Genres: ' + ', '.join([genre['description'] for genre in appData['genres']]))
 
         # release date
         releaseDate = appData['release_date']
