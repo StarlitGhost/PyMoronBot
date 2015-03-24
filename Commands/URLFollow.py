@@ -247,7 +247,11 @@ class URLFollow(CommandInterface):
         data = []
 
         # name
-        data.append(assembleFormattedText(A.normal[appData['name'], A.fg.gray[' by '], u', '.join(appData['developers'])]))
+        if 'developers' in appData:
+            name = assembleFormattedText(A.normal[appData['name'], A.fg.gray[' by '], u', '.join(appData['developers'])])
+        else:
+            name = appData['name']
+        data.append(name)
 
         # genres
         data.append(u'Genres: ' + ', '.join([genre['description'] for genre in appData['genres']]))
