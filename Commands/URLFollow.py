@@ -73,7 +73,7 @@ class URLFollow(CommandInterface):
         youtubeMatch = re.search(r'(youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#\?]{11})', url)
         imgurMatch   = re.search(r'(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', url)
         twitterMatch = re.search(r'twitter.com/(?P<tweeter>[^/]+)/status(es)?/(?P<tweetID>[0-9]+)', url)
-        steamMatch   = re.search(r'store.steampowered.com/app/(?P<steamAppID>[0-9]+)', url)
+        steamMatch   = re.search(r'store.steampowered.com/(?P<steamType>(app|sub))/(?P<steamID>[0-9]+)', url)
         ksMatch      = re.search(r'kickstarter.com/projects/(?P<ksID>[^/]+/[^/&#\?]+)', url)
         twitchMatch  = re.search(r'twitch\.tv/(?P<twitchChannel>[^/]+)', url)
         
@@ -84,7 +84,7 @@ class URLFollow(CommandInterface):
         elif twitterMatch:
             return self.FollowTwitter(twitterMatch.group('tweeter'), twitterMatch.group('tweetID'), message)
         elif steamMatch:
-            return self.FollowSteam(steamMatch.group('steamAppID'), message)
+            return self.FollowSteam(steamMatch.group('steamType'), steamMatch.group('steamID'), message)
         elif ksMatch:
             return self.FollowKickstarter(ksMatch.group('ksID'), message)
         elif twitchMatch:
@@ -235,14 +235,15 @@ class URLFollow(CommandInterface):
                            message.ReplyTo,
                            {'urlfollowURL': 'https://twitter.com/{}/status/{}'.format(tweeter, tweetID)})
 
-    def FollowSteam(self, steamAppId, message):
-        webPage = WebUtils.fetchURL('http://store.steampowered.com/api/appdetails/?appids={0}&cc=US&l=english&v=1'.format(steamAppId))
+    def FollowSteam(self, steamType, steamId, message):
+        steamType = {'app': 'app', 'sub': 'package'}[steamType]
+        webPage = WebUtils.fetchURL('http://store.steampowered.com/api/{0}details/?{0}ids={1}&cc=US&l=english&v=1'.format(steamType, steamId))
 
         response = json.loads(webPage.body)
-        if not response[steamAppId]['success']:
+        if not response[steamId]['success']:
             return  # failure
 
-        appData = response[steamAppId]['data']
+        appData = response[steamId]['data']
 
         data = []
 
@@ -252,6 +253,12 @@ class URLFollow(CommandInterface):
         else:
             name = appData['name']
         data.append(name)
+        
+        # package contents (might need to trim this...)
+        if 'apps' in appData:
+            appNames = [app['name'] for app in appData['apps']]
+            apps = u'Package containing: {}'.format(u', '.join(appNames))
+            data.append(apps)
 
         # genres
         if 'genres' in appData:
@@ -260,7 +267,8 @@ class URLFollow(CommandInterface):
         # release date
         releaseDate = appData['release_date']
         if not releaseDate['coming_soon']:
-            data.append(u'Release Date: ' + releaseDate['date'])
+            if releaseDate['date']:
+                data.append(u'Release Date: ' + releaseDate['date'])
         else:
             data.append(assembleFormattedText(A.normal['Release Date: ', A.fg.cyan[str(releaseDate['date'])]]))
 
@@ -277,11 +285,12 @@ class URLFollow(CommandInterface):
             data.append(u'Metacritic: {0}'.format(metacritic))
 
         # prices
-        if 'price_overview' in appData:
-            prices = {'USD': appData['price_overview'],
-                      'GBP': self.getSteamPrice(steamAppId, 'GB'),
-                      'EUR': self.getSteamPrice(steamAppId, 'FR'),
-                      'AUD': self.getSteamPrice(steamAppId, 'AU')}
+        priceField = {'app': 'price_overview', 'package': 'price'}[steamType]
+        if priceField in appData:
+            prices = {'USD': appData[priceField],
+                      'GBP': self.getSteamPrice(steamType, steamId, 'GB'),
+                      'EUR': self.getSteamPrice(steamType, steamId, 'FR'),
+                      'AUD': self.getSteamPrice(steamType, steamId, 'AU')}
 
             currencies = {'USD': u'$',
                           'GBP': u'\u00A3',
@@ -298,10 +307,9 @@ class URLFollow(CommandInterface):
             data.append(priceString)
         
         # description
-        description = appData['about_the_game']
-        if description is not None:
+        if 'about_the_game' in appData and appData['about_the_game'] is not None:
             limit = 150
-            description = re.sub(r'(<[^>]+>|[\r\n\t])+', assembleFormattedText(A.normal[' ', A.fg.gray['>'], ' ']), description)
+            description = re.sub(r'(<[^>]+>|[\r\n\t])+', assembleFormattedText(A.normal[' ', A.fg.gray['>'], ' ']), appData['about_the_game'])
             if len(description) > limit:
                 description = u'{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
             data.append(description)
@@ -309,15 +317,16 @@ class URLFollow(CommandInterface):
         return IRCResponse(ResponseType.Say,
                            self.graySplitter.join(data),
                            message.ReplyTo,
-                           {'urlfollowURL': 'http://store.steampowered.com/app/{}'.format(steamAppId)})
+                           {'urlfollowURL': 'http://store.steampowered.com/{}/{}'.format({'app': 'app', 'package': 'sub'}[steamType], steamId)})
 
     @classmethod
-    def getSteamPrice(cls, appId, region):
-        webPage = WebUtils.fetchURL('http://store.steampowered.com/api/appdetails/?appids={0}&cc={1}&l=english&v=1'.format(appId, region))
+    def getSteamPrice(cls, appType, appId, region):
+        webPage = WebUtils.fetchURL('http://store.steampowered.com/api/{}details/?{}ids={}&cc={}&l=english&v=1'.format(appType, appId, region))
+        priceField = {'app': 'price_overview', 'package': 'price'}[appType]
         response = json.loads(webPage.body)
         if region == 'AU':
-            response[appId]['data']['price_overview']['currency'] = 'AUD'
-        return response[appId]['data']['price_overview']
+            response[appId]['data'][priceField]['currency'] = 'AUD'
+        return response[appId]['data'][priceField]
 
     def FollowKickstarter(self, ksID, message):
         webPage = WebUtils.fetchURL('https://www.kickstarter.com/projects/{}/'.format(ksID))
