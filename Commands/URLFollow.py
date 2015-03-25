@@ -321,7 +321,7 @@ class URLFollow(CommandInterface):
 
     @classmethod
     def getSteamPrice(cls, appType, appId, region):
-        webPage = WebUtils.fetchURL('http://store.steampowered.com/api/{}details/?{}ids={}&cc={}&l=english&v=1'.format(appType, appId, region))
+        webPage = WebUtils.fetchURL('http://store.steampowered.com/api/{0}details/?{0}ids={1}&cc={2}&l=english&v=1'.format(appType, appId, region))
         priceField = {'app': 'price_overview', 'package': 'price'}[appType]
         response = json.loads(webPage.body)
         if region == 'AU':
