@@ -297,10 +297,13 @@ class URLFollow(CommandInterface):
                           'EUR': u'\u20AC',
                           'AUD': u'AU$'}
 
-            if prices['AUD']['final'] == prices['USD']['final']:
+            if not prices['AUD'] or prices['AUD']['final'] == prices['USD']['final']:
                 del prices['AUD']
+            
+            # filter out any missing prices
+            prices = {key: val for key, val in prices.iteritems() if val}
 
-            priceString = u'/'.join([currencies[val['currency']] + unicode(val['final'] / 100.0) if val else '' for val in prices.values()])
+            priceString = u'/'.join([currencies[val['currency']] + unicode(val['final'] / 100.0) for val in prices.values()])
             if prices['USD']['discount_percent'] > 0:
                 priceString += assembleFormattedText(A.normal[A.fg.green[' ({0}% sale!)'.format(prices['USD']['discount_percent'])]])
 
