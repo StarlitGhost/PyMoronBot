@@ -75,6 +75,19 @@ class Responses(CommandInterface):
                                              'loves cheese',
                                              '([^a-zA-Z]|^)cheese([^a-zA-Z]|$)',
                                              ResponseType.Do))
+                                             
+            '''Also respond to French cheese'''
+            self.responses.add(MobroResponse('fromage',
+                                             'adore le fromage',
+                                             '([^a-zA-Z]|^)fromage([^a-zA-Z]|$)',
+                                             ResponseType.Do))
+            
+            '''And Dutch cheese because it'll be funny if it ever comes up'''                                 
+            self.responses.add(MobroResponse('kaas',
+                                             'is gek op kaas',
+                                             '([^a-zA-Z]|^)kaas([^a-zA-Z]|$)',
+                                             ResponseType.Do))
+
 
             '''Responds to JavaScript's insane shenanigans'''
             self.responses.add(MobroResponse('wat',
