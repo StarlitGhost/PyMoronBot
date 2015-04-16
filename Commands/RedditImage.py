@@ -16,6 +16,7 @@ from Utils import WebUtils
 
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
+
 # Idea for this initially taken from Heufneutje's RE_HeufyBot Aww module, but I made it more generic for aliasing
 # https://github.com/Heufneutje/RE_HeufyBot/blob/f45219d1a61f0ed0fd60a89dcaeb2e962962356e/modules/Aww/src/heufybot/modules/Aww.java
 # Future plans:

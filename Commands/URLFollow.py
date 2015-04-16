@@ -354,23 +354,24 @@ class URLFollow(CommandInterface):
                 data.append(title.h2.text.strip())
 
         stats = soup.find(id='stats')
+        # all of this is now in page javascript, extracting it will be a pain...
+        if stats is not None:
+            backerCount = stats.find(id='backers_count')
+            if backerCount is not None:
+                data.append('Backers: {0:,}'.format(int(backerCount['data-backers-count'])))
 
-        backerCount = stats.find(id='backers_count')
-        if backerCount is not None:
-            data.append('Backers: {0:,}'.format(int(backerCount['data-backers-count'])))
+            pledged = stats.find(id='pledged')
+            if pledged is not None:
+                if float(pledged['data-percent-raised']) >= 1.0:
+                    percentageString = A.fg.green['({3:,.0f}% funded)']
+                else:
+                    percentageString = A.fg.red['({3:,.0f}% funded)']
 
-        pledged = stats.find(id='pledged')
-        if pledged is not None:
-            if float(pledged['data-percent-raised']) >= 1.0:
-                percentageString = A.fg.green['({3:,.0f}% funded)']
-            else:
-                percentageString = A.fg.red['({3:,.0f}% funded)']
-                
-            pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}', A.fg.gray['/'], '{1:,.0f} {2} ', percentageString])
-            data.append(pledgedString.format(float(pledged['data-pledged']),
-                                             float(pledged['data-goal']),
-                                             pledged.data['data-currency'],
-                                             float(pledged['data-percent-raised']) * 100))
+                pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}', A.fg.gray['/'], '{1:,.0f} {2} ', percentageString])
+                data.append(pledgedString.format(float(pledged['data-pledged']),
+                                                 float(pledged['data-goal']),
+                                                 pledged.data['data-currency'],
+                                                 float(pledged['data-percent-raised']) * 100))
 
         findState = soup.find(id='main_content')
         if 'Project-state-canceled' in findState['class']:
