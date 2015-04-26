@@ -87,6 +87,12 @@ class Responses(CommandInterface):
                                              'is gek op kaas',
                                              '([^a-zA-Z]|^)kaas([^a-zA-Z]|$)',
                                              ResponseType.Do))
+                                             
+            '''Respond to Finnish cheese because lel'''
+            self.responses.add(MobroResponse('juusto',
+                                             'rakastaa juustoa',
+                                             '([^a-zA-Z]|^)juusto([^a-zA-Z]|$)',
+                                             ResponseType.Do))
 
 
             '''Responds to JavaScript's insane shenanigans'''
