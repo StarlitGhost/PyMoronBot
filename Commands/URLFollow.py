@@ -367,10 +367,18 @@ class URLFollow(CommandInterface):
                 else:
                     percentageString = A.fg.red['({3:,.0f}% funded)']
 
-                pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}', A.fg.gray['/'], '{1:,.0f} {2} ', percentageString])
+                if int(backerCount['data-backers-count']) > 0:
+                    pledgePerBacker = float(pledged['data-pledged']) / int(backerCount['data-backers-count'])
+                else:
+                    pledgePerBacker = 0
+                
+                pledgePerBackerString = A.fg.gray['{4:,.0f}/backer']
+
+                pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}', A.fg.gray['/'], '{1:,.0f} {2} ', pledgePerBackerString, percentageString])
                 data.append(pledgedString.format(float(pledged['data-pledged']),
                                                  float(pledged['data-goal']),
                                                  pledged.data['data-currency'],
+                                                 pledgePerBacker,
                                                  float(pledged['data-percent-raised']) * 100))
 
         findState = soup.find(id='main_content')
