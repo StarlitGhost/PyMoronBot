@@ -374,7 +374,7 @@ class URLFollow(CommandInterface):
                 
                 pledgePerBackerString = A.fg.gray['{4:,.0f}/backer']
 
-                pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}', A.fg.gray['/'], '{1:,.0f} {2} ', pledgePerBackerString, percentageString])
+                pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}', A.fg.gray['/'], '{1:,.0f} {2} ', percentageString, ' ', pledgePerBackerString])
                 data.append(pledgedString.format(float(pledged['data-pledged']),
                                                  float(pledged['data-goal']),
                                                  pledged.data['data-currency'],
