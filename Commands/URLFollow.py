@@ -15,6 +15,7 @@ from Data import ignores
 from Utils import WebUtils, StringUtils
 
 from bs4 import BeautifulSoup
+from isodate import parse_duration
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
@@ -96,43 +97,40 @@ class URLFollow(CommandInterface):
         if self.youtubeKey is None:
             return IRCResponse(ResponseType.Say, '[YouTube API key not found]', message.ReplyTo)
 
-        url = 'https://gdata.youtube.com/feeds/api/videos/{0}?v=2&key={1}'.format(videoID, self.youtubeKey)
+        fields = 'items(id,snippet(title,description),contentDetails(duration))'
+        parts = 'snippet,contentDetails'
+        url = 'https://www.googleapis.com/youtube/v3/videos?id={}&fields={}&part={}&key={}'.format(
++                videoID, fields,parts, self.youtubeKey)
         
         webPage = WebUtils.fetchURL(url)
         webPage.body = webPage.body.decode('utf-8')
-        
-        titleMatch = re.search('<title>(?P<title>[^<]+?)</title>', webPage.body)
-        
-        if titleMatch:
-            lengthMatch = re.search("<yt:duration seconds='(?P<length>[0-9]+?)'/>", webPage.body)
-            descMatch = re.search("<media:description type='plain'>(?P<desc>[^<]+?)</media:description>", webPage.body)
-            
-            title = titleMatch.group('title')
-            title = self.htmlParser.unescape(title)
-            length = lengthMatch.group('length')
-            m, s = divmod(int(length), 60)
-            h, m = divmod(m, 60)
-            if h > 0:
-                length = u'{0:02d}:{1:02d}:{2:02d}'.format(h, m, s)
-            else:
-                length = u'{0:02d}:{1:02d}'.format(m, s)
+        j = json.loads(webPage.body)
 
+        if 'items' not in j:
+            return None
+
+        title = j['items'][0]['snippet']['title']
+        description = j['items'][0]['snippet']['description']
+        length = parse_duration(j["items"][0]["contentDetails"]["duration"]).total_seconds()
+
+        m, s = divmod(int(length), 60)
+        h, m = divmod(m, 60)
+        if h > 0:
+            length = u'{0:02d}:{1:02d}:{2:02d}'.format(h, m, s)
+        else:
+            length = u'{0:02d}:{1:02d}'.format(m, s)
+
+        if not description:
             description = u'<no description available>'
-            if descMatch:
-                description = descMatch.group('desc')
-                description = re.sub('<[^<]+?>', '', description)
-                description = self.htmlParser.unescape(description)
-                description = re.sub('\n+', ' ', description)
-                description = re.sub('\s+', ' ', description)
-                if len(description) > 150:
-                    description = description[:147] + u'...'
-                
-            return IRCResponse(ResponseType.Say,
-                               self.graySplitter.join([title, length, description]),
-                               message.ReplyTo,
-                               {'urlfollowURL': 'http://youtu.be/{}'.format(videoID)})
-        
-        return
+        description = re.sub('\n+', ' ', description)
+        description = re.sub('\s+', ' ', description)
+        if len(description) > 150:
+            description = description[:147] + u'...'
+
+        return IRCResponse(ResponseType.Say,
+                           self.graySplitter.join([title, length, description]),
+                           message.ReplyTo,
+                           {'urlfollowURL': 'http://youtu.be/{}'.format(videoID)})
     
     def FollowImgur(self, imgurID, message):
         if self.imgurClientID is None:
