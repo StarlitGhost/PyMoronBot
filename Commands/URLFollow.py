@@ -99,8 +99,7 @@ class URLFollow(CommandInterface):
 
         fields = 'items(id,snippet(title,description),contentDetails(duration))'
         parts = 'snippet,contentDetails'
-        url = 'https://www.googleapis.com/youtube/v3/videos?id={}&fields={}&part={}&key={}'.format(
-+                videoID, fields,parts, self.youtubeKey)
+        url = 'https://www.googleapis.com/youtube/v3/videos?id={}&fields={}&part={}&key={}'.format(videoID, fields,parts, self.youtubeKey)
         
         webPage = WebUtils.fetchURL(url)
         webPage.body = webPage.body.decode('utf-8')
