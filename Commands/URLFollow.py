@@ -121,10 +121,10 @@ class URLFollow(CommandInterface):
 
         if not description:
             description = u'<no description available>'
-        description = re.sub('\n+', ' ', description)
-        description = re.sub('\s+', ' ', description)
-        if len(description) > 150:
-            description = description[:147] + u'...'
+        description = re.sub('(\n|\s)+', ' ', description)
+        limit = 150
+        if len(description) > limit:
+            description = u'{} ...'.format(description[:limit].rsplit(' ', 1)[0])
 
         return IRCResponse(ResponseType.Say,
                            self.graySplitter.join([title, length, description]),
