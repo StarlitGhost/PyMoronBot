@@ -1,5 +1,4 @@
-[![Stories in Ready](https://badge.waffle.io/MatthewCox/PyMoronBot.png?label=ready&title=Ready)](https://waffle.io/MatthewCox/PyMoronBot)
-PyMoronBot
+PyMoronBot [![Stories in Ready](https://badge.waffle.io/MatthewCox/PyMoronBot.png?label=ready&title=Ready)](https://waffle.io/MatthewCox/PyMoronBot)
 ==========
 
 A modular IRC bot, written in Python.
