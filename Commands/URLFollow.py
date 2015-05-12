@@ -375,8 +375,8 @@ class URLFollow(CommandInterface):
                 data.append(pledgedString.format(float(pledged['data-pledged']),
                                                  float(pledged['data-goal']),
                                                  pledged.data['data-currency'],
-                                                 pledgePerBacker,
-                                                 float(pledged['data-percent-raised']) * 100))
+                                                 float(pledged['data-percent-raised']) * 100,
+                                                 pledgePerBacker))
 
         findState = soup.find(id='main_content')
         if 'Project-state-canceled' in findState['class']:
