@@ -97,9 +97,9 @@ class URLFollow(CommandInterface):
         if self.youtubeKey is None:
             return IRCResponse(ResponseType.Say, '[YouTube API key not found]', message.ReplyTo)
 
-        fields = 'items(id,snippet(title,description),contentDetails(duration))'
+        fields = 'items(id,snippet(title,description,channelTitle),contentDetails(duration))'
         parts = 'snippet,contentDetails'
-        url = 'https://www.googleapis.com/youtube/v3/videos?id={}&fields={}&part={}&key={}'.format(videoID, fields,parts, self.youtubeKey)
+        url = 'https://www.googleapis.com/youtube/v3/videos?id={}&fields={}&part={}&key={}'.format(videoID, fields, parts, self.youtubeKey)
         
         webPage = WebUtils.fetchURL(url)
         webPage.body = webPage.body.decode('utf-8')
@@ -110,6 +110,7 @@ class URLFollow(CommandInterface):
 
         title = j['items'][0]['snippet']['title']
         description = j['items'][0]['snippet']['description']
+        channel = j['items'][0]['snippet']['channelTitle']
         length = parse_duration(j["items"][0]["contentDetails"]["duration"]).total_seconds()
 
         m, s = divmod(int(length), 60)
@@ -127,7 +128,7 @@ class URLFollow(CommandInterface):
             description = u'{} ...'.format(description[:limit].rsplit(' ', 1)[0])
 
         return IRCResponse(ResponseType.Say,
-                           self.graySplitter.join([title, length, description]),
+                           self.graySplitter.join([title, length, channel, description]),
                            message.ReplyTo,
                            {'urlfollowURL': 'http://youtu.be/{}'.format(videoID)})
     
