@@ -21,18 +21,9 @@ class Actions(CommandInterface):
         """
         @type message: IRCMessage
         """
-        actions = ['pokes',
-                   'gropes',
-                   'molests',
-                   'slaps',
-                   'kicks',
-                   'rubs',
-                   'hugs',
-                   'cuddles',
-                   'glomps']
-        regex = r"^(?P<action>({0})),?[ ]{1}([^a-zA-Z0-9_\|`\[\]\^-]|$)"
+        regex = r"^(?P<action>(\w+s)),?[ ]{}([^a-zA-Z0-9_\|`\[\]\^-]|$)"
         match = re.search(
-            regex.format('|'.join(actions), self.bot.nickname),
+            regex.format(self.bot.nickname),
             message.MessageString,
             re.IGNORECASE)
         if match:
