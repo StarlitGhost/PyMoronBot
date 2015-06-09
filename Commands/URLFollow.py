@@ -36,6 +36,8 @@ class URLFollow(CommandInterface):
 
         self.youtubeKey = load_key(u'YouTube')
         self.imgurClientID = load_key(u'imgur Client ID')
+        
+        self.autoFollow = True
 
     def shouldExecute(self, message):
         """
@@ -52,9 +54,17 @@ class URLFollow(CommandInterface):
         """
         @type message: IRCMessage
         """
+        match = None
         if message.Command.lower() in self.triggers:
-            match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.Parameters, re.IGNORECASE)
-        else:
+            if message.ParameterList[0].lower() == 'on':
+                self.autoFollow = True
+                return IRCResponse(ResponseType.Say, 'Auto-follow on', message.ReplyTo)
+            elif message.ParameterList[0].lower() == 'off': 
+                self.autoFollow = False
+                return IRCResponse(ResponseType.Say, 'Auto-follow off', message.ReplyTo)
+            else:
+                match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.Parameters, re.IGNORECASE)
+        elif self.autoFollow:
             match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.MessageString, re.IGNORECASE)
         if not match:
             return
