@@ -28,5 +28,5 @@ class Actions(CommandInterface):
             re.IGNORECASE)
         if match:
             return IRCResponse(ResponseType.Do,
-                               '%s %s' % (match.group('action'), message.User.Name),
+                               message.MessageString.replace(self.bot.nickname, message.User.Name),
                                message.ReplyTo)
