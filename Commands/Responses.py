@@ -97,7 +97,7 @@ class Responses(CommandInterface):
             '''And why not German too?'''
             self.responses.add(MobroResponse(u'Käse',
                                              u'liebt Käse',
-                                             u'([^a-zA-Z]|^)Käse([^a-zA-Z]|$)',
+                                             ur'([^a-zA-Z]|^)Käse([^a-zA-Z]|$)',
                                              ResponseType.Do))
 
             '''Responds to JavaScript's insane shenanigans'''
@@ -436,7 +436,7 @@ class MobroResponse(object):
         if isinstance(self.regex, str):
             self.regex = [self.regex]
         for regex in self.regex:
-            if re.search(regex, message, re.IGNORECASE):
+            if re.search(regex, message, re.IGNORECASE | re.UNICODE):
                 if not self.mustAllMatch:
                     return True
             elif self.mustAllMatch:
