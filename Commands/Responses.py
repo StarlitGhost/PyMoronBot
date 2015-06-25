@@ -95,9 +95,9 @@ class Responses(CommandInterface):
                                              ResponseType.Do))
 
             '''And why not German too?'''
-            self.responses.add(MobroResponse('Käse',
-                                             'liebt Käse',
-                                             '([^a-zA-Z]|^)Käse([^a-zA-Z]|$)',
+            self.responses.add(MobroResponse(u'Käse',
+                                             u'liebt Käse',
+                                             u'([^a-zA-Z]|^)Käse([^a-zA-Z]|$)',
                                              ResponseType.Do))
 
             '''Responds to JavaScript's insane shenanigans'''
