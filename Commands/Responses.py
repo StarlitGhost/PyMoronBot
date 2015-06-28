@@ -94,11 +94,11 @@ class Responses(CommandInterface):
                                              '([^a-zA-Z]|^)juusto([^a-zA-Z]|$)',
                                              ResponseType.Do))
 
-            '''And why not German too?'''
-            self.responses.add(MobroResponse(u'Käse',
-                                             u'liebt Käse',
-                                             ur'([^a-zA-Z]|^)Käse([^a-zA-Z]|$)',
-                                             ResponseType.Do))
+            '''And why not German too?''' # because it breaks everything apparently
+#            self.responses.add(MobroResponse(u'Käse',
+#                                             u'liebt Käse',
+#                                             ur'([^a-zA-Z]|^)Käse([^a-zA-Z]|$)',
+#                                             ResponseType.Do))
 
             '''Responds to JavaScript's insane shenanigans'''
             self.responses.add(MobroResponse('wat',
