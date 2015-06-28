@@ -160,7 +160,7 @@ class Responses(CommandInterface):
                     r'blee+p\s+bloo+p': 'droid',
                     r'y?arr+': 'pirate',
                     r'qua+ck': 'duck',
-                    r'whoo+': 'owl',
+                    r'(hoo+t|whoo+)': 'owl',
                     r'br+a+i+n+s+': 'zombie',
                     r'ba+w+k': 'chicken',
                     r'baa+': 'sheep',
