@@ -336,7 +336,7 @@ class Responses(CommandInterface):
                     "http://i.imgur.com/ddiNHHz.jpg",   # cartoon wolf boop, pass it on!
                     "http://i.imgur.com/6QPFAkO.gifv",  # monkey flings itself between trees, messing with a bunch of tiger cubs
                     "http://i.imgur.com/mncYpu5.gifv",  # hockey goalkeeper ass-boops another hockey player into a wall
-                    "http://i.imgur.com/RhlVgmk.gifv",  # sneaky cupboard cat boops another cat
+                    "http://i.imgur.com/NZRxzNe.gif",   # sneaky cupboard cat boops another cat
                     "http://i.imgur.com/1jMYf8U.gifv",  # a couple of guinea pigs boop a cat
                     "http://i.imgur.com/k6YicPf.gif",   # dog gets booped on nose with a toy, then cat runs up and boops its back. dog is very confuse
                     "https://i.imgur.com/m67qRsQ.gifv", # lamb repeatedly boops its face into a dog's paw, dog doesn't care
