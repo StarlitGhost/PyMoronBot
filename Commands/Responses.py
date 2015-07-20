@@ -345,6 +345,7 @@ class Responses(CommandInterface):
                     "https://i.imgur.com/8TKVJ63.gifv", # Goat stands on its back legs to boop with a horse
                     "http://i.imgur.com/1AgMAbK.gifv",  # cat runs out of a dark room, eyes glowing, and leaps into the camera
                     "http://i.imgur.com/i7J5VHI.gifv",  # kitten on a sofa jumps around and boops a dog peering up at it on the nose
+                    "http://i.imgur.com/XTuRoOs.gif",   # bunny boop triforce
                     ]
                 return [IRCResponse(ResponseType.Say,
                                     'Boop! {}'.format(random.choice(boops)),
