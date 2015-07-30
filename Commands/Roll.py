@@ -38,6 +38,9 @@ class NegativeDiceException(Exception):
 class NegativeSidesException(Exception):
     pass
 
+class ZeroSidesException(Exception):
+    pass
+
 
 class Roll(CommandInterface):
     triggers = ['roll', 'rollv']
@@ -154,11 +157,13 @@ class Roll(CommandInterface):
             if numDice > MAX_DICE:
                 raise TooManyDiceException(u'attempted to roll more than {0} dice in a single d expression'.format(MAX_DICE))
             if numSides > MAX_SIDES:
-                raise TooManySidesException(u'attempted to roll a dice with more than {0} sides'.format(MAX_SIDES))
+                raise TooManySidesException(u'attempted to roll a die with more than {0} sides'.format(MAX_SIDES))
             if numDice < 0:
                 raise NegativeDiceException(u'attempted to roll a negative number of dice')
             if numSides < 0:
-                raise NegativeSidesException(u'attempted to roll a dice with a negative number of sides')
+                raise NegativeSidesException(u'attempted to roll a die with a negative number of sides')
+            if numSides < 1:
+                raise ZeroSidesException(u'attempted to roll a die with zero sides')
 
             rolls = []
             for dice in xrange(0, numDice):
@@ -194,7 +199,8 @@ class Roll(CommandInterface):
                 TooManyDiceException,
                 TooManySidesException,
                 NegativeDiceException,
-                NegativeSidesException) as e:
+                NegativeSidesException,
+                ZeroSidesException) as e:
             self.yaccer.rolls = []
 
             return IRCResponse(ResponseType.Say,
