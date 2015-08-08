@@ -290,7 +290,7 @@ class Responses(CommandInterface):
                     "http://i.imgur.com/wtK1T.jpg",     # jet booping tanker truck
                     "http://goo.gl/Nh4PK",              # demon booping the earth
                     "http://goo.gl/JHBKUb",             # real men head boop with kittens
-                    "http://goo.gl/Juhcv",              # sweetie belle booping apple bloom
+                    "http://i.imgur.com/hlCm7aA.png",   # sweetie belle booping apple bloom
                     "http://i.imgur.com/BLQoL61.gif",   # darting boop
                     "http://i.imgur.com/3b2lSjd.gif",   # pounce boops
                     "http://i.imgur.com/P83UL.gif",     # reciprocated cat boop
