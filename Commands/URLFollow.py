@@ -354,16 +354,16 @@ class URLFollow(CommandInterface):
         if shorturl is None:
             shorturl = 'https://www.kickstarter.com/projects/{}/'.format(ksID)
 
-        title = soup.find(class_='NS_projects__header')
+        title = soup.find(property='og:title')
         if title is not None:
             creator = soup.find(attrs={'data-modal-class': 'modal_project_by'})
             if creator is not None:
                 data.append(unicode(assembleFormattedText(A.normal['{0}',
                                                                    A.fg.gray[' by '],
-                                                                   '{1}'])).format(title.h2.text.strip(),
+                                                                   '{1}'])).format(title['content'].strip(),
                                                                                    creator.text.strip()))
             else:
-                data.append(title.h2.text.strip())
+                data.append(title['content'].strip())
 
         stats = soup.find(id='stats')
         # all of this is now in page javascript, extracting it will be a pain...
