@@ -366,7 +366,7 @@ class URLFollow(CommandInterface):
                 data.append(title['content'].strip())
 
         stats = soup.find(id='stats')
-        # all of this is now in page javascript, extracting it will be a pain...
+        # all of this is now in page javascript for completed projects, extracting it will be a pain...
         if stats is not None:
             backerCount = stats.find(id='backers_count')
             if backerCount is not None:
@@ -392,6 +392,11 @@ class URLFollow(CommandInterface):
                                                  pledged.data['data-currency'],
                                                  float(pledged['data-percent-raised']) * 100,
                                                  pledgePerBacker))
+        else:
+            # at least get the backer count of completed projects... full stats as above will be much trickier
+            backerCount = soup.find(class_='NS_projects__spotlight_stats')
+            if backerCount is not None:
+                data.append('Backers: {}'.format(backerCount.b.text.strip()))
 
         findState = soup.find(id='main_content')
         if 'Project-state-canceled' in findState['class']:
