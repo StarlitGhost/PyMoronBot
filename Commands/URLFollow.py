@@ -350,7 +350,7 @@ class URLFollow(CommandInterface):
 
         data = []
 
-        shorturl = soup.find(rel='shorturl')
+        shorturl = soup.find(rel='shorturl')['href']
         if shorturl is None:
             shorturl = 'https://www.kickstarter.com/projects/{}/'.format(ksID)
 
