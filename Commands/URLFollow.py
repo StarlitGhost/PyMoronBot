@@ -350,6 +350,10 @@ class URLFollow(CommandInterface):
 
         data = []
 
+        shorturl = soup.find(rel='shorturl')
+        if shorturl is None:
+            shorturl = 'https://www.kickstarter.com/projects/{}/'.format(ksID)
+
         title = soup.find(class_='NS_projects__header')
         if title is not None:
             creator = soup.find(attrs={'data-modal-class': 'modal_project_by'})
@@ -415,7 +419,7 @@ class URLFollow(CommandInterface):
         return IRCResponse(ResponseType.Say,
                            self.graySplitter.join(data),
                            message.ReplyTo,
-                           {'urlfollowURL': 'https://www.kickstarter.com/projects/{}/'.format(ksID)})
+                           {'urlfollowURL': shorturl})
 
     def FollowTwitch(self, channel, message):
         # Heavily based on Didero's DideRobot code for the same
