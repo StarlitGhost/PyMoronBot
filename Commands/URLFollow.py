@@ -402,25 +402,23 @@ class URLFollow(CommandInterface):
                 else:
                     pledgePerBacker = 0
 
-        currency = soup.select('span.money.no-code')[-1]
-        currencyCode = currency['class']
-        currencyCode.remove('money')
-        currencyCode.remove('no-code')
-        currencyCode = currencyCode[0].upper()
-        currencySymbol = re.sub(ur'[0-9,.]', u'', currency.text)
+        currency = soup.select('span.money.no-code')[-1]['class']
+        currency.remove('money')
+        currency.remove('no-code')
+        currency = currency[0].upper()
 
         if percentage >= 1.0:
-            percentageString = A.fg.green['({4:,.0f}% funded)']
+            percentageString = A.fg.green['({3:,.0f}% funded)']
         else:
-            percentageString = A.fg.red['({4:,.0f}% funded)']
+            percentageString = A.fg.red['({3:,.0f}% funded)']
 
-        pledgePerBackerString = A.fg.gray['{0}{5:,.0f}/backer']
+        pledgePerBackerString = A.fg.gray['{4:,.0f}/backer']
 
-        pledgedString = assembleFormattedText(A.normal['Pledged: {0}{1:,.0f}', A.fg.gray['/'], '{0}{2:,.0f} {3} ', percentageString, ' ', pledgePerBackerString])
-        data.append(pledgedString.format(currencySymbol,
-                                         pledged,
+        pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}', A.fg.gray['/'], '{1:,.0f} {2} ', percentageString, ' ', pledgePerBackerString])
+        data.append(pledgedString.format(pledged,
                                          goal,
-                                         currencyCode,
+                                         currency,
+                                         #pledgedData.data['data-currency'],
                                          percentage * 100,
                                          pledgePerBacker))
 
