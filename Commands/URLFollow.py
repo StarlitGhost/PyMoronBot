@@ -375,7 +375,7 @@ class URLFollow(CommandInterface):
         else:
             backerCount = soup.find(class_='NS_projects__spotlight_stats')
             if backerCount is not None:
-                backerCount = int(backerCount.b.text.strip().split()[0])
+                backerCount = int(backerCount.b.text.strip().split()[0].replace(',', ''))
 
         data.append('Backers: {0:,}'.format(backerCount))
 
@@ -390,19 +390,22 @@ class URLFollow(CommandInterface):
                 else:
                     pledgePerBacker = 0
         else:
-            money = soup.select('div.money.no-code')
+            money = soup.select('span.money.no-code')
             if money:
                 pledgedString = money[0].text.strip()
                 goalString = money[1].text.strip()
-                pledged = float(pledgedString)
-                goal = float(goalString)
+                pledged = float(re.sub(ur'[^0-9.]', u'', pledgedString))
+                goal = float(re.sub(ur'[^0-9.]', u'', goalString))
                 percentage = (pledged / goal)
                 if backerCount > 0:
                     pledgePerBacker = pledged / backerCount
                 else:
                     pledgePerBacker = 0
 
-        currency = soup.select('div.money.no-code')[0]['class'].remove('money').remove('no-code')[0].upper()
+        currency = soup.select('span.money.no-code')[-1]['class']
+        currency.remove('money')
+        currency.remove('no-code')
+        currency = currency[0].upper()
 
         if percentage >= 1.0:
             percentageString = A.fg.green['({3:,.0f}% funded)']
