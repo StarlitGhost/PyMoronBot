@@ -396,7 +396,7 @@ class URLFollow(CommandInterface):
             # at least get the backer count of completed projects... full stats as above will be much trickier
             backerCount = soup.find(class_='NS_projects__spotlight_stats')
             if backerCount is not None:
-                data.append('Backers: {}'.format(backerCount.b.text.strip()))
+                data.append('Backers: {}'.format(backerCount.b.text.strip().split()[0]))
 
         findState = soup.find(id='main_content')
         if 'Project-state-canceled' in findState['class']:
