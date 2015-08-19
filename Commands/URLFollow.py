@@ -383,7 +383,7 @@ class URLFollow(CommandInterface):
             pledgeData = stats.find(id='pledged')
             if pledgeData is not None:
                 pledged = float(pledgeData['data-pledged'])
-                goal = float(pledged['data-goal'])
+                goal = float(pledgeData['data-goal'])
                 percentage = float(pledgeData['data-percent-raised'])
                 if backerCount > 0:
                     pledgePerBacker = pledged / backerCount
@@ -415,7 +415,7 @@ class URLFollow(CommandInterface):
         data.append(pledgedString.format(pledged,
                                          goal,
                                          currency,
-                                         #pledged.data['data-currency'],
+                                         #pledgedData.data['data-currency'],
                                          percentage * 100,
                                          pledgePerBacker))
 
