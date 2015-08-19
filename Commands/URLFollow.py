@@ -344,7 +344,7 @@ class URLFollow(CommandInterface):
         return response[appId]['data'][priceField]
 
     def FollowKickstarter(self, ksID, message):
-        webPage = WebUtils.fetchURL('https://www.kickstarter.com/projects/{}/'.format(ksID))
+        webPage = WebUtils.fetchURL('https://www.kickstarter.com/projects/{}/description'.format(ksID))
 
         soup = BeautifulSoup(webPage.body)
 
@@ -366,37 +366,58 @@ class URLFollow(CommandInterface):
                 data.append(title['content'].strip())
 
         stats = soup.find(id='stats')
-        # all of this is now in page javascript for completed projects, extracting it will be a pain...
+        # projects in progress
         if stats is not None:
             backerCount = stats.find(id='backers_count')
             if backerCount is not None:
-                data.append('Backers: {0:,}'.format(int(backerCount['data-backers-count'])))
-
-            pledged = stats.find(id='pledged')
-            if pledged is not None:
-                if float(pledged['data-percent-raised']) >= 1.0:
-                    percentageString = A.fg.green['({3:,.0f}% funded)']
-                else:
-                    percentageString = A.fg.red['({3:,.0f}% funded)']
-
-                if int(backerCount['data-backers-count']) > 0:
-                    pledgePerBacker = float(pledged['data-pledged']) / int(backerCount['data-backers-count'])
-                else:
-                    pledgePerBacker = 0
-                
-                pledgePerBackerString = A.fg.gray['{4:,.0f}/backer']
-
-                pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}', A.fg.gray['/'], '{1:,.0f} {2} ', percentageString, ' ', pledgePerBackerString])
-                data.append(pledgedString.format(float(pledged['data-pledged']),
-                                                 float(pledged['data-goal']),
-                                                 pledged.data['data-currency'],
-                                                 float(pledged['data-percent-raised']) * 100,
-                                                 pledgePerBacker))
+                backerCount = int(backerCount['data-backers-count'])
+        # completed projects
         else:
-            # at least get the backer count of completed projects... full stats as above will be much trickier
             backerCount = soup.find(class_='NS_projects__spotlight_stats')
             if backerCount is not None:
-                data.append('Backers: {}'.format(backerCount.b.text.strip().split()[0]))
+                backerCount = int(backerCount.b.text.strip().split()[0])
+
+        data.append('Backers: {0:,}'.format(backerCount))
+
+        if stats is not None:
+            pledgeData = stats.find(id='pledged')
+            if pledgeData is not None:
+                pledged = float(pledgeData['data-pledged'])
+                goal = float(pledged['data-goal'])
+                percentage = float(pledgeData['data-percent-raised'])
+                if backerCount > 0:
+                    pledgePerBacker = pledged / backerCount
+                else:
+                    pledgePerBacker = 0
+        else:
+            money = soup.select('div.money.no-code')
+            if money:
+                pledgedString = money[0].text.strip()
+                goalString = money[1].text.strip()
+                pledged = float(pledgedString)
+                goal = float(goalString)
+                percentage = (pledged / goal)
+                if backerCount > 0:
+                    pledgePerBacker = pledged / backerCount
+                else:
+                    pledgePerBacker = 0
+
+        currency = soup.select('div.money.no-code')['class'].remove('money').remove('no-code')[0].upper()
+
+        if percentage >= 1.0:
+            percentageString = A.fg.green['({3:,.0f}% funded)']
+        else:
+            percentageString = A.fg.red['({3:,.0f}% funded)']
+
+        pledgePerBackerString = A.fg.gray['{4:,.0f}/backer']
+
+        pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}', A.fg.gray['/'], '{1:,.0f} {2} ', percentageString, ' ', pledgePerBackerString])
+        data.append(pledgedString.format(pledged,
+                                         goal,
+                                         currency,
+                                         #pledged.data['data-currency'],
+                                         percentage * 100,
+                                         pledgePerBacker))
 
         findState = soup.find(id='main_content')
         if 'Project-state-canceled' in findState['class']:
