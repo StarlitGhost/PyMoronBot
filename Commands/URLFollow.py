@@ -402,7 +402,7 @@ class URLFollow(CommandInterface):
                 else:
                     pledgePerBacker = 0
 
-        currency = soup.select('div.money.no-code')['class'].remove('money').remove('no-code')[0].upper()
+        currency = soup.select('div.money.no-code')[0]['class'].remove('money').remove('no-code')[0].upper()
 
         if percentage >= 1.0:
             percentageString = A.fg.green['({3:,.0f}% funded)']
