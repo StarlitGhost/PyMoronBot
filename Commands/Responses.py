@@ -189,6 +189,8 @@ class Responses(CommandInterface):
                 # Emily Bonus
                 if message.User.Name == 'Emily':
                     randomChance = random.randint(1, 25)
+                    
+                article = 'an' if self.animal[0] in 'aeiou' else 'a'
 
                 # General user animals
                 if randomChance == 1:
@@ -203,7 +205,7 @@ class Responses(CommandInterface):
                                             message.ReplyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} critically fails at being a {}.'.format(message.User.Name, self.animal),
+                                            '{} critically fails at being {} {}.'.format(message.User.Name, article, self.animal),
                                             message.ReplyTo)]
 
                 elif randomChance <= 8:
@@ -214,7 +216,7 @@ class Responses(CommandInterface):
                                             message.ReplyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is not a {}.'.format(message.User.Name, self.animal),
+                                            '{} is not {} {}.'.format(message.User.Name, article, self.animal),
                                             message.ReplyTo)]
                 elif randomChance <= 14:
                     '''User Might Be A [animal] '''
@@ -224,7 +226,7 @@ class Responses(CommandInterface):
                                             message.ReplyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} /might/ be a {}.'.format(message.User.Name, self.animal),
+                                            '{} /might/ be {} {}.'.format(message.User.Name, article, self.animal),
                                             message.ReplyTo)]
                 elif randomChance <= 19:
                     ''' User Is A [animal] '''
@@ -238,7 +240,7 @@ class Responses(CommandInterface):
                                             message.ReplyTo)]
                     else:
                         return [IRCResponse(ResponseType.Say,
-                                            '{} is DEFINITELY a {}.'.format(message.User.Name, self.animal),
+                                            '{} is DEFINITELY {} {}.'.format(message.User.Name, article, self.animal),
                                             message.ReplyTo)]
                 elif randomChance == 20:
                     ''' User Is A Critical [animal] '''
