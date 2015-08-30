@@ -511,15 +511,15 @@ class URLFollow(CommandInterface):
         title = soup.title
         if title:
             title = title.text
-            title = title.decode('utf-8')
-            title = re.sub('[\r\n]+', '', title)
-            title = title.strip()
-            title = re.sub('\s+', ' ', title)
-            title = self.htmlParser.unescape(title)
-            
+            title = re.sub(u'[\r\n]+', u'', title)  # strip any newlines
+            title = title.strip()   # strip all whitespace either side
+            title = re.sub(u'\s+', u' ', title)     # replace multiple whitespace chars with a single space
+            title = self.htmlParser.unescape(title)     # unescape html entities
+
+            # Split on the first space before 300 characters, and replace the rest with '...'
             if len(title) > 300:
-                title = title[:300].rsplit(' ', 1)[0] + " ..."
-            
+                title = title[:300].rsplit(u' ', 1)[0] + u" ..."
+
             return title
         
         return None
