@@ -24,7 +24,7 @@ class Manhole(CommandInterface):
     port = 4040
 
     def onLoad(self):
-        while self.manhole is None or not self.manhole.running:
+        while self.manhole is None and not self.manhole.running:
             try:
                 self.manhole = makeService({
                     "namespace": {"bot": self.bot},
