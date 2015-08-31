@@ -88,9 +88,10 @@ class ModuleLoader(CommandInterface):
                     else:
                         failures.append(commandNameCaseMap[commandName])
 
-                except Exception, x:
-                    exceptions.append(commandNameCaseMap[commandName])
-                    print x.args
+                except Exception as x:
+                    xName = x.__class__.__name__
+                    exceptions.append(u"{} ({})".format(commandNameCaseMap[commandName], xName))
+                    print xName, x.args
                     traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions
@@ -122,9 +123,10 @@ class ModuleLoader(CommandInterface):
                 else:
                     failures.append(postProcessNameCaseMap[postProcessName])
 
-            except Exception, x:
-                exceptions.append(postProcessNameCaseMap[postProcessName])
-                print x.args
+            except Exception as x:
+                xName = x.__class__.__name__
+                exceptions.append(u"{} ({})".format(postProcessNameCaseMap[postProcessName], xName))
+                print xName, x.args
                 traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions
@@ -150,9 +152,10 @@ class ModuleLoader(CommandInterface):
                     successes.append(commandNameCaseMap[commandName])
                 else:
                     failures.append(commandNameCaseMap[commandName])
-            except Exception, x:
-                exceptions.append(commandNameCaseMap[commandName])
-                print x.args
+            except Exception as x:
+                xName = x.__class__.__name__
+                exceptions.append(u"{} ({})".format(commandNameCaseMap[commandName], xName))
+                print xName, x.args
                 traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions
@@ -178,9 +181,10 @@ class ModuleLoader(CommandInterface):
                     successes.append(postProcessNameCaseMap[postProcessName])
                 else:
                     failures.append(postProcessNameCaseMap[postProcessName])
-            except Exception, x:
-                exceptions.append(postProcessNameCaseMap[postProcessName])
-                print x.args
+            except Exception as x:
+                xName = x.__class__.__name__
+                exceptions.append(u"{} ({})".format(postProcessNameCaseMap[postProcessName], xName))
+                print xName, x.args
                 traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions
