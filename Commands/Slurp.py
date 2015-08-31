@@ -4,6 +4,8 @@ Created on Aug 31, 2015
 
 @author: Tyranic-Moron
 """
+import HTMLParser
+import re
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -18,6 +20,8 @@ class Slurp(CommandInterface):
     triggers = ['slurp']
     help = "slurp <attribute> <url> <css selector> - scrapes the given attribute from the tag selected at the given url"
 
+    htmlParser = HTMLParser.HTMLParser()
+
     def execute(self, message):
         """
         @type message: IRCMessage
@@ -26,6 +30,9 @@ class Slurp(CommandInterface):
             return IRCResponse(ResponseType.Say, u"Not enough parameters, usage: {}".format(self.help), message.ReplyTo)
 
         prop, url, selector = (message.ParameterList[0], message.ParameterList[1], u" ".join(message.ParameterList[2:]))
+
+        if not re.match(ur'^\w+://', url):
+            url = u"http://{}".format(url)
 
         page = WebUtils.fetchURL(url)
         if page is None:
@@ -40,7 +47,7 @@ class Slurp(CommandInterface):
                                message.ReplyTo)
 
         specials = {
-            'name': tag.name,
+            'tagname': tag.name,
             'text': tag.text
         }
 
@@ -57,6 +64,12 @@ class Slurp(CommandInterface):
 
         if not isinstance(value, basestring):
             value = u" ".join(value)
+
+        # sanitize the value
+        value = value.strip()
+        value = re.sub(ur'[\r\n]+', u' ', value)
+        value = re.sub(ur'\s+', u' ', value)
+        value = self.htmlParser.unescape(value)
 
         return IRCResponse(ResponseType.Say, value, message.ReplyTo)
 
