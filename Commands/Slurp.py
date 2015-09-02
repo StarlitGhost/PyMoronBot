@@ -53,7 +53,7 @@ class Slurp(CommandInterface):
 
         if prop in specials:
             value = specials[prop]
-        elif prop in tag:
+        elif prop in tag.attrs:
             value = tag[prop]
         else:
             return IRCResponse(ResponseType.Say,
