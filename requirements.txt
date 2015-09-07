@@ -12,3 +12,4 @@ pymysql>=0.6.4
 pycrypto>=2.6.1
 pyasn1>=0.1.7
 isodate>=0.5.1
+jq>=0.1.4
