@@ -21,6 +21,8 @@ class JQ(CommandInterface):
     help = "jq <url> <filter> - filters json returned by the given url, returning values. \
 filter syntax here: https://stedolan.github.io/jq/manual/#Basicfilters"
 
+    runInThread = True
+
     htmlParser = HTMLParser.HTMLParser()
 
     def execute(self, message):

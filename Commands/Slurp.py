@@ -20,6 +20,8 @@ class Slurp(CommandInterface):
     triggers = ['slurp']
     help = "slurp <attribute> <url> <css selector> - scrapes the given attribute from the tag selected at the given url"
 
+    runInThread = True
+
     htmlParser = HTMLParser.HTMLParser()
 
     def execute(self, message):
