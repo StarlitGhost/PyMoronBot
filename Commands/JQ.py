@@ -18,7 +18,8 @@ from jq import jq
 
 class JQ(CommandInterface):
     triggers = ['jq']
-    help = "jq <url> <filter> - filters json returned by the given url, returning values"
+    help = "jq <url> <filter> - filters json returned by the given url, returning values. \
+filter syntax here: https://stedolan.github.io/jq/manual/#Basicfilters"
 
     htmlParser = HTMLParser.HTMLParser()
 
