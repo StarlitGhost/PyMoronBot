@@ -19,6 +19,7 @@ from bs4 import BeautifulSoup
 class Slurp(CommandInterface):
     triggers = ['slurp']
     help = "slurp <attribute> <url> <css selector> - scrapes the given attribute from the tag selected at the given url"
+    runInThread = True
 
     runInThread = True
 
@@ -36,11 +37,14 @@ class Slurp(CommandInterface):
         if not re.match(ur'^\w+://', url):
             url = u"http://{}".format(url)
 
-        page = WebUtils.fetchURL(url)
-        if page is None:
-            return IRCResponse(ResponseType.Say, u"Problem fetching {}".format(url), message.ReplyTo)
+        if 'slurp' in message.Metadata and url in message.Metadata['slurp']:
+            soup = message.Metadata['slurp'][url]
+        else:
+            page = WebUtils.fetchURL(url)
+            if page is None:
+                return IRCResponse(ResponseType.Say, u"Problem fetching {}".format(url), message.ReplyTo)
+            soup = BeautifulSoup(page.body)
 
-        soup = BeautifulSoup(page.body)
         tag = soup.select_one(selector)
 
         if tag is None:
@@ -73,5 +77,6 @@ class Slurp(CommandInterface):
         value = re.sub(ur'\s+', u' ', value)
         value = self.htmlParser.unescape(value)
 
-        return IRCResponse(ResponseType.Say, value, message.ReplyTo)
-
+        return IRCResponse(ResponseType.Say, value, message.ReplyTo,
+                           extraVars={'slurpURL': url},
+                           metadata={'slurp': {url: soup}})

@@ -21,6 +21,10 @@ class UnbalancedBracesException(Exception):
         self.column = column
 
 
+class DictMergeError(Exception):
+    pass
+
+
 class Sub(CommandInterface):
     triggers = ['sub']
     help = "sub <text> - executes nested commands in <text> and replaces the commands with their output\n" \
@@ -48,6 +52,7 @@ class Sub(CommandInterface):
         prevLevel = -1
         responseStack = []
         extraVars = {}
+        metadata = {}
 
         for segment in segments:
             (level, command, start, end) = segment
@@ -60,7 +65,8 @@ class Sub(CommandInterface):
             # Build a new message out of this segment
             inputMessage = IRCMessage(message.Type, message.User.String, message.Channel,
                                       self.bot.commandChar + command.lstrip(),
-                                      self.bot)
+                                      self.bot,
+                                      metadata=metadata)
 
             # Execute the constructed message
             if inputMessage.Command.lower() in self.bot.moduleHandler.mappedTriggers:
@@ -75,12 +81,13 @@ class Sub(CommandInterface):
             responseStack.append((level, response.Response, start, end))
             # Update the extraVars dict
             extraVars.update(response.ExtraVars)
+            metadata = self._recursiveMerge(metadata, response.Metadata)
 
             prevLevel = level
 
         responseString = self._substituteResponses(subString, responseStack, -1, extraVars, -1)
         responseString = self._unmangleEscapes(responseString)
-        return IRCResponse(ResponseType.Say, responseString, message.ReplyTo)
+        return IRCResponse(ResponseType.Say, responseString, message.ReplyTo, extraVars=extraVars, metadata=metadata)
 
     @staticmethod
     def _parseSubcommandTree(string):
@@ -136,3 +143,27 @@ class Sub(CommandInterface):
             string = string.replace(u'@LB@', u'\\{')
             string = string.replace(u'@RB@', u'\\}')
         return string
+
+    def _recursiveMerge(self, d1, d2):
+        from collections import MutableMapping
+        '''
+        Update two dicts of dicts recursively,
+        if either mapping has leaves that are non-dicts,
+        the second's leaf overwrites the first's.
+        '''
+        for k, v in d1.iteritems():
+            if k in d2:
+                if all(isinstance(e, MutableMapping) for e in (v, d2[k])):
+                    d2[k] = self._recursiveMerge(v, d2[k])
+                # we could further check types and merge as appropriate here.
+                elif isinstance(v, list):
+                    # merge/append lists
+                    if isinstance(d2[k], list):
+                        # merge lists
+                        v.extend(d2[k])
+                    else:
+                        # append to list
+                        v.append(d2[k])
+        d3 = d1.copy()
+        d3.update(d2)
+        return d3
