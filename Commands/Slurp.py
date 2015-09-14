@@ -34,7 +34,11 @@ class Slurp(CommandInterface):
         if not re.match(ur'^\w+://', url):
             url = u"http://{}".format(url)
 
-        page = WebUtils.fetchURL(url)
+        if 'slurp' in message.Metadata and url in message.Metadata['slurp']:
+            page = message.Metadata['slurp'][url]
+        else:
+            page = WebUtils.fetchURL(url)
+
         if page is None:
             return IRCResponse(ResponseType.Say, u"Problem fetching {}".format(url), message.ReplyTo)
 
@@ -71,5 +75,6 @@ class Slurp(CommandInterface):
         value = re.sub(ur'\s+', u' ', value)
         value = self.htmlParser.unescape(value)
 
-        return IRCResponse(ResponseType.Say, value, message.ReplyTo)
-
+        return IRCResponse(ResponseType.Say, value, message.ReplyTo,
+                           extraVars={'slurpURL': url},
+                           metadata={'slurp': {url: soup}})

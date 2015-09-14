@@ -58,14 +58,19 @@ class IRCUser(object):
 
 class IRCMessage(object):
 
-    def __init__(self, msgType, user, channel, message, bot):
+    def __init__(self, msgType, user, channel, message, bot, metadata=None):
         """
         @type msgType: str
         @type user: str
         @type channel: IRCChannel
         @type message: unicode
         @type bot: MoronBot
+        @type metadata: dict
         """
+        if metadata is None:
+            metadata = {}
+        self.Metadata = metadata
+
         try:
             unicodeMessage = message.decode('utf-8', 'ignore')
         except UnicodeEncodeError:  # Already utf-8?

@@ -21,6 +21,10 @@ class UnbalancedBracesException(Exception):
         self.column = column
 
 
+class DictMergeError(Exception):
+    pass
+
+
 class Sub(CommandInterface):
     triggers = ['sub']
     help = "sub <text> - executes nested commands in <text> and replaces the commands with their output\n" \
@@ -48,6 +52,7 @@ class Sub(CommandInterface):
         prevLevel = -1
         responseStack = []
         extraVars = {}
+        metadata = {}
 
         for segment in segments:
             (level, command, start, end) = segment
@@ -60,7 +65,8 @@ class Sub(CommandInterface):
             # Build a new message out of this segment
             inputMessage = IRCMessage(message.Type, message.User.String, message.Channel,
                                       self.bot.commandChar + command.lstrip(),
-                                      self.bot)
+                                      self.bot,
+                                      metadata=metadata)
 
             # Execute the constructed message
             if inputMessage.Command.lower() in self.bot.moduleHandler.mappedTriggers:
@@ -75,12 +81,13 @@ class Sub(CommandInterface):
             responseStack.append((level, response.Response, start, end))
             # Update the extraVars dict
             extraVars.update(response.ExtraVars)
+            metadata = self._mergeDicts(metadata, response.Metadata)
 
             prevLevel = level
 
         responseString = self._substituteResponses(subString, responseStack, -1, extraVars, -1)
         responseString = self._unmangleEscapes(responseString)
-        return IRCResponse(ResponseType.Say, responseString, message.ReplyTo)
+        return IRCResponse(ResponseType.Say, responseString, message.ReplyTo, extraVars=extraVars, metadata=metadata)
 
     @staticmethod
     def _parseSubcommandTree(string):
@@ -136,3 +143,41 @@ class Sub(CommandInterface):
             string = string.replace(u'@LB@', u'\\{')
             string = string.replace(u'@RB@', u'\\}')
         return string
+
+    def _mergeDicts(self, a, b):
+        """
+        merges b into a and returns the merged result
+        NOTE: tuples and arbitrary objects are not handled
+        (Heavily) based on http://stackoverflow.com/a/15836901/331047
+        @type a: dict
+        @type b: dict
+        @return: dict
+        """
+        key = None
+        try:
+            if a is None or isinstance(a, (basestring, int, long, float)):
+                # 'a' is a primitive, or new
+                a = b
+            elif isinstance(a, list):
+                # merge/append lists
+                if isinstance(b, list):
+                    # merge lists
+                    a.extend(b)
+                else:
+                    # append to list
+                    a.append(b)
+            elif isinstance(a, dict):
+                # merge dicts
+                if isinstance(b, dict):
+                    for key in b:
+                        if key in a:
+                            a[key] = self._mergeDicts(a[key], b[key])
+                        else:
+                            a[key] = b[key]
+                else:
+                    raise DictMergeError("Cannot merge non-dict '{}' into dict '{}'".format(b, a))
+            else:
+                raise DictMergeError("NOT IMPLEMENTED '{}' into '{}'".format(b, a))
+        except TypeError, e:
+            raise DictMergeError("TypeError '{}' in key '{}' when merging '{}' into '{}'".format(e, key, b, a))
+        return a

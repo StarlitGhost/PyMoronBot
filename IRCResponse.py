@@ -14,9 +14,18 @@ class IRCResponse(object):
     Response = ''
     Target = ''
 
-    def __init__(self, messageType, response, target, extraVars=None):
+    def __init__(self, messageType, response, target, extraVars=None, metadata=None):
+        """
+        @type messageType: ResponseType
+        @type response: unicode
+        @type target: unicode
+        @type extraVars: dict
+        @type metadata: dict
+        """
         if extraVars is None:
             extraVars = {}
+        if metadata is None:
+            metadata = {}
         self.Type = messageType
         try:
             self.Response = unicode(response, 'utf-8')
@@ -28,3 +37,4 @@ class IRCResponse(object):
             self.Target = target
 
         self.ExtraVars = extraVars
+        self.Metadata = metadata
