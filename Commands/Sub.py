@@ -81,7 +81,7 @@ class Sub(CommandInterface):
             responseStack.append((level, response.Response, start, end))
             # Update the extraVars dict
             extraVars.update(response.ExtraVars)
-            metadata = self._mergeDicts(metadata, response.Metadata)
+            metadata = self._recursiveMerge(metadata, response.Metadata)
 
             prevLevel = level
 
@@ -144,40 +144,26 @@ class Sub(CommandInterface):
             string = string.replace(u'@RB@', u'\\}')
         return string
 
-    def _mergeDicts(self, a, b):
-        """
-        merges b into a and returns the merged result
-        NOTE: tuples and arbitrary objects are not handled
-        (Heavily) based on http://stackoverflow.com/a/15836901/331047
-        @type a: dict
-        @type b: dict
-        @return: dict
-        """
-        key = None
-        try:
-            if a is None or isinstance(a, (basestring, int, long, float)):
-                # 'a' is a primitive, or new
-                a = b
-            elif isinstance(a, list):
-                # merge/append lists
-                if isinstance(b, list):
-                    # merge lists
-                    a.extend(b)
-                else:
-                    # append to list
-                    a.append(b)
-            elif isinstance(a, dict):
-                # merge dicts
-                if isinstance(b, dict):
-                    for key in b:
-                        if key in a:
-                            a[key] = self._mergeDicts(a[key], b[key])
-                        else:
-                            a[key] = b[key]
-                else:
-                    raise DictMergeError("Cannot merge non-dict '{}' into dict '{}'".format(b, a))
-            else:
-                raise DictMergeError("NOT IMPLEMENTED '{}' into '{}'".format(b, a))
-        except TypeError, e:
-            raise DictMergeError("TypeError '{}' in key '{}' when merging '{}' into '{}'".format(e, key, b, a))
-        return a
+    def _recursiveMerge(self, d1, d2):
+        from collections import MutableMapping
+        '''
+        Update two dicts of dicts recursively,
+        if either mapping has leaves that are non-dicts,
+        the second's leaf overwrites the first's.
+        '''
+        for k, v in d1.iteritems():
+            if k in d2:
+                if all(isinstance(e, MutableMapping) for e in (v, d2[k])):
+                    d2[k] = self._recursiveMerge(v, d2[k])
+                # we could further check types and merge as appropriate here.
+                elif isinstance(v, list):
+                    # merge/append lists
+                    if isinstance(d2[k], list):
+                        # merge lists
+                        v.extend(d2[k])
+                    else:
+                        # append to list
+                        v.append(d2[k])
+        d3 = d1.copy()
+        d3.update(d2)
+        return d3
