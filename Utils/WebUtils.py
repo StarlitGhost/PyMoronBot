@@ -168,11 +168,12 @@ def googleSearch(query):
 
 # mostly taken directly from Heufneutje's PyHeufyBot
 # https://github.com/Heufneutje/PyHeufyBot/blob/eb10b5218cd6b9247998d8795d93b8cd0af45024/pyheufybot/utils/webutils.py#L74
-def pasteEE(data, description, expire):
+def pasteEE(data, description, expire, raw=True):
     """
     @type data: unicode
     @type description: unicode
     @type expire: int
+    @type raw: bool
     @rtype: unicode
     """
     values = {u"key": u"public",
@@ -184,7 +185,8 @@ def pasteEE(data, description, expire):
     if result:
         jsonResult = json.loads(result.body)
         if jsonResult["status"] == "success":
-            return jsonResult["paste"]["link"]
+            linkType = "raw" if raw else "link"
+            return jsonResult["paste"][linkType]
         elif jsonResult["status"] == "error":
             return u"An error occurred while posting to Paste.ee, code: {}, reason: {}"\
                 .format(jsonResult["errorcode"], jsonResult["error"])
