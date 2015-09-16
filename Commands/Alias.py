@@ -162,7 +162,8 @@ class Alias(CommandInterface):
                                                      name, helpText)
                         for name, helpText in self.aliasHelpDict.iteritems()]
 
-        export = u"{}\n\n{}".format(u"\n".join(addCommands), u"\n".join(helpCommands))
+        export = u"{}\n\n{}".format(u"\n".join(sorted(addCommands)),
+                                    u"\n".join(sorted(helpCommands)))
 
         url = WebUtils.pasteEE(export,
                                u"Exported {} aliases for {}".format(self.bot.nickname, cmdArgs.server),
