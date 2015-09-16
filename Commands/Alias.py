@@ -5,6 +5,7 @@ Created on May 21, 2014
 @author: HubbeKing, Tyranic-Moron
 """
 import re
+from collections import OrderedDict
 
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
@@ -176,13 +177,14 @@ class Alias(CommandInterface):
         """import <url> - imports aliases from the given address"""
         return
 
-    subCommands = {u'add': _add,
-                   u'del': _del,
-                   u'list': _list,
-                   u'show': _show,
-                   u'help': _help,
-                   u'export': _export,
-                   u'import': _import}
+    subCommands = OrderedDict([
+        (u'add', _add),
+        (u'del', _del),
+        (u'list', _list),
+        (u'show', _show),
+        (u'help', _help),
+        (u'export', _export),
+        (u'import', _import)])
 
     def help(self, message):
         """
