@@ -58,7 +58,7 @@ class Sed(CommandInterface):
             else:
                 return IRCResponse(ResponseType.Say, "No text matching '{}' found in the last {} messages".format(search, self.historySize), message.ReplyTo)
 
-        else:
+        elif message.Command.lower() not in self.bot.moduleHandler.mappedTriggers:
             self.storeMessage(message)
 
     @classmethod
