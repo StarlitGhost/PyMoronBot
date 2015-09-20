@@ -14,6 +14,8 @@ import GlobalVars
 from Utils import WebUtils
 from moronbot import cmdArgs
 
+from bs4 import UnicodeDammit
+
 
 class Alias(CommandInterface):
     triggers = ['alias']
@@ -195,7 +197,9 @@ class Alias(CommandInterface):
                                u"Exported {} aliases for {}".format(self.bot.nickname, cmdArgs.server),
                                60)
         return IRCResponse(ResponseType.Say,
-                           u"Exported {} aliases to {}".format(len(addCommands), url),
+                           u"Exported {} aliases and {} help texts to {}".format(len(addCommands),
+                                                                                 len(helpCommands),
+                                                                                 url),
                            message.ReplyTo)
 
     def _import(self, message):
@@ -223,6 +227,7 @@ class Alias(CommandInterface):
                                message.ReplyTo)
 
         text = page.body
+        text = UnicodeDammit(text).unicode_markup
         lines = text.splitlines()
         numAliases = 0
         numHelpTexts = 0
@@ -255,7 +260,7 @@ class Alias(CommandInterface):
                 self._newAlias(aliasName, aliasCommand)
                 numAliases += 1
             elif subCommand == u"help":
-                aliasHelp = " ".join(splitLine[3:])
+                aliasHelp = u" ".join(splitLine[3:])
                 self.aliasHelpDict[aliasName] = aliasHelp
                 numHelpTexts += 1
 
