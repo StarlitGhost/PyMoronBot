@@ -154,28 +154,114 @@ class Alias(CommandInterface):
                            message.ReplyTo)
 
     def _export(self, message):
-        """export <all/alias name(s)> - exports all aliases - or the specified aliases - to paste.ee, \
+        """export [<alias name(s)] - exports all aliases - or the specified aliases - to paste.ee, \
         and returns a link"""
+        if len(message.ParameterList) > 1:
+            # filter the alias dictionary by the listed aliases
+            params = [alias.lower() for alias in message.ParameterList[1:]]
+            aliases = {alias: self.aliases[alias]
+                       for alias in self.aliases
+                       if alias in params}
+            aliasHelp = {alias: self.aliasHelpDict[alias]
+                         for alias in self.aliasHelpDict
+                         if alias in params}
+
+            if len(aliases) == 0:
+                return IRCResponse(ResponseType.Say,
+                                   u"I don't have any of the aliases listed for export",
+                                   message.ReplyTo)
+        else:
+            aliases = self.aliases
+            aliasHelp = self.aliasHelpDict
+
+            if len(aliases) == 0:
+                return IRCResponse(ResponseType.Say,
+                                   u"There are no aliases for me to export!",
+                                   message.ReplyTo)
+
         addCommands = [u"{}alias add {} {}".format(self.bot.commandChar,
                                                    name, u" ".join(command))
-                       for name, command in self.aliases.iteritems()]
+                       for name, command in aliases.iteritems()]
         helpCommands = [u"{}alias help {} {}".format(self.bot.commandChar,
                                                      name, helpText)
-                        for name, helpText in self.aliasHelpDict.iteritems()]
+                        for name, helpText in aliasHelp.iteritems()]
 
         export = u"{}\n\n{}".format(u"\n".join(sorted(addCommands)),
                                     u"\n".join(sorted(helpCommands)))
 
         url = WebUtils.pasteEE(export,
                                u"Exported {} aliases for {}".format(self.bot.nickname, cmdArgs.server),
-                               0)
+                               60)
         return IRCResponse(ResponseType.Say,
-                           u"Aliases exported to {}".format(url),
+                           u"Exported {} aliases to {}".format(len(addCommands), url),
                            message.ReplyTo)
 
     def _import(self, message):
-        """import <url> - imports aliases from the given address"""
-        return
+        """import <url> [<alias(es)>] - imports all aliases from the given address, or only the listed aliases"""
+        if message.User.Name not in GlobalVars.admins:
+            return IRCResponse(ResponseType.Say,
+                               u"Only my admins may import aliases!",
+                               message.ReplyTo)
+        if len(message.ParameterList) < 2:
+            return IRCResponse(ResponseType.Say,
+                               u"You didn't give a url to import from!",
+                               message.ReplyTo)
+
+        if len(message.ParameterList) > 2:
+            onlyListed = True
+            importList = [alias.lower() for alias in message.ParameterList[2:]]
+        else:
+            onlyListed = False
+
+        url = message.ParameterList[1]
+        page = WebUtils.fetchURL(url)
+        if page is None:
+            return IRCResponse(ResponseType.Say,
+                               u"Failed to open page at {}".format(url),
+                               message.ReplyTo)
+
+        text = page.body
+        lines = text.splitlines()
+        numAliases = 0
+        numHelpTexts = 0
+        for lineNumber, line in enumerate(lines):
+            # Skip over blank lines
+            if line == u"":
+                continue
+            splitLine = line.split()
+            if splitLine[0].lower() != u"{}alias".format(self.bot.commandChar):
+                return IRCResponse(ResponseType.Say,
+                                   u"Line {} at {} does not begin with {}alias".format(lineNumber,
+                                                                                       url,
+                                                                                       self.bot.commandChar),
+                                   message.ReplyTo)
+            subCommand = splitLine[1].lower()
+            if subCommand not in [u"add", u"help"]:
+                return IRCResponse(ResponseType.Say,
+                                   u"Line {} at {} is not an add or help command".format(lineNumber, url),
+                                   message.ReplyTo)
+
+            aliasName = splitLine[2].lower()
+            aliasCommand = splitLine[3:]
+            aliasCommand[0] = aliasCommand[0].lower()
+
+            # Skip over aliases that weren't listed, if any were listed
+            if onlyListed and aliasName not in importList:
+                continue
+
+            if subCommand == u"add":
+                self._newAlias(aliasName, aliasCommand)
+                numAliases += 1
+            elif subCommand == u"help":
+                aliasHelp = u" ".join(splitLine[3:])
+                self.aliasHelpDict[aliasName] = aliasHelp
+                numHelpTexts += 1
+
+        return IRCResponse(ResponseType.Say,
+                           u"Imported {} alias(es) and {} help string(s) from {}".format(numAliases,
+                                                                                         numHelpTexts,
+                                                                                         url),
+                           message.ReplyTo)
 
     subCommands = OrderedDict([
         (u'add', _add),
