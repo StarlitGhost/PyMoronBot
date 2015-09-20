@@ -79,7 +79,7 @@ class Alias(CommandInterface):
                            message.ReplyTo)
 
     def _del(self, message):
-        """del <alias> - deletes the alias named <alias>"""
+        """del <alias> - deletes the alias named <alias>. You can list multiple aliases to delete (space separated)"""
         if message.User.Name not in GlobalVars.admins:
             return IRCResponse(ResponseType.Say,
                                u"Only my admins may delete aliases!",
@@ -88,15 +88,17 @@ class Alias(CommandInterface):
         if len(message.ParameterList) == 1:
             return IRCResponse(ResponseType.Say, u"Delete which alias?", message.ReplyTo)
 
-        alias = message.ParameterList[1].lower()
-        if alias not in self.aliases:
-            return IRCResponse(ResponseType.Say,
-                               u"I don't have an alias called '{}'".format(alias),
-                               message.ReplyTo)
+        deleted = []
+        skipped = []
+        for aliasName in [alias.lower() for alias in message.ParameterList[1:]]:
+            if aliasName not in self.aliases:
+                skipped.append(aliasName)
+                continue
 
-        self._delAlias(alias)
+            deleted.append(aliasName)
+            self._delAlias(aliasName)
         return IRCResponse(ResponseType.Say,
-                           u"Deleted alias '{}'".format(alias),
+                           u"Deleted alias(es) '{}', {} skipped".format(u", ".join(deleted), len(skipped)),
                            message.ReplyTo)
 
     def _list(self, message):
