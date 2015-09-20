@@ -255,7 +255,7 @@ class Alias(CommandInterface):
                 self._newAlias(aliasName, aliasCommand)
                 numAliases += 1
             elif subCommand == u"help":
-                aliasHelp = u" ".join(splitLine[3:])
+                aliasHelp = " ".join(splitLine[3:])
                 self.aliasHelpDict[aliasName] = aliasHelp
                 numHelpTexts += 1
 
