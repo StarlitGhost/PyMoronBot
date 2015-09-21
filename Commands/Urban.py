@@ -39,7 +39,9 @@ class Urban(CommandInterface):
         response = json.loads(webPage.body)
 
         if len(response['list']) == 0:
-            return IRCResponse(ResponseType.Say, "No entry found for '{0}'".format(search), message.ReplyTo)
+            return IRCResponse(ResponseType.Say,
+                               "No entry found for '{0}'".format(message.Parameters),
+                               message.ReplyTo)
 
         graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
