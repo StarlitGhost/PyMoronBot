@@ -220,7 +220,12 @@ class Alias(CommandInterface):
             onlyListed = False
 
         url = message.ParameterList[1]
-        page = WebUtils.fetchURL(url)
+        try:
+            page = WebUtils.fetchURL(url)
+        except ValueError:
+            return IRCResponse(ResponseType.Say,
+                               u"'{}' is not a valid URL".format(url),
+                               message.ReplyTo)
         if page is None:
             return IRCResponse(ResponseType.Say,
                                u"Failed to open page at {}".format(url),
