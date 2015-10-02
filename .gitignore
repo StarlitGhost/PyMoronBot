@@ -46,3 +46,4 @@ parser.out
 parsetab.py
 PTVS/*
 *.db
+manhole.passwd

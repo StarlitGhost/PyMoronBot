@@ -26,5 +26,5 @@ class StripColour(PostProcessInterface):
         """
         @type response: IRCResponse
         """
-        response.Response = StringUtils.stripColours(response.Response)
+        response.Response = StringUtils.stripFormatting(response.Response)
         return response
