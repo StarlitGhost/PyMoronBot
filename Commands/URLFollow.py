@@ -83,9 +83,9 @@ class URLFollow(CommandInterface):
         """
         youtubeMatch = re.search(r'(youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#\?]{11})', url)
         imgurMatch   = re.search(r'(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', url)
-        twitterMatch = re.search(r'twitter.com/(?P<tweeter>[^/]+)/status(es)?/(?P<tweetID>[0-9]+)', url)
-        steamMatch   = re.search(r'store.steampowered.com/(?P<steamType>(app|sub))/(?P<steamID>[0-9]+)', url)
-        ksMatch      = re.search(r'kickstarter.com/projects/(?P<ksID>[^/]+/[^/&#\?]+)', url)
+        twitterMatch = re.search(r'twitter\.com/(?P<tweeter>[^/]+)/status(es)?/(?P<tweetID>[0-9]+)', url)
+        steamMatch   = re.search(r'store\.steampowered\.com/(?P<steamType>(app|sub))/(?P<steamID>[0-9]+)', url)
+        ksMatch      = re.search(r'kickstarter\.com/projects/(?P<ksID>[^/]+/[^/&#\?]+)', url)
         twitchMatch  = re.search(r'twitch\.tv/(?P<twitchChannel>[^/]+)/?(\s|$)', url)
         
         if youtubeMatch:
