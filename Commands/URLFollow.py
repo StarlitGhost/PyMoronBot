@@ -457,7 +457,7 @@ class URLFollow(CommandInterface):
         chanData = {}
         channelOnline = False
         twitchHeaders = [('Accept', 'application/vnd.twitchtv.v2+json')]
-        webPage = WebUtils.fetchURL(u'https://api.twitch.tv/kraken/streams/{0}'.format(channel), twitchHeaders)
+        webPage = WebUtils.fetchURL(u'https://api.twitch.tv/kraken/streams/{}'.format(channel), twitchHeaders)
 
         streamData = json.loads(webPage.body)
 
@@ -465,17 +465,17 @@ class URLFollow(CommandInterface):
             chanData = streamData['stream']['channel']
             channelOnline = True
         elif 'error' not in streamData:
-            webPage = WebUtils.fetchURL(u'https://api.twitch.tv/kraken/channels/{0}'.format(channel), twitchHeaders)
+            webPage = WebUtils.fetchURL(u'https://api.twitch.tv/kraken/channels/{}'.format(channel), twitchHeaders)
             chanData = json.loads(webPage.body)
 
         if len(chanData) > 0:
             if channelOnline:
-                channelInfo = assembleFormattedText(A.fg.green['']) + '{0}'.format(chanData['display_name']) + assembleFormattedText(A.normal[''])
+                channelInfo = assembleFormattedText(A.fg.green['']) + u'{}'.format(chanData['display_name']) + assembleFormattedText(A.normal[''])
             else:
-                channelInfo = assembleFormattedText(A.fg.red['']) + '{0}'.format(chanData['display_name']) + assembleFormattedText(A.normal[''])
-            channelInfo += u' "{0}"'.format(re.sub('[\r\n]+', self.graySplitter, chanData['status'].strip()))
+                channelInfo = assembleFormattedText(A.fg.red['']) + u'{}'.format(chanData['display_name']) + assembleFormattedText(A.normal[''])
+            channelInfo += u' "{}"'.format(re.sub(r'[\r\n]+', self.graySplitter, chanData['status'].strip()))
             if chanData['game'] is not None:
-                channelInfo += assembleFormattedText(A.normal[A.fg.gray[', playing '], '{0}'.format(chanData['game'])])
+                channelInfo += assembleFormattedText(A.normal[A.fg.gray[', playing '], u'{}'.format(chanData['game'])])
             if chanData['mature']:
                 channelInfo += assembleFormattedText(A.normal[A.fg.lightRed[' [Mature]']])
             if channelOnline:
