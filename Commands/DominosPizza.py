@@ -97,6 +97,7 @@ class DominosPizza(CommandInterface):
         j = json.loads(page.body)
 
         if j['customerName'] is None:
+            self._stopPizzaTracker(orderID)
             return IRCResponse(ResponseType.Say,
                                u"There are no pizza tracking details at the page linked by {}.".format(trackingDetails.orderer),
                                trackingDetails.channel.Name)
