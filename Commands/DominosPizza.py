@@ -89,18 +89,20 @@ class DominosPizza(CommandInterface):
         if page is None:
             # tracking API didn't respond
             self._stopPizzaTracker(orderID)
-            return IRCResponse(ResponseType.Say,
-                               u"The pizza tracking page linked by {} "
-                               u"had some kind of error, tracking stopped".format(trackingDetails.orderer),
-                               trackingDetails.channel.Name)
+            self.bot.sendResponse(IRCResponse(ResponseType.Say,
+                                  u"The pizza tracking page linked by {} "
+                                  u"had some kind of error, tracking stopped".format(trackingDetails.orderer),
+                                  trackingDetails.channel.Name))
+            return
 
         j = json.loads(page.body)
 
         if j['customerName'] is None:
             self._stopPizzaTracker(orderID)
-            return IRCResponse(ResponseType.Say,
-                               u"There are no pizza tracking details at the page linked by {}.".format(trackingDetails.orderer),
-                               trackingDetails.channel.Name)
+            self.bot.sendResponse(IRCResponse(ResponseType.Say,
+                                  u"There are no pizza tracking details at the page linked by {}.".format(trackingDetails.orderer),
+                                  trackingDetails.channel.Name))
+            return
         
         step = j['statusId']
         if step > trackingDetails.step:
@@ -112,7 +114,7 @@ class DominosPizza(CommandInterface):
         if step == 6:
             self._stopPizzaTracker(orderID)
         
-        return response
+        self.bot.sendResponse(response)
 
     def _stopPizzaTracker(self, orderID):
         """
