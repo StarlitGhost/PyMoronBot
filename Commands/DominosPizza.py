@@ -19,7 +19,7 @@ class DominosPizza(CommandInterface):
         self.trackers = {}
         """@type : dict[str, TrackingDetails]"""
 
-        self.regex = r'www\.dominos\.co\.uk/checkout/pizzatracker\.aspx\?id=(?P<orderID>[a-zA-Z0-9]+)'
+        self.regex = r'www\.dominos\.(co\.uk|\.ie)/checkout/pizzatracker\.aspx\?id=(?P<orderID>[a-zA-Z0-9]+)'
 
         commands = self.bot.moduleHandler.commands
         if 'URLFollow' in commands:
@@ -83,35 +83,35 @@ class DominosPizza(CommandInterface):
 
         trackingDetails = self.trackers[orderID]
 
-        trackURL = u'http://www.dominos.co.uk/checkout/pizzaTrackeriFrame.aspx?id={}'.format(orderID)
+        trackURL = u'https://www.dominos.co.uk/pizzaTracker/getOrderDetails?id={}'.format(orderID)
         page = WebUtils.fetchURL(trackURL)
 
-        if page is not None:
-            root = BeautifulSoup(page.body)
-            stepImg = root.find('img')
-            if stepImg is not None and stepImg.has_attr('alt'):
-                stepImgAlt = stepImg['alt']
-                stepMatch = re.search(r'^Step (?P<step>[0-9]+)$', stepImgAlt)
+        if page is None:
+            # tracking API didn't respond
+            self._stopPizzaTracker(orderID)
+            return IRCResponse(ResponseType.Say,
+                               u"The pizza tracking page linked by {} "
+                               u"had some kind of error, tracking stopped".format(trackingDetails.orderer),
+                               trackingDetails.channel.Name)
 
-                if stepMatch:
-                    step = int(stepMatch.group('step'))
-                    if step > trackingDetails.step:
-                        trackingDetails.step = step
-                        self.bot.sendResponse(IRCResponse(ResponseType.Say,
-                                                          steps[step-1].format(trackingDetails.orderer),
-                                                          trackingDetails.channel.Name))
+        j = json.loads(page.body)
 
-                    if step == 6:
-                        self._stopPizzaTracker(orderID)
+        if j['customerName'] is None:
+            return IRCResponse(ResponseType.Say,
+                               u"There are no pizza tracking details at the page linked by {}.".format(trackingDetails.orderer),
+                               trackingDetails.channel.Name)
+        
+        step = j['statusId']
+        if step > trackingDetails.step:
+            trackingDetails.step = step
+            response = IRCResponse(ResponseType.Say,
+                                   steps[step-1].format(trackingDetails.orderer),
+                                   trackingDetails.channel.Name)
 
-                    return
-
-        # if we reach here the tracking page was invalid in some way
-        self.bot.sendResponse(IRCResponse(ResponseType.Say,
-                                          u"The pizza tracking page linked by {} "
-                                          u"had some kind of error, tracking stopped".format(trackingDetails.orderer),
-                                          trackingDetails.channel.Name))
-        self._stopPizzaTracker(orderID)
+        if step == 6:
+            self._stopPizzaTracker(orderID)
+        
+        return response
 
     def _stopPizzaTracker(self, orderID):
         """
