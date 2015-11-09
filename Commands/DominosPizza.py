@@ -5,7 +5,7 @@ from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
 from Utils import WebUtils
 
-from bs4 import BeautifulSoup
+import json
 from twisted.internet import task, threads
 
 
