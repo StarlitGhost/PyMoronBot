@@ -19,7 +19,7 @@ class DominosPizza(CommandInterface):
         self.trackers = {}
         """@type : dict[str, TrackingDetails]"""
 
-        self.regex = r'www\.dominos\.(co\.uk|\.ie)/PizzaTracker\?id=(?P<orderID>[a-zA-Z0-9]+)'
+        self.regex = r'www\.dominos\.(co\.uk|\.ie)/PizzaTracker/?\?id=(?P<orderID>[a-zA-Z0-9=]+)'
 
         commands = self.bot.moduleHandler.commands
         if 'URLFollow' in commands:
@@ -74,12 +74,12 @@ class DominosPizza(CommandInterface):
         """
         @type orderID: str
         """
-        steps = [u"{}'s pizza order has been placed",
-                 u"{}'s pizza is being prepared",
-                 u"{}'s pizza is in the oven",
-                 u"{}'s pizza is sitting on a shelf, waiting for a driver",
-                 u"{}'s pizza is out for delivery",
-                 u"{}'s pizza has been delivered! Tracking stopped"]
+        steps = {6: u"{}'s pizza order has been placed",
+                 7: u"{}'s pizza is being prepared",
+                 5: u"{}'s pizza is in the oven",
+                 8: u"{}'s pizza is sitting on a shelf, waiting for a driver",
+                 9: u"{}'s pizza is out for delivery",
+                 3: u"{}'s pizza has been delivered! Tracking stopped"}
 
         trackingDetails = self.trackers[orderID]
 
@@ -105,13 +105,13 @@ class DominosPizza(CommandInterface):
             return
         
         step = j['statusId']
-        if step > trackingDetails.step:
+        if step != trackingDetails.step:
             trackingDetails.step = step
             response = IRCResponse(ResponseType.Say,
                                    steps[step-1].format(trackingDetails.orderer),
                                    trackingDetails.channel.Name)
 
-        if step == 6:
+        if step == 3:
             self._stopPizzaTracker(orderID)
         
         self.bot.sendResponse(response)
