@@ -108,7 +108,7 @@ class DominosPizza(CommandInterface):
         if step != trackingDetails.step:
             trackingDetails.step = step
             response = IRCResponse(ResponseType.Say,
-                                   steps[step-1].format(trackingDetails.orderer),
+                                   steps[step].format(trackingDetails.orderer),
                                    trackingDetails.channel.Name)
 
         if step == 3:
