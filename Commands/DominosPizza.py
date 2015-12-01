@@ -104,6 +104,8 @@ class DominosPizza(CommandInterface):
                                   trackingDetails.channel.Name))
             return
         
+        response = None
+        
         step = j['statusId']
         if step != trackingDetails.step:
             trackingDetails.step = step
@@ -114,7 +116,8 @@ class DominosPizza(CommandInterface):
         if step == 3:
             self._stopPizzaTracker(orderID)
         
-        self.bot.sendResponse(response)
+        if response is not None:
+            self.bot.sendResponse(response)
 
     def _stopPizzaTracker(self, orderID):
         """
