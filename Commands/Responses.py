@@ -290,7 +290,6 @@ class Responses(CommandInterface):
                     "http://i.imgur.com/jpcKLuy.png",   # pinkie pie and twilight sparkle boop
                     "http://i.imgur.com/qeNvd.png",     # elephant boop
                     "http://i.imgur.com/wtK1T.jpg",     # jet booping tanker truck
-                    "http://goo.gl/Nh4PK",              # demon booping the earth
                     "http://goo.gl/JHBKUb",             # real men head boop with kittens
                     "http://i.imgur.com/hlCm7aA.png",   # sweetie belle booping apple bloom
                     "http://i.imgur.com/BLQoL61.gif",   # darting boop
