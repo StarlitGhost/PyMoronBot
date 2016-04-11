@@ -9,7 +9,7 @@ import json
 from twisted.internet import task, threads
 
 
-class DominosPizza(CommandInterface):
+class Dominotifications(CommandInterface):
     help = "Automatic module that tracks Domino's pizza tracker links, " \
            "informing you of the progress of your pizza until delivery"
 
@@ -23,13 +23,13 @@ class DominosPizza(CommandInterface):
 
         commands = self.bot.moduleHandler.commands
         if 'URLFollow' in commands:
-            commands['URLFollow'].handledExternally['DominosPizza'] = [self.regex]
+            commands['URLFollow'].handledExternally['Dominotifications'] = [self.regex]
 
     def onUnload(self):
         self._stopAllPizzaTrackers()
         commands = self.bot.moduleHandler.commands
-        if 'URLFollow' in commands and 'DominosPizza' in commands['URLFollow'].handledExternally:
-            del commands['URLFollow'].handledExternally['DominosPizza']
+        if 'URLFollow' in commands and 'Dominotifications' in commands['URLFollow'].handledExternally:
+            del commands['URLFollow'].handledExternally['Dominotifications']
 
     def shouldExecute(self, message):
         """
