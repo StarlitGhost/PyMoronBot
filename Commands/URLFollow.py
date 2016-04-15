@@ -227,7 +227,7 @@ class URLFollow(CommandInterface):
 
         links = tweetText.find_all('a', {'data-expanded-url': True})
         for link in links:
-            link.string = ' ' + link['data-expanded-url']
+            link.string = link['data-expanded-url']
 
         embeddedLinks = tweetText.find_all('a', {'data-pre-embedded': 'true'})
         for link in embeddedLinks:
