@@ -60,7 +60,10 @@ class RedditImage(CommandInterface):
             data.append(u'\x034\x02NSFW!\x0F')
         if image['animated']:
             data.append(u'\x032\x02Animated!\x0F')
-        data.append(image['link'])
+        if 'gifv' in image:
+            data.append(image['gifv'])
+        else:
+            data.append(image['link'])
 
         graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
         return IRCResponse(ResponseType.Say, graySplitter.join(data), message.ReplyTo)
