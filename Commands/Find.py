@@ -25,14 +25,14 @@ class Find(CommandInterface):
         try:
             results = WebUtils.googleSearch(message.Parameters)
 
-            firstResult = results['responseData']['results'][0]
+            firstResult = results[u'items'][0]
 
-            title = firstResult['titleNoFormatting']
-            content = firstResult['content']
-            content = re.sub(r'<.*?>', '', content)  # strip html tags
+            title = firstResult[u'title']
+            title = re.sub(r'\s+', ' ', title)
+            content = firstResult[u'snippet']
             content = re.sub(r'\s+', ' ', content)  # replace multiple spaces with single ones (includes newlines?)
             content = StringUtils.unescapeXHTML(content)
-            url = firstResult['unescapedUrl']
+            url = firstResult[u'link']
             replyText = u'{1}{0}{2}{0}{3}'.format(StringUtils.graySplitter, title, content, url)
 
             return IRCResponse(ResponseType.Say, replyText, message.ReplyTo)
