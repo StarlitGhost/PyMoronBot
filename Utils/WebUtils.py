@@ -17,6 +17,8 @@ import json
 import re
 import time
 
+from apiclient.discovery import build
+
 from Data.api_keys import load_key
 
 
@@ -160,10 +162,14 @@ def googleSearch(query):
     @type query: unicode
     @rtype: dict[unicode, T]
     """
-    googleAPI = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q='
-    webPage = fetchURL('{}{}'.format(googleAPI, quote(query)))
-    j = json.loads(webPage.body)
-    return j
+    googleKey = load_key(u'Google')
+    
+    service = build('customsearch', 'v1', developerKey=googleKey)
+    res = service.cse().list(
+        q = quote(query),
+        cx = '002603151577378558984:xiv3qbttad0'
+    ).execute()
+    return res
 
 
 # mostly taken directly from Heufneutje's PyHeufyBot
