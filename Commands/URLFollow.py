@@ -390,7 +390,7 @@ class URLFollow(CommandInterface):
                 else:
                     pledgePerBacker = 0
 
-            currency = pledgeData.data['data-currency']
+            currency = stats.find_all(attrs={'data-currency': True})[-1]['data-currency']
         else:
             money = soup.select('span.money.no-code')
             if money:
