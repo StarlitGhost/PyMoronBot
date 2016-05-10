@@ -389,6 +389,8 @@ class URLFollow(CommandInterface):
                     pledgePerBacker = pledged / backerCount
                 else:
                     pledgePerBacker = 0
+
+            currency = pledgeData.data['data-currency']
         else:
             money = soup.select('span.money.no-code')
             if money:
@@ -402,10 +404,10 @@ class URLFollow(CommandInterface):
                 else:
                     pledgePerBacker = 0
 
-        currency = soup.select('span.money.no-code')[-1]['class']
-        currency.remove('money')
-        currency.remove('no-code')
-        currency = currency[0].upper()
+            currency = soup.select('span.money.no-code')[-1]['class']
+            currency.remove('money')
+            currency.remove('no-code')
+            currency = currency[0].upper()
 
         if percentage >= 1.0:
             percentageString = A.fg.green['({3:,.0f}% funded)']
