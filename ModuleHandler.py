@@ -99,7 +99,7 @@ class ModuleHandler(object):
                             self.sendResponse(IRCResponse(
                                 ResponseType.Say,
                                 "Command '{}' timed out and was killed".format(message.Command),
-                                message.ReplyTo)
+                                message.ReplyTo))
                             os.kill(p.pid, signal.SIGKILL)
                         else:
                             self.sendResponse(q.get())
