@@ -10,7 +10,7 @@ def getAddrInfoWrapper(host, port, _=0, socktype=0, proto=0, flags=0):
 
 socket.getaddrinfo = getAddrInfoWrapper
 
-from urllib import urlencode, quote
+from urllib import urlencode
 from urllib2 import build_opener, Request, urlopen, URLError
 from urlparse import urlparse
 import json
@@ -166,7 +166,7 @@ def googleSearch(query):
     
     service = build('customsearch', 'v1', developerKey=googleKey)
     res = service.cse().list(
-        q = quote(query),
+        q = query,
         cx = '002603151577378558984:xiv3qbttad0'
     ).execute()
     return res
