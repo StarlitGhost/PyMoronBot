@@ -9,6 +9,7 @@ class CommandInterface(object):
     acceptedTypes = ['PRIVMSG']
     help = '<no help defined (yet)>'
     runInThread = False
+    timeout = 5
 
     priority = 0
     
