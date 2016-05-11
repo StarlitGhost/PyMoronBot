@@ -93,7 +93,7 @@ class ModuleHandler(object):
                         response = command.execute(message)
                         self.sendResponse(response)
                     else:
-                        
+                        d = threads.deferToThread(self._handleInThread, command, message)
             except Exception:
                 # ^ dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
                 print "Python Execution Error in '{0}': {1}".format(command.__class__.__name__, str(sys.exc_info()))
