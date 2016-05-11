@@ -166,7 +166,7 @@ def googleSearch(query):
     
     service = build('customsearch', 'v1', developerKey=googleKey)
     res = service.cse().list(
-        q = quote(query),
+        q = query,
         cx = '002603151577378558984:xiv3qbttad0'
     ).execute()
     return res
