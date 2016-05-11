@@ -15,6 +15,7 @@ import dateutil.parser as dparser
 class LRRChecker(CommandInterface):
     help = "Automatic function, scans LRR video RSS feeds and reports new items in the channel."
     runInThread = True
+    timeout = 30
 
     def shouldExecute(self, message):
         """
