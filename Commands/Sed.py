@@ -17,6 +17,7 @@ from CommandInterface import CommandInterface
 class Sed(CommandInterface):
     triggers = ['sed']
     acceptedTypes = ['PRIVMSG', 'ACTION']
+    runInThread = True
     
     historySize = 20
     
