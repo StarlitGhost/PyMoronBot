@@ -4,8 +4,6 @@ import sys
 import traceback
 import operator
 import os
-import multiprocessing
-import signal
 from glob import glob
 
 from twisted.internet import threads
@@ -93,30 +91,12 @@ class ModuleHandler(object):
                         response = command.execute(message)
                         self.sendResponse(response)
                     else:
-                        d = threads.deferToThread(self._handleInThread, command, message)
+                        d = threads.deferToThread(command.execute, message)
+                        d.addCallback(self.sendResponse)
             except Exception:
                 # ^ dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
                 print "Python Execution Error in '{0}': {1}".format(command.__class__.__name__, str(sys.exc_info()))
                 traceback.print_tb(sys.exc_info()[2])
-
-    def _handleInThread(self, command, message):
-        q = multiprocessing.Queue()
-        p = multiprocessing.Process(target=self._executeCommandInProcess, args=(command, message, q))
-        p.start()
-        p.join(timeout=command.timeout)
-        if p.is_alive():
-            if message.Command != '':
-                self.sendResponse(IRCResponse(
-                    ResponseType.Say,
-                    "Command '{}' timed out and was killed".format(message.Command),
-                    message.ReplyTo))
-            os.kill(p.pid, signal.SIGKILL)
-        else:
-            self.sendResponse(q.get())
-    
-    def _executeCommandInProcess(self, command, message, queue):
-        response = command.execute(message)
-        queue.put(response)
 
     def _load(self, name, category, categoryDict, categoryCaseMap):
         name = name.lower()

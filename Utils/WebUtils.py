@@ -68,7 +68,7 @@ def fetchURL(url, extraHeaders=None):
         opener.addheaders = headers
         response = opener.open(url)
         responseHeaders = response.info().dict
-        #print '{} headers: {}'.format(urlparse(response.geturl()).hostname, responseHeaders)
+        print '{} headers: {}'.format(urlparse(response.geturl()).hostname, responseHeaders)
         pageType = responseHeaders["content-type"]
 
         # Make sure we don't download any unwanted things
@@ -166,7 +166,7 @@ def googleSearch(query):
     
     service = build('customsearch', 'v1', developerKey=googleKey)
     res = service.cse().list(
-        q = query,
+        q = quote(query),
         cx = '002603151577378558984:xiv3qbttad0'
     ).execute()
     return res
