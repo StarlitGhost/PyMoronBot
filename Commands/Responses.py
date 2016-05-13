@@ -279,7 +279,7 @@ class Responses(CommandInterface):
                     "http://bit.ly/zJrjGF",             # jeans kitty boop
                     "http://goo.gl/d054n",              # This is called "aversion therapy."
                     "http://goo.gl/6IoB0",              # my grumpy button, ur pushin' it
-                    "http://bit.ly/z79CJv",             # colonel goggie in the hallway with the nose boop
+                    "http://imgur.com/O61oxTc.jpg",     # colonel goggie in the hallway with the nose boop
                     "http://bit.ly/yODbYA",             # You may go, but first I must boop your nose
                     "http://bit.ly/AdX2cw",             # boop, gotchur nose
                     "http://goo.gl/1Xu0LK",             # fluttershy & rainbow dash
