@@ -37,7 +37,10 @@ filter syntax here: https://stedolan.github.io/jq/manual/#Basicfilters"
         if not re.match(ur'^\w+://', url):
             url = u"http://{}".format(url)
 
-        page = WebUtils.fetchURL(url)
+        if 'jq' in message.Metadata and url in message.Metadata['jq']:
+            page = message.Metadata['jq'][url]
+        else:
+            page = WebUtils.fetchURL(url)
         if page is None:
             return IRCResponse(ResponseType.Say, u"Problem fetching {}".format(url), message.ReplyTo)
 
@@ -67,5 +70,7 @@ filter syntax here: https://stedolan.github.io/jq/manual/#Basicfilters"
         value = re.sub(ur'\s+', u' ', value)
         value = self.htmlParser.unescape(value)
 
-        return IRCResponse(ResponseType.Say, value, message.ReplyTo)
+        return IRCResponse(ResponseType.Say, value, message.ReplyTo,
+                           extraVars={'jqURL': url},
+                           metadata={'jq': {url: page}})
 
