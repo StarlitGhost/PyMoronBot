@@ -62,6 +62,10 @@ class Sub(CommandInterface):
             if level < prevLevel:
                 command = self._substituteResponses(command, responseStack, level, extraVars, start)
 
+            # Replace any extraVars in the command
+            for var, value in extraVars.iteritems():
+                command = re.sub(ur'\$\b{}\b'.format(re.escape(var)), u'{}'.format(value), command)
+
             # Build a new message out of this segment
             inputMessage = IRCMessage(message.Type, message.User.String, message.Channel,
                                       self.bot.commandChar + command.lstrip(),
