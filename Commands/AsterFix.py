@@ -8,6 +8,8 @@ Created on Feb 17, 2015
 import difflib
 import re
 
+from pyxdameraulevenshtein import normalized_damerau_levenshtein_distance as ndld
+
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
@@ -52,7 +54,7 @@ class AsterFix(CommandInterface):
         if len(lastMessageList) <= 1:
             return
         
-        likelyChanges = difflib.get_close_matches(change, lastMessageList, 5, 0.5)
+        likelyChanges = self._getCloseMatches(change, lastMessageList, 5, 0.5)
         likelyChanges = filter((lambda word: word != change), likelyChanges)
 
         if likelyChanges:
@@ -72,3 +74,9 @@ class AsterFix(CommandInterface):
 
     def storeMessage(self, message):
         self.messages[message.User.Name] = message
+
+    def _getCloseMatches(self, change, messageList, n, threshold):
+        similarities = sorted([(ndld(change, part), part) for part in messageList])
+        closeMatches = [word for (diff, word) in similarities if diff < threshold]
+        topN = closeMatches[:n]
+        return topN
