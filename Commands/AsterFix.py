@@ -5,7 +5,6 @@ Created on Feb 17, 2015
 @author: Tyranic-Moron
 """
 
-import difflib
 import re
 
 from pyxdameraulevenshtein import normalized_damerau_levenshtein_distance as ndld
