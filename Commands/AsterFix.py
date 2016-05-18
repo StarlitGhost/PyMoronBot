@@ -76,6 +76,6 @@ class AsterFix(CommandInterface):
 
     def _getCloseMatches(self, change, messageList, n, threshold):
         similarities = sorted([(ndld(change, part), part) for part in messageList])
-        closeMatches = [word for (diff, word) in similarities if diff < threshold]
+        closeMatches = [word for (diff, word) in similarities if diff <= threshold]
         topN = closeMatches[:n]
         return topN
