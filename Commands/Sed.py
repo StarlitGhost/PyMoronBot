@@ -130,7 +130,7 @@ class Sed(CommandInterface):
 
             new = new[:300]
 
-            if new != message.MessageString:
+            if re.match(search, message.MessageString, subFlags):
                 newMessage = copy.copy(message)
                 newMessage.MessageString = new
                 self.storeMessage(newMessage, False)
