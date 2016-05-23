@@ -478,8 +478,7 @@ class MobroResponse(object):
         @type chatMessage: IRCMessage
         """
         self.enabled = not self.enabled
-        return self.chat("Response '%s' %s" % (self.name, {True: "Enabled", False: "Disabled"}[self.enabled]),
-                         chatMessage)
+        return self.chat("Response {!r} {}".format(self.name, 'enabled' if self.enabled else 'disabled'), chatMessage)
 
     #overwrite this with your own talkwords(IRCMessage) function if a response calls for it
     def talkwords(self, chatMessage):
