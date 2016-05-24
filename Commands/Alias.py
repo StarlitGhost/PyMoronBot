@@ -310,7 +310,7 @@ class Alias(CommandInterface):
                u"available subcommands for alias are: {1}".format(subCommand, u', '.join(self.subCommands.keys()))
 
     def shouldExecute(self, message):
-        if message.Command.lower() in self.bot.moduleHandler.mappedTriggers:
+        if message.Command.lower() in self.triggers or message.Command.lower() in self.aliases:
             return True
         return False
 
@@ -318,7 +318,7 @@ class Alias(CommandInterface):
         """
         @type message: IRCMessage
         """
-        if message.Command in self.triggers:
+        if message.Command.lower() in self.triggers:
             if len(message.ParameterList) > 0:
                 subCommand = message.ParameterList[0].lower()
                 if subCommand not in self.subCommands:
@@ -331,7 +331,7 @@ class Alias(CommandInterface):
                                    self._helpText,
                                    message.ReplyTo)
 
-        if message.Command.lower() not in self.triggers and message.Command.lower() in self.aliases:
+        elif message.Command.lower() in self.aliases:
             newMessage = self._aliasedMessage(message)
             newCommand = newMessage.Command.lower()
 
