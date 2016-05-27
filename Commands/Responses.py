@@ -63,7 +63,9 @@ class Responses(CommandInterface):
             '''Guards against the Dutch'''
             self.responses.add(MobroResponse('dutch',
                                              'The Dutch, AGAIN!',
-                                             '([^a-zA-Z]|^)dutch([^a-zA-Z]|$)'))
+                                             '([^a-zA-Z]|^)dutch([^a-zA-Z]|$)',
+                                             ResponseType.Say,
+                                             False))
 
             '''Sensitive to bees'''
             self.responses.add(MobroResponse('bees',
