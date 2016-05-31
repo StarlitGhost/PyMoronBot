@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-admins = ['Tyranic-Moron', 'T-M|Work', 'Tyranic_Moron', 'T-M|Asleep', 'GarrusVakarian', 'LordCustardSmingleigh', 'XelaReko', 'XelaReco', 'Xel|Work', 'dave_random', 'ElementalAlchemist', 'Homoglyph', 'Heufy|Work', 'Heufneutje', 'HeufyDroid', 'HeufyCloud', 'HeufyTrain', 'HeufyBus', 'HubbeKing', 'HubbeWork', 'HubbeTrain', 'Mara', 'Didero', 'ekimekim']
+admins = ['Tyranic-Moron', 'Tyranic_Moron', 'TyranicMoron', 'GarrusVakarian', 'XelaReko', 'XelaReco', 'Xel|Work', 'dave_random', 'ElementalAlchemist', 'Homoglyph', 'Heufneutje', 'HeufyCloud', 'HeufyTrain', 'HeufyBus', 'HubbeKing', 'HubbeWork', 'HubbeTrain', 'Mara', 'Didero', 'ekimekim', 'ekimekim|windows', 'ekimekim|work']
 
 finger = 'GET YOUR FINGER OUT OF THERE'
 version = '1.0.0'
