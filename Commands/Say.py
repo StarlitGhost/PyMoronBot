@@ -12,13 +12,16 @@ from CommandInterface import CommandInterface
 
 class Say(CommandInterface):
     triggers = ['say']
-    help = 'say <text> - makes the bot repeat the specified text'
+    help = 'say [channel] <text> - makes the bot repeat the specified text'
 
     def execute(self, message):
         """
         @type message: IRCMessage
         """
-        if len(message.ParameterList) > 0:
-            return IRCResponse(ResponseType.Say, message.Parameters, message.ReplyTo)
-        else:
+        if not message.ParameterList:
             return IRCResponse(ResponseType.Say, 'Say what?', message.ReplyTo)
+        
+        if message.ParameterList[0] in self.bot.channels:
+            return IRCResponse(ResponseType.Say, u" ".join(message.ParameterList[1:]), message.ParameterList[0])
+        
+        return IRCResponse(ResponseType.Say, message.Parameters, message.ReplyTo)
