@@ -23,7 +23,7 @@ All of these features can be individually enabled/disabled by loading or unloadi
 
 Installation Instructions
 -------------------------
-* Install Python 2.6+
+* Install Python 2.7+
 * Clone the repo with `git clone https://github.com/MatthewCox/PyMoronBot.git`
 * Create a virtualenv to run the bot in, and activate it
 * Run `pip install -r requirements.txt` to install all the requirements
