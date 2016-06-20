@@ -2,22 +2,24 @@ PyMoronBot [![Stories in Ready](https://badge.waffle.io/MatthewCox/PyMoronBot.pn
 ==========
 
 A modular IRC bot with extensive aliasing capabilities, written in Python.
+
 Initially a language port/rewrite of [MoronBot](https://github.com/MatthewCox/MoronBot/) (C#), but now somewhat diverged.
 
 Features
 --------
-* Alias any of the following to create new commands on-the-fly, and then alias *those* aliases to create even more
-* Use Slurp and JQ to extract data from HTML/XML or JSON
-* Use Sub or Chain to link multiple modules together
-  * and use Var to store data for use within the same command (eg, a URL you want to slurp multiple times)
-* Follows URLs posted in chat to see where they lead (following all redirects), responding with the page title and final hostname
+* [Alias](Commands/Alias.py) any of the following to create new commands on-the-fly, and then alias *those* aliases to create even more
+* Use [Slurp](Commands/Slurp.py) and [JQ](Commands/JQ.py) to extract data from HTML/XML or JSON
+* Use [Sub](Commands/Sub.py) or [Chain](Commands/Chain.py) to link multiple modules together
+  * and use [Var](Commands/Var.py) to store data for use within the same command (eg, a URL you want to slurp multiple times)
+* [Follows URLs](Commands/URLFollow.py) posted in chat to see where they lead (following all redirects), responding with the page title and final hostname
   * with specialised follows to get extra relevant information from Imgur, KickStarter, Steam, Twitch, Twitter, and YouTube links
-* Recognizes sed-like patterns in chat and replaces the most recent match in the last 20 messages
-* Also recognizes `*correction` style corrections and replaces the most likely candidate word in that user's previous message
-* Detect when single responses are longer than ~2 IRC messages, and submit them to paste.ee instead, replacing the response with a link
+* Recognizes [sed-like](Commands/Sed.py) patterns in chat and replaces the most recent match in the last 20 messages
+* Also recognizes [`*correction`](Commands/AsterFix.py) style corrections and replaces the most likely candidate word in that user's previous message
+* [AutoPasteEE](PostProcesses/AutoPasteEE.py) detects when single responses are longer than ~2 IRC messages, and submit them to paste.ee instead, replacing the response with a link
+* Consistent help for any module via the [Help](Commands/Help.py) module
 * And many more (take a look in [Commands](Commands) and [PostProcesses](PostProcesses))
 
-All of these features can be individually enabled/disabled by loading or unloading the module that provides them.
+All of these features can be individually enabled/disabled by loading or unloading the module that provides them
 
 Installation Instructions
 -------------------------
@@ -31,4 +33,4 @@ Running the Bot
 ---------------
 Activate your virtualenv, and run `python moronbot.py -s server.address -c \#channel`
 
-You can run `python moronbot.py -h` for help with the command line args.
+You can run `python moronbot.py -h` for help with the command line args
