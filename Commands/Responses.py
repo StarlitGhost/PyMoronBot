@@ -363,6 +363,8 @@ class Responses(CommandInterface):
                     "http://imgur.com/dkLJLrt.mp4",     # corgi is wiggle nose booped, then turns to camera with tongue out
                     "https://i.imgur.com/JOwvswE.gifv", # finger pokes frog in the head until frog has had enough of that shit
                     "http://i.imgur.com/li9KPAD.gifv",  # corgi butt finger boops
+                    "http://i.imgur.com/IciHp73.gifv",  # cat lying on its back gets a nose-boop, wiggles paws (image title: Excessive reaction to a booping)
+                    "https://i.imgur.com/tMIW18y.jpg",  # dog on a swing boops another dog's nose, like Michelangelo's Creation of Adam (image title: the creashun of pupper)
                     ]
                 return [IRCResponse(ResponseType.Say,
                                     'Boop! {}'.format(random.choice(boops)),
