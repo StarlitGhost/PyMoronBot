@@ -30,7 +30,10 @@ class Manhole(CommandInterface):
                     "namespace": {"bot": self.bot},
                     "passwd": os.path.join("Data", "manhole.passwd"),
                     "telnetPort": None,
-                    "sshPort": str(self.port)
+                    "sshPort": str(self.port),
+                    "sshKeyDir": os.path.join("Data"),
+                    "sshKeyName": "manhole.sshkey",
+                    "sshKeySize": 4096
                 })
                 self.manhole.startService()
             except CannotListenError:
