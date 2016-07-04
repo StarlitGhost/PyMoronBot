@@ -12,6 +12,7 @@ import sre_constants
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
+from Data import ignores
 
 
 class Sed(CommandInterface):
@@ -32,8 +33,12 @@ class Sed(CommandInterface):
         """
         @type message: IRCMessage
         """
-        if message.Type in self.acceptedTypes:
-            return True
+        if message.Type not in self.acceptedTypes:
+            return False
+        if ignores.ignoreList is not None:
+            if message.User.Name.lower() in ignores.ignoreList:
+                return False
+        return True
 
     def execute(self, message):
         """
