@@ -47,11 +47,11 @@ def log(text, target):
 
 
 class Log(CommandInterface):
-    triggers = ['log']
-    help = "log (-n / yyyy-mm-dd) - " \
-           "without parameters, links to today's log. " \
-           "-n links to the log n days ago. " \
-           "yyyy-mm-dd links to the log for the specified date"
+    triggers = []#['log']
+    help = "Logs {} messages.".format("/".join(logFuncs.keys()))#"log (-n / yyyy-mm-dd) - " \
+           #"without parameters, links to today's log. " \
+           #"-n links to the log n days ago. " \
+           #"yyyy-mm-dd links to the log for the specified date"
 
     priority = -1
 
