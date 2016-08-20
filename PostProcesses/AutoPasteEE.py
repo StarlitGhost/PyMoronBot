@@ -7,7 +7,7 @@ Created on May 21, 2014
 
 from PostProcessInterface import PostProcessInterface
 from IRCResponse import IRCResponse
-from Utils import WebUtils
+from Utils import StringUtils, WebUtils
 
 
 class AutoPasteEE(PostProcessInterface):
@@ -21,7 +21,7 @@ class AutoPasteEE(PostProcessInterface):
         limit = 700  # chars
         expire = 10  # minutes
         if len(response.Response) > limit:
-            replaced = WebUtils.pasteEE(response.Response,
+            replaced = WebUtils.pasteEE(StringUtils.stripFormatting(response.Response),
                                         u'Response longer than {0} chars intended for {1}'.format(limit,
                                                                                                   response.Target),
                                         expire)
