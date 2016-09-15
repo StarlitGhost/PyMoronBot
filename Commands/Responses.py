@@ -173,7 +173,7 @@ class Responses(CommandInterface):
 
                 self.animal = None
                 for match, animal in matchDict.iteritems():
-                    if re.search(r'^{}([^\sa-z]+)?$'.format(match), message, re.IGNORECASE):
+                    if re.search(r'^{}([^\s\w]+)?$'.format(match), message, re.IGNORECASE):
                         self.animal = animal
                         return True
 
