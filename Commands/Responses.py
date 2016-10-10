@@ -303,7 +303,7 @@ class Responses(CommandInterface):
                     "http://i.imgur.com/jWMdZ.jpg",     # black & white kitten boop
                     "http://i.imgur.com/dz81Dbs.jpg",   # puppy picnic boop
                     "http://i.imgur.com/0KWKb.gif",     # spinspinspin BOOP!
-                    "http://i.minus.com/izXxGnlNFmVrN.gif",  # horse & excitable puppy boop
+                    #"http://i.minus.com/izXxGnlNFmVrN.gif",  # horse & excitable puppy boop - minus.com is dead for good?
                     "http://i.imgur.com/UaNm6fv.gif",   # boop to turn off kitten
                     "http://i.imgur.com/QmVjLNQ.png",   # snow leopard boop
                     "http://i.imgur.com/HaAovQK.gif",   # darting bed boop
