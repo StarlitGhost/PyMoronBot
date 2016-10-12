@@ -36,6 +36,7 @@ class URLFollow(CommandInterface):
 
         self.youtubeKey = load_key(u'YouTube')
         self.imgurClientID = load_key(u'imgur Client ID')
+        self.twitchClientID = load_key(u'Twitch Client ID')
         
         self.autoFollow = True
 
@@ -454,9 +455,13 @@ class URLFollow(CommandInterface):
         # Heavily based on Didero's DideRobot code for the same
         # https://github.com/Didero/DideRobot/blob/06629fc3c8bddf8f729ce2d27742ff999dfdd1f6/commands/urlTitleFinder.py#L37
         # TODO: other stats?
+        if self.twitchClientID is None:
+            return IRCResponse(ResponseType.Say, '[Twitch Client ID not found]', message.ReplyTo)
+        
         chanData = {}
         channelOnline = False
-        twitchHeaders = [('Accept', 'application/vnd.twitchtv.v2+json')]
+        twitchHeaders = [('Accept', 'application/vnd.twitchtv.v2+json'),
+                         ('Client-ID', self.twitchClientID)]
         webPage = WebUtils.fetchURL(u'https://api.twitch.tv/kraken/streams/{}'.format(channel), twitchHeaders)
 
         streamData = json.loads(webPage.body)
