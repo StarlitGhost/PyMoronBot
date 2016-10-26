@@ -63,7 +63,7 @@ class Urban(CommandInterface):
         more = 'http://{}.urbanup.com/'.format(word)
 
         if word.lower() != message.Parameters.lower():
-            word = "{0} (Contains '{0}')".format(word, message.Parameters)
+            word = "{0} (Contains '{1}')".format(word, message.Parameters)
 
         defFormatString = unicode(assembleFormattedText(A.normal[A.bold["{0}:"], " {1}"]))
         exampleFormatString = unicode(assembleFormattedText(A.normal[A.bold["Example(s):"], " {0}"]))
