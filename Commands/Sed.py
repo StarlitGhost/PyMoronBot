@@ -12,6 +12,7 @@ import sre_constants
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
+from Utils.SignalTimeout import SignalTimeout, TimeoutException
 from Data import ignores
 
 
@@ -51,7 +52,14 @@ class Sed(CommandInterface):
 
         if match:
             search, replace, flags, text = match
-            response = self.substitute(search, replace, flags, text, message, message.ReplyTo)
+            try:
+                with SignalTimeout(5):
+                    response = self.substitute(search, replace, flags, text,
+                                               message, message.ReplyTo)
+            except TimeoutException:
+                return IRCResponse(ResponseType.Say,
+                                   "Aborted search for '{}', took too long".format(search),
+                                   message.ReplyTo)
 
             if response is not None:
                 responseType = ResponseType.Say
