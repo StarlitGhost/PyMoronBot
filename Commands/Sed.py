@@ -6,6 +6,10 @@ Created on Feb 14, 2014
 """
 
 import copy
+try:
+    import re2
+except ImportError:
+    import re as re2
 import re
 import sre_constants
 
@@ -52,14 +56,14 @@ class Sed(CommandInterface):
 
         if match:
             search, replace, flags, text = match
-            try:
-                with SignalTimeout(5):
-                    response = self.substitute(search, replace, flags, text,
+            #try:
+                #with SignalTimeout(5):
+            response = self.substitute(search, replace, flags, text,
                                                message, message.ReplyTo)
-            except TimeoutException:
-                return IRCResponse(ResponseType.Say,
-                                   "Aborted search for '{}', took too long".format(search),
-                                   message.ReplyTo)
+            #except TimeoutException:
+            #return IRCResponse(ResponseType.Say,
+            #                       "Aborted search for '{}', took too long".format(search),
+            #                       message.ReplyTo)
 
             if response is not None:
                 responseType = ResponseType.Say
@@ -119,7 +123,8 @@ class Sed(CommandInterface):
             newMessage = copy.copy(inputMessage)
             
             try:
-                new = re.sub(search, replace, text, count, subFlags)
+                searchC = re2.compile(search, subFlags)
+                new = searchC.sub(replace, text, count)
             except sre_constants.error as e:
                 newMessage.MessageString = "[Regex Error in Sed pattern: {}]".format(e.message)
                 return newMessage
@@ -135,7 +140,8 @@ class Sed(CommandInterface):
 
         for message in reversed(messages):
             try:
-                new = re.sub(search, replace, message.MessageString, count, subFlags)
+                searchC = re2.compile(search, subFlags)
+                new = searchC.sub(replace, message.MessageString, count)
             except sre_constants.error as e:
                 newMessage = copy.copy(inputMessage)
                 newMessage.MessageString = "[Regex Error in Sed pattern: {}]".format(e.message)
@@ -143,7 +149,7 @@ class Sed(CommandInterface):
 
             new = new[:300]
 
-            if re.search(search, message.MessageString, subFlags):
+            if searchC.search(message.MessageString):
                 newMessage = copy.copy(message)
                 newMessage.MessageString = new
                 self.storeMessage(newMessage, False)
