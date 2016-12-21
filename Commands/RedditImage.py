@@ -23,7 +23,7 @@ from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 # - multiple fetch types beyond the current random, eg reddit sort types (top rated, hot, best, etc)
 class RedditImage(CommandInterface):
     triggers = ['redditimage']
-    help = "redditimage <subreddit> - fetches a random image from the specified subreddit"
+    help = "redditimage <subreddit> [<range>] - fetches a random image from the top 100 (or given range) of the specified subreddit"
     runInThread = True
 
     def onLoad(self):
@@ -34,13 +34,22 @@ class RedditImage(CommandInterface):
         """
         @type message: IRCMessage
         """
-        if len(message.ParameterList) != 1:
+        if len(message.ParameterList) == 0 or len(message.ParameterList) > 2:
             return IRCResponse(ResponseType.Say, self.help, message.ReplyTo)
 
         subreddit = message.ParameterList[0].lower()
+        if len(message.ParameterList) == 2:
+            try:
+                topRange = int(message.ParameterList[1])
+                if topRange < 0:
+                    return IRCResponse(ResponseType.Say, "The range should be a positive integer!", message.ReplyTo)
+            except ValueError:
+                return IRCResponse(ResponseType.Say, "The range should be a positive integer!", message.ReplyTo)
+        else:
+            topRange = 100
 
         url = "https://api.imgur.com/3/gallery/r/{}/time/all/{}"
-        url = url.format(subreddit, random.randint(0, 100))
+        url = url.format(subreddit, random.randint(0, topRange))
         response = WebUtils.fetchURL(url, self.headers)
         jsonResponse = json.loads(response.body)
         images = jsonResponse['data']
