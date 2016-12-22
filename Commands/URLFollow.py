@@ -360,7 +360,7 @@ class URLFollow(CommandInterface):
             # live projects
             creator = soup.find(attrs={'data-modal-class': 'modal_project_by'})
             # completed projects
-            if creator is None:
+            if creator is None or not creator.text:
                 creator = soup.find(class_='green-dark', attrs={'data-modal-class': 'modal_project_by'})
             if creator is not None:
                 data.append(unicode(assembleFormattedText(A.normal['{0}',
