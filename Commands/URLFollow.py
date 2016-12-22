@@ -414,11 +414,11 @@ class URLFollow(CommandInterface):
         #currency = currency[0].upper()
 
         if percentage >= 1.0:
-            percentageString = A.fg.green['({3:,.0f}% funded)']
+            percentageString = A.fg.green['({2:,.0f}% funded)']
         else:
-            percentageString = A.fg.red['({3:,.0f}% funded)']
+            percentageString = A.fg.red['({2:,.0f}% funded)']
 
-        pledgePerBackerString = A.fg.gray['{4:,.0f}/backer']
+        pledgePerBackerString = A.fg.gray['{3:,.0f}/backer']
 
         pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}', A.fg.gray['/'], '{1:,.0f} ', percentageString, ' ', pledgePerBackerString])
         data.append(pledgedString.format(pledged,
