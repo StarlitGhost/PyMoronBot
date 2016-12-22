@@ -374,7 +374,7 @@ class URLFollow(CommandInterface):
                 backerCount = int(backerCount['data-backers-count'])
         # completed projects
         else:
-            backerCount = soup.find(class_='NS_projects__spotlight_stats')
+            backerCount = soup.find(class_='NS_campaigns__spotlight_stats')
             if backerCount is not None:
                 backerCount = int(backerCount.b.text.strip().split()[0].replace(',', ''))
 
@@ -391,10 +391,10 @@ class URLFollow(CommandInterface):
                 else:
                     pledgePerBacker = 0
         else:
-            money = soup.select('span.money.no-code')
+            money = soup.select('span.money')
             if money:
-                pledgedString = money[0].text.strip()
-                goalString = money[1].text.strip()
+                pledgedString = money[1].text.strip()
+                goalString = money[2].text.strip()
                 pledged = float(re.sub(ur'[^0-9.]', u'', pledgedString))
                 goal = float(re.sub(ur'[^0-9.]', u'', goalString))
                 percentage = (pledged / goal)
@@ -403,10 +403,11 @@ class URLFollow(CommandInterface):
                 else:
                     pledgePerBacker = 0
 
-        currency = soup.select('span.money.no-code')[-1]['class']
-        currency.remove('money')
-        currency.remove('no-code')
-        currency = currency[0].upper()
+        # no longer any way to get this?
+        #currency = soup.select('span.money.no-code')[-1]['class']
+        #currency.remove('money')
+        #currency.remove('no-code')
+        #currency = currency[0].upper()
 
         if percentage >= 1.0:
             percentageString = A.fg.green['({3:,.0f}% funded)']
@@ -415,28 +416,26 @@ class URLFollow(CommandInterface):
 
         pledgePerBackerString = A.fg.gray['{4:,.0f}/backer']
 
-        pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}', A.fg.gray['/'], '{1:,.0f} {2} ', percentageString, ' ', pledgePerBackerString])
+        pledgedString = assembleFormattedText(A.normal['Pledged: {0:,.0f}', A.fg.gray['/'], '{1:,.0f} ', percentageString, ' ', pledgePerBackerString])
         data.append(pledgedString.format(pledged,
                                          goal,
-                                         currency,
-                                         #pledgedData.data['data-currency'],
                                          percentage * 100,
                                          pledgePerBacker))
 
         findState = soup.find(id='main_content')
-        if 'Project-state-canceled' in findState['class']:
+        if 'Campaign-state-canceled' in findState['class']:
             data.append(assembleFormattedText(A.normal[A.fg.red['Cancelled']]))
         
-        elif 'Project-state-suspended' in findState['class']:
+        elif 'Campaign-state-suspended' in findState['class']:
             data.append(assembleFormattedText(A.normal[A.fg.blue['Suspended']]))
             
-        elif 'Project-state-failed' in findState['class']:
+        elif 'Campaign-state-failed' in findState['class']:
             data.append(assembleFormattedText(A.normal[A.fg.red['Failed']]))
 
-        elif 'Project-state-successful' in findState['class']:
+        elif 'Campaign-state-successful' in findState['class']:
                 data.append(assembleFormattedText(A.normal[A.fg.green['Successful']]))
 
-        elif 'Project-state-live' in findState['class']:
+        elif 'Campaign-state-live' in findState['class']:
             duration = stats.find(id='project_duration_data')
 
             if duration is not None:
