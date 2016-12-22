@@ -82,6 +82,9 @@ class ModuleHandler(object):
                 traceback.print_tb(sys.exc_info()[2])
 
         return newResponse
+    
+    def _deferredError(self, failure):
+        print str(failure)
 
     def handleMessage(self, message):
         for command in sorted(self.commands.values(), key=operator.attrgetter('priority')):
@@ -93,6 +96,7 @@ class ModuleHandler(object):
                     else:
                         d = threads.deferToThread(command.execute, message)
                         d.addCallback(self.sendResponse)
+                        d.addErrback(self._deferredError)
             except Exception:
                 # ^ dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
                 print "Python Execution Error in '{0}': {1}".format(command.__class__.__name__, str(sys.exc_info()))
