@@ -42,7 +42,7 @@ class Sub(CommandInterface):
         try:
             segments = list(self._parseSubcommandTree(subString))
         except UnbalancedBracesException as e:
-            red = assembleFormattedText(A.fg.lightRed[''])
+            red = assembleFormattedText(A.bold[A.fg.lightRed['']])
             normal = assembleFormattedText(A.normal[''])
             error = subString[:e.column] + red + subString[e.column] + normal + subString[e.column+1:]
             error = self._unmangleEscapes(error, False)
