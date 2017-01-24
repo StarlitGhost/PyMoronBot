@@ -273,6 +273,8 @@ class Hangman(CommandInterface):
                 correct = gs.guessPhrase(guess)
             except WrongPhraseLengthException as e:
                 return self._exceptionFormatter(e, message.ReplyTo)
+            except PhraseMismatchesGuessesException as e:
+                return self._exceptionFormatter(e, message.ReplyTo)
 
         user = message.User.Name
         if correct:
@@ -331,8 +333,8 @@ class Hangman(CommandInterface):
         """
         @type message: IRCMessage
         """
-        if not message.ParameterList:
-            return IRCResponse(ResponseType.Say, self.help(message), message.ReplyTo)
+        if len(message.ParameterList) == 0:
+            return self._start(message)
 
         subCommand = message.ParameterList[0].lower()
         if subCommand in self.subCommands:
