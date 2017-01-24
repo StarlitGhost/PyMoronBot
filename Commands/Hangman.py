@@ -136,7 +136,7 @@ class GameState(object):
                 g = g.encode('utf-8')
                 colouredGuesses.append(assembleFormattedText(A.fg.red[g]))
         reset = assembleFormattedText(A.normal[''])
-
+        colouredGuesses = [c.decode(encoding='utf-8', errors='ignore') for c in colouredGuesses]
         return u'[{}{}]'.format(u''.join(colouredGuesses), reset)
 
     def _incrementBadGuesses(self):
@@ -212,7 +212,7 @@ class Hangman(CommandInterface):
     def _stop(self, message, suppressMessage=False):
         """stop - stops the current game. Bot-admin only"""
         if not suppressMessage:
-            if message.User.Name.lower() not in GlobalVars.admins:
+            if message.User.Name not in GlobalVars.admins:
                 return IRCResponse(ResponseType.Say,
                                    u'[Hangman] only my admins can stop games!',
                                    message.ReplyTo)
