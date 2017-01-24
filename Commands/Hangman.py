@@ -66,7 +66,7 @@ class GameState(object):
 
         maskedPhrase = self._renderMaskedPhrase()
         for i, c in enumerate(maskedPhrase):
-            if c == u'_':
+            if c == u'␣':
                 continue
             if phrase[i] != maskedPhrase[i]:
                 raise PhraseMismatchesGuessesException()
