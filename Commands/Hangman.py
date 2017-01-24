@@ -97,7 +97,7 @@ class GameState(object):
     def _renderMaskedPhrase(self):
         maskedPhrase = [
             c if c == u' ' or c in self.guesses
-            else u'_'
+            else u'␣'
             for c in self.phrase
         ]
         return u''.join(maskedPhrase)
