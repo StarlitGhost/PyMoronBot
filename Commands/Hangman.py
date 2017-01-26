@@ -8,6 +8,7 @@ Created on Jan 23, 2017
 import random
 import re
 from collections import OrderedDict
+from unicodedata import category as unicodeCategory
 
 import GlobalVars
 from IRCMessage import IRCMessage
@@ -35,6 +36,17 @@ class PhraseMismatchesGuessesException(Exception):
         self.message = u"your guess does not match the revealed letters"
 
 
+class PhraseUsesKnownBadLettersException(Exception):
+    def __init__(self):
+        self.message = u"your guess uses letters that are known to be wrong"
+
+
+class InvalidCharacterException(Exception):
+    def __init__(self, char):
+        self.char = char
+        self.message = u"'{}' is not a valid word character".format(char)
+
+
 class GameState(object):
     def __init__(self, phrase, maxBadGuesses):
         self.phrase = phrase
@@ -47,6 +59,8 @@ class GameState(object):
         letter = letter.lower()
         if letter in self.guesses:
             raise AlreadyGuessedException(letter)
+        if not unicodeCategory(letter)[0] in ['L']:
+            raise InvalidCharacterException(letter)
 
         self.guesses.append(letter)
 
@@ -67,6 +81,8 @@ class GameState(object):
         maskedPhrase = self._renderMaskedPhrase()
         for i, c in enumerate(maskedPhrase):
             if c == u'␣':
+                if phrase[i] in self.guesses:
+                    raise PhraseUsesKnownBadLettersException()
                 continue
             if phrase[i] != maskedPhrase[i]:
                 raise PhraseMismatchesGuessesException()
@@ -131,7 +147,7 @@ class GameState(object):
         for g in self.guesses:
             if g in self.phrase:
                 g = g.encode('utf-8')
-                colouredGuesses.append(assembleFormattedText(A.fg.green[g]))
+                colouredGuesses.append(assembleFormattedText(A.bold[A.fg.green[g]]))
             else:
                 g = g.encode('utf-8')
                 colouredGuesses.append(assembleFormattedText(A.fg.red[g]))
@@ -161,6 +177,7 @@ class PhraseList(object):
             return next(self.phraseGenerator)
         except StopIteration:
             self.shuffle()
+            return next(self.phraseGenerator)
 
     def _loadPhrases(self):
         try:
@@ -265,24 +282,33 @@ class Hangman(CommandInterface):
         if len(guess) == 1:
             try:
                 correct = gs.guessLetter(guess)
-            except AlreadyGuessedException as e:
+            except (AlreadyGuessedException,
+                    InvalidCharacterException) as e:
                 return self._exceptionFormatter(e, message.ReplyTo)
         # whole phrase
         else:
             try:
                 correct = gs.guessPhrase(guess)
-            except WrongPhraseLengthException as e:
-                return self._exceptionFormatter(e, message.ReplyTo)
-            except PhraseMismatchesGuessesException as e:
+            except (WrongPhraseLengthException,
+                    PhraseMismatchesGuessesException,
+                    PhraseUsesKnownBadLettersException) as e:
                 return self._exceptionFormatter(e, message.ReplyTo)
 
         user = message.User.Name
+        # split the username with a zero-width space
+        # hopefully this kills client highlighting on nick mentions
+        #user = user[:1] + u'\u200b' + user[1:]
+        # try a tiny arrow instead, some clients actually render zero-width spaces
+        colUser = user[:1] + u'\u034e' + user[1:]
+        colUser = colUser.encode(encoding='utf-8', errors='ignore')
         if correct:
-            colUser = assembleFormattedText(A.normal[A.fg.green[user]])
+            colUser = assembleFormattedText(A.normal[A.fg.green[colUser]])
         else:
-            colUser = assembleFormattedText(A.normal[A.fg.red[user]])
+            colUser = assembleFormattedText(A.normal[A.fg.red[colUser]])
         responses.append(IRCResponse(ResponseType.Say,
-                                     u'{} - {}'.format(gs.render(), colUser),
+                                     u'{} - {}'.format(gs.render(),
+                                                       colUser.decode(encoding='utf-8',
+                                                                      errors='ignore')),
                                      message.ReplyTo))
 
         if gs.finished:
