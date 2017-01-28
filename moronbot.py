@@ -84,20 +84,20 @@ class MoronBot(irc.IRCClient):
 
     def irc_NICK(self, prefix, params):
         userArray = prefix.split('!')
-        oldnick = userArray[0]
-        newnick = params[0]
+        oldNick = userArray[0]
+        newNick = params[0]
 
         for key in self.channels:
             channel = self.channels[key]
             for userKey in channel.Users:
                 user = channel.Users[userKey]
-                if userKey == oldnick:
-                    channel.Users[newnick] = IRCUser('{0}!{1}@{2}'.format(newnick, user.User, user.Hostmask))
-                    del channel.Users[oldnick]
-                    if oldnick in channel.Ranks:
-                        channel.Ranks[newnick] = channel.Ranks[oldnick]
-                        del channel.Ranks[oldnick]
-                    message = IRCMessage('NICK', prefix, channel, newnick, self)
+                if userKey == oldNick:
+                    channel.Users[newNick] = IRCUser('{0}!{1}@{2}'.format(newNick, user.User, user.Hostmask))
+                    del channel.Users[oldNick]
+                    if oldNick in channel.Ranks:
+                        channel.Ranks[newNick] = channel.Ranks[oldNick]
+                        del channel.Ranks[oldNick]
+                    message = IRCMessage('NICK', prefix, channel, newNick, self)
                     self.handleMessage(message)
 
     def nickChanged(self, nick):
@@ -182,14 +182,14 @@ class MoronBot(irc.IRCClient):
 
     def irc_RPL_CHANNELMODEIS(self, _, params):
         channel = self.channels[params[1]]
-        modestring = params[2][1:]
-        modeparams = params[3:]
+        modeString = params[2][1:]
+        modeParams = params[3:]
 
-        for mode in modestring:
+        for mode in modeString:
             if mode in ServerInfo.ChannelSetArgsModes or mode in ServerInfo.ChannelSetUnsetArgsModes:
                 # Mode takes an argument
-                channel.Modes[mode] = modeparams[0]
-                del modeparams[0]
+                channel.Modes[mode] = modeParams[0]
+                del modeParams[0]
             else:
                 channel.Modes[mode] = None
 
