@@ -59,7 +59,7 @@ class GameState(object):
         letter = letter.lower()
         if letter in self.guesses:
             raise AlreadyGuessedException(letter)
-        if not unicodeCategory(letter)[0] in ['L']:
+        if not self._isLetter(letter):
             raise InvalidCharacterException(letter)
 
         self.guesses.append(letter)
@@ -83,6 +83,8 @@ class GameState(object):
             if c == u'␣':
                 if phrase[i] in self.guesses:
                     raise PhraseUsesKnownBadLettersException()
+                if not self._isLetter(phrase[i]):
+                    raise InvalidCharacterException(phrase[i])
                 continue
             if phrase[i] != maskedPhrase[i]:
                 raise PhraseMismatchesGuessesException()
@@ -112,7 +114,8 @@ class GameState(object):
 
     def _renderMaskedPhrase(self):
         maskedPhrase = [
-            c if c == u' ' or c in self.guesses
+            c if not self._isLetter(c)
+              or c in self.guesses
             else u'␣'
             for c in self.phrase
         ]
@@ -159,6 +162,10 @@ class GameState(object):
         self.badGuesses += 1
         if self.badGuesses == self.maxBadGuesses:
             self.finished = True
+
+    @staticmethod
+    def _isLetter(letter):
+        return unicodeCategory(letter)[0] in ['L']
 
 
 class PhraseList(object):
