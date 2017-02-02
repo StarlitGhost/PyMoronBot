@@ -169,6 +169,7 @@ class Responses(CommandInterface):
                     r'(blub(\s+)?)+': 'deep one',
                     r'bu*zz+': 'bee',
                     r'boo+': 'ghost',
+                    r'(noo+t ?)+': 'penguin',
                 }
 
                 self.animal = None
