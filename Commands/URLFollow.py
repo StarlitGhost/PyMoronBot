@@ -225,6 +225,7 @@ class URLFollow(CommandInterface):
             tweetTimeText = time.strftime('%Y/%m/%d %H:%M', time.strptime(tweetTimeText, '%I:%M %p - %d %b %Y'))
         except ValueError:
             pass
+        tweetTimeText = re.sub(ur'[\r\n\s]+', u' ', tweetTimeText)
 
         links = tweetText.find_all('a', {'data-expanded-url': True})
         for link in links:
