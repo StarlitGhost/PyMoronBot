@@ -34,9 +34,10 @@ class Currency(CommandInterface):
             amount = 1.0
             offset = 0
 
-        ccFrom = message.ParameterList[offset]
+        ccFrom = message.ParameterList[offset].upper()
         ccTo   = message.ParameterList[offset+2:]
         ccTo   = ",".join(ccTo)
+        ccTo   = ccTo.upper()
 
         url = "https://api.fixer.io/latest?base={}&symbols={}"
         url = url.format(ccFrom, ccTo)
