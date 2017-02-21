@@ -374,7 +374,7 @@ class URLFollow(CommandInterface):
         stats = soup.find(id='stats')
         # projects in progress
         if stats is not None:
-            backerCount = stats.find(id='backers_count')
+            backerCount = soup.find(id='backers_count')
             if backerCount is not None:
                 backerCount = int(backerCount['data-backers-count'])
         # completed projects
@@ -383,10 +383,10 @@ class URLFollow(CommandInterface):
             if backerCount is not None:
                 backerCount = int(backerCount.b.text.strip().split()[0].replace(',', ''))
 
-        data.append('Backers: {0:,}'.format(backerCount))
+        data.append('Backers: {:,d}'.format(backerCount))
 
         if stats is not None:
-            pledgeData = stats.find(id='pledged')
+            pledgeData = soup.find(id='pledged')
             if pledgeData is not None:
                 pledged = float(pledgeData['data-pledged'])
                 goal = float(pledgeData['data-goal'])
@@ -438,10 +438,10 @@ class URLFollow(CommandInterface):
             data.append(assembleFormattedText(A.normal[A.fg.red['Failed']]))
 
         elif 'Campaign-state-successful' in findState['class']:
-                data.append(assembleFormattedText(A.normal[A.fg.green['Successful']]))
+            data.append(assembleFormattedText(A.normal[A.fg.green['Successful']]))
 
         elif 'Campaign-state-live' in findState['class']:
-            duration = stats.find(id='project_duration_data')
+            duration = soup.find(id='project_duration_data')
 
             if duration is not None:
                 remaining = float(duration['data-hours-remaining'])
