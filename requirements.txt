@@ -4,7 +4,7 @@ psutil==2.1.1
 python-dateutil==2.6.0
 ply==3.10
 enum34==1.1.6
-twitter==1.14.3
+twitter==1.17.1
 requests==2.13.0
 pytimeparse==1.1.6
 pymysql==0.6.4
