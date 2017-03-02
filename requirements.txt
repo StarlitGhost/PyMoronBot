@@ -1,7 +1,7 @@
 Twisted==15.1.0
 beautifulsoup4==4.3.2
 psutil==2.1.1
-python-dateutil==2.2
+python-dateutil==2.6.0
 ply==3.4
 enum34==1.0
 twitter==1.14.3
