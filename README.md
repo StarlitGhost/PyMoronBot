@@ -1,4 +1,4 @@
-PyMoronBot [![Stories in Ready](https://badge.waffle.io/MatthewCox/PyMoronBot.png?label=ready&title=Ready)](https://waffle.io/MatthewCox/PyMoronBot)
+PyMoronBot [![Stories in Ready](https://badge.waffle.io/MatthewCox/PyMoronBot.png?label=ready&title=Ready)](https://waffle.io/MatthewCox/PyMoronBot) [![Python 3](https://pyup.io/repos/github/MatthewCox/PyMoronBot/python-3-shield.svg)](https://pyup.io/repos/github/MatthewCox/PyMoronBot/) [![Updates](https://pyup.io/repos/github/MatthewCox/PyMoronBot/shield.svg)](https://pyup.io/repos/github/MatthewCox/PyMoronBot/)
 ==========
 
 A modular IRC bot with extensive aliasing capabilities, written in Python.
