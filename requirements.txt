@@ -15,5 +15,5 @@ jq==0.1.6
 google-api-python-client==1.6.2
 pyxDamerauLevenshtein==1.4.1
 re2==0.2.22
-parsedatetime==2.2
+parsedatetime==2.3
 cryptography==1.8.1
