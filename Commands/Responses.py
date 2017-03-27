@@ -290,7 +290,6 @@ class Responses(CommandInterface):
                     "http://i.imgur.com/vC5gy.jpg",     # dog in car boop
                     "http://i.imgur.com/xmzLY.gifv",    # cat lap booping dog
                     "http://i.imgur.com/NSAKo.jpg",     # orange cat perma-booping dog on bed
-                    "http://bit.ly/NI0jYk",
                     "http://i.imgur.com/jpcKLuy.png",   # pinkie pie and twilight sparkle boop
                     "http://i.imgur.com/qeNvd.png",     # elephant boop
                     "http://i.imgur.com/wtK1T.jpg",     # jet booping tanker truck
