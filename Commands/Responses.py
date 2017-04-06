@@ -275,7 +275,6 @@ class Responses(CommandInterface):
             def boopTalkwords(message):
                 boops = [
                     #"http://goo.gl/HJzfS",              # feline anatomy
-                    "http://goo.gl/Umt61b",             # not boop ur nose, bite tur nose
                     "http://bit.ly/zA2bUY",             # i boop ur noes
                     "http://i.imgur.com/B2vDpq0.png",   # hey cat, imma boop ur head, lol
                     "http://bit.ly/ACbm0J",             # Iz gunna boop yer nose, k?
