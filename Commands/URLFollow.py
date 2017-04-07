@@ -516,6 +516,13 @@ class URLFollow(CommandInterface):
         return
 
     def GetTitle(self, webpage):
+        # BeautifulSoup doesn't do the right thing if you give it bytes.
+        # We're not 100% sure what the content-type of this page is meant to be,
+        # but UTF-8 is going to be right 90% of the time.
+        try:
+            webpage = webpage.decode('utf-8')
+        except UnicodeDecodeError:
+            pass
         soup = BeautifulSoup(webpage)
         title = soup.title
         if title:
