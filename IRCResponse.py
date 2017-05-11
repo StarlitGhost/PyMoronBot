@@ -36,5 +36,9 @@ class IRCResponse(object):
         except TypeError:  # Already utf-8?
             self.Target = target
 
+        # remove CTCP chars
+        if not self.Type == ResponseType.Raw:
+            self.Response = self.Response.replace('\x01', '')
+
         self.ExtraVars = extraVars
         self.Metadata = metadata
