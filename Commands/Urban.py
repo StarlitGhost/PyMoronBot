@@ -60,7 +60,7 @@ class Urban(CommandInterface):
         up = defn['thumbs_up']
         down = defn['thumbs_down']
         
-        more = 'http://{}.urbanup.com/'.format(word)
+        more = 'http://{}.urbanup.com/'.format(word.replace(' ', '-'))
 
         if word.lower() != message.Parameters.lower():
             word = "{0} (Contains '{1}')".format(word, message.Parameters)
