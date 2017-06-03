@@ -29,7 +29,10 @@ class Gif(CommandInterface):
             invalid = u"'{}' is not a valid year, valid years are {} to {}"\
                 .format(message.ParameterList[0], years[0], years[-1])
             try:
-                year = int(message.ParameterList[0])
+                if len(message.ParameterList[0]) < 4:
+                    year = int(message.ParameterList[0])
+                else:
+                    raise ValueError
             except ValueError:
                 return IRCResponse(ResponseType.Say, invalid, message.ReplyTo)
 

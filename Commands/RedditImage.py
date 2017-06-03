@@ -40,9 +40,12 @@ class RedditImage(CommandInterface):
         subreddit = message.ParameterList[0].lower()
         if len(message.ParameterList) == 2:
             try:
-                topRange = int(message.ParameterList[1])
+                if len(message.ParameterList[1]) < 20:
+                    topRange = int(message.ParameterList[1])
+                else:
+                    raise ValueError
                 if topRange < 0:
-                    return IRCResponse(ResponseType.Say, "The range should be a positive integer!", message.ReplyTo)
+                    raise ValueError
             except ValueError:
                 return IRCResponse(ResponseType.Say, "The range should be a positive integer!", message.ReplyTo)
         else:

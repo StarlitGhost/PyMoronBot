@@ -253,7 +253,10 @@ class Hangman(CommandInterface):
         Bot-admin only"""
         if message.User.Name in GlobalVars.admins:
             try:
-                maxBadGuesses = int(message.ParameterList[1])
+                if len(message.ParameterList[1]) < 3:
+                    maxBadGuesses = int(message.ParameterList[1])
+                else:
+                    raise ValueError
                 if 0 < maxBadGuesses < 21:
                     response = u'[Hangman] maximum bad guesses changed from {} to {}'.format(self.maxBadGuesses,
                                                                                              maxBadGuesses)

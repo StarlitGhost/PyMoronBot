@@ -69,7 +69,10 @@ class Roll(CommandInterface):
         def t_NUMBER(t):
             r"""\d+"""
             try:
-                t.value = int(t.value)
+                if len(t.value) < 100:
+                    t.value = int(t.value)
+                else:
+                    raise ValueError
             except ValueError:
                 t.value = 0
             return t
