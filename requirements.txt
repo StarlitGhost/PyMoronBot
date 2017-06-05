@@ -5,7 +5,7 @@ python-dateutil==2.6.0
 ply==3.10
 enum34==1.1.6
 twitter==1.17.1
-requests==2.16.5
+requests==2.17.3
 pytimeparse==1.1.6
 pymysql==0.7.11
 pycrypto==2.6.1
