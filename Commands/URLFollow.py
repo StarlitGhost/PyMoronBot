@@ -321,7 +321,7 @@ class URLFollow(CommandInterface):
 
         # platforms
         if 'platforms' in appData:
-            platforms = appData['platforms']:
+            platforms = appData['platforms']
             platformArray = []
             if platforms['windows']:
                 platformArray.append(u'Win')
