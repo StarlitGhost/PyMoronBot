@@ -278,9 +278,9 @@ class URLFollow(CommandInterface):
         releaseDate = appData['release_date']
         if not releaseDate['coming_soon']:
             if releaseDate['date']:
-                data.append(u'Release Date: ' + releaseDate['date'])
+                data.append(u'Released: ' + releaseDate['date'])
         else:
-            data.append(assembleFormattedText(A.normal['Release Date: ', A.fg.cyan[str(releaseDate['date'])]]))
+            data.append(assembleFormattedText(A.normal['To Be Released: ', A.fg.cyan[str(releaseDate['date'])]]))
 
         # metacritic
         # http://www.metacritic.com/faq#item32 (Why is the breakdown of green, yellow, and red scores different for games?)
@@ -318,10 +318,28 @@ class URLFollow(CommandInterface):
                 priceString += assembleFormattedText(A.normal[A.fg.green[' ({0}% sale!)'.format(prices['USD']['discount_percent'])]])
 
             data.append(priceString)
+
+        # platforms
+        if 'platforms' in appData:
+            platforms = appData['platforms']:
+            platformArray = []
+            if platforms['windows']:
+                platformArray.append(u'Win')
+            else:
+                platformArray.append(u'---')
+            if platforms['mac']:
+                platformArray.append(u'Mac')
+            else:
+                platformArray.append(u'---')
+            if platforms['linux']:
+                platformArray.append(u'Lin')
+            else:
+                platformArray.append(u'---')
+            data.append(u'/'.join(platformArray))
         
         # description
         if 'about_the_game' in appData and appData['about_the_game'] is not None:
-            limit = 150
+            limit = 100
             description = re.sub(r'(<[^>]+>|[\r\n\t])+', assembleFormattedText(A.normal[' ', A.fg.gray['>'], ' ']), appData['about_the_game'])
             if len(description) > limit:
                 description = u'{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
