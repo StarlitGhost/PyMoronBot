@@ -482,7 +482,7 @@ class URLFollow(CommandInterface):
         
         chanData = {}
         channelOnline = False
-        twitchHeaders = [('Accept', 'application/vnd.twitchtv.v2+json'),
+        twitchHeaders = [('Accept', 'application/vnd.twitchtv.v3+json'),
                          ('Client-ID', self.twitchClientID)]
         webPage = WebUtils.fetchURL(u'https://api.twitch.tv/kraken/streams/{}'.format(channel), twitchHeaders)
 
