@@ -37,7 +37,7 @@ class Flip(CommandInterface):
             u's': u's',    u'S': u'S',
             u't': u'ʇ',    u'T': u'⊥',
             u'u': u'n',    u'U': u'∩',
-            u'v': u'ʌ',    u'V': u'ᴧ',
+            u'v': u'ʌ',    u'V': u'Λ',
             u'w': u'ʍ',    u'W': u'M',
             u'x': u'x',    u'X': u'X',
             u'y': u'ʎ',    u'Y': u'⅄',
