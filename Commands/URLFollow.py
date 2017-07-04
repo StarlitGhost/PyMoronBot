@@ -5,6 +5,7 @@ import json
 import math
 import re
 import time
+import datetime
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -16,6 +17,8 @@ from Utils import WebUtils, StringUtils
 
 from bs4 import BeautifulSoup
 from isodate import parse_duration
+import dateutil.parser
+import dateutil.tz
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
@@ -108,8 +111,8 @@ class URLFollow(CommandInterface):
         if self.youtubeKey is None:
             return IRCResponse(ResponseType.Say, '[YouTube API key not found]', message.ReplyTo)
 
-        fields = 'items(id,snippet(title,description,channelTitle),contentDetails(duration))'
-        parts = 'snippet,contentDetails'
+        fields = 'items(id,snippet(title,description,channelTitle,liveBroadcastContent),contentDetails(duration),statistics(viewCount),liveStreamingDetails(scheduledStartTime))'
+        parts = 'snippet,contentDetails,statistics,liveStreamingDetails'
         url = 'https://www.googleapis.com/youtube/v3/videos?id={}&fields={}&part={}&key={}'.format(videoID, fields, parts, self.youtubeKey)
         
         webPage = WebUtils.fetchURL(url)
@@ -119,27 +122,54 @@ class URLFollow(CommandInterface):
         if 'items' not in j:
             return None
 
-        title = j['items'][0]['snippet']['title']
-        description = j['items'][0]['snippet']['description']
-        channel = j['items'][0]['snippet']['channelTitle']
-        length = parse_duration(j["items"][0]["contentDetails"]["duration"]).total_seconds()
+        data = []
 
-        m, s = divmod(int(length), 60)
-        h, m = divmod(m, 60)
-        if h > 0:
-            length = u'{0:02d}:{1:02d}:{2:02d}'.format(h, m, s)
+        vid = j['items'][0]
+
+        title = vid['snippet']['title']
+        data.append(title)
+        channel = vid['snippet']['channelTitle']
+        data.append(channel)
+        if vid['snippet']['liveBroadcastContent'] == 'none':
+            length = parse_duration(vid['contentDetails']['duration']).total_seconds()
+            m, s = divmod(int(length), 60)
+            h, m = divmod(m, 60)
+            if h > 0:
+                length = u'{0:02d}:{1:02d}:{2:02d}'.format(h, m, s)
+            else:
+                length = u'{0:02d}:{1:02d}'.format(m, s)
+
+            data.append(length)
+        elif vid['snippet']['liveBroadcastContent'] == 'upcoming':
+            startTime = vid['liveStreamingDetails']['scheduledStartTime']
+            startDateTime = dateutil.parser.parse(startTime)
+            now = datetime.datetime.now(dateutil.tz.tzutc())
+            delta = startDateTime - now
+            timespan = StringUtils.deltaTimeToString(delta, 'm')
+            timeString = assembleFormattedText(A.normal['Live in ', A.fg.cyan[A.bold[timespan]]])
+            data.append(timeString)
+            pass # time till stream starts, indicate it's upcoming
+        elif vid['snippet']['liveBroadcastContent'] == 'live':
+            status = unicode(assembleFormattedText(A.normal[A.fg.red[A.bold['{} Live']]]))
+            status = status.format(u'●')
+            data.append(status)
         else:
-            length = u'{0:02d}:{1:02d}'.format(m, s)
+            pass # if we're here, wat
 
+        views = int(vid['statistics']['viewCount'])
+        data.append('{:,}'.format(views))
+
+        description = vid['snippet']['description']
         if not description:
             description = u'<no description available>'
         description = re.sub('(\n|\s)+', ' ', description)
         limit = 150
         if len(description) > limit:
             description = u'{} ...'.format(description[:limit].rsplit(' ', 1)[0])
+        data.append(description)
 
         return IRCResponse(ResponseType.Say,
-                           self.graySplitter.join([title, length, channel, description]),
+                           self.graySplitter.join(data),
                            message.ReplyTo,
                            {'urlfollowURL': 'http://youtu.be/{}'.format(videoID)})
     
@@ -280,7 +310,7 @@ class URLFollow(CommandInterface):
             if releaseDate['date']:
                 data.append(u'Released: ' + releaseDate['date'])
         else:
-            data.append(assembleFormattedText(A.normal['To Be Released: ', A.fg.cyan[str(releaseDate['date'])]]))
+            data.append(assembleFormattedText(A.normal['To Be Released: ', A.fg.cyan[A.bold[str(releaseDate['date'])]]]))
 
         # metacritic
         # http://www.metacritic.com/faq#item32 (Why is the breakdown of green, yellow, and red scores different for games?)
@@ -315,7 +345,7 @@ class URLFollow(CommandInterface):
 
             priceString = u'/'.join([currencies[val['currency']] + unicode(val['final'] / 100.0) for val in prices.values()])
             if prices['USD']['discount_percent'] > 0:
-                priceString += assembleFormattedText(A.normal[A.fg.green[' ({0}% sale!)'.format(prices['USD']['discount_percent'])]])
+                priceString += assembleFormattedText(A.normal[A.fg.green[A.bold[' ({0}% sale!)'.format(prices['USD']['discount_percent'])]]])
 
             data.append(priceString)
 
