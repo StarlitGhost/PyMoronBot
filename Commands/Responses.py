@@ -307,7 +307,7 @@ class Responses(CommandInterface):
                     "http://i.imgur.com/QmVjLNQ.png",   # snow leopard boop
                     "http://i.imgur.com/HaAovQK.gifv",  # darting bed boop
                     "http://i.imgur.com/Le4lOKX.gifv",  # kitten gonna get him boop
-                    "http://i.imgur.com/so5M2Mk.gifv",  # shibe back boop
+                    #"http://i.imgur.com/so5M2Mk.gifv",  # shibe back boop
                     "http://i.imgur.com/P7Ca5Si.gifv",  # shibe pikachu boop
                     "http://i.imgur.com/yvlmyNI.gifv",  # quick run up boop walk away (NewClassic)
                     "http://goo.gl/9FTseh",             # Fluttershy & Pinkie Pie boop
