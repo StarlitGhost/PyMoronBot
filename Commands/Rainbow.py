@@ -13,8 +13,8 @@ from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
 class Rainbow(CommandInterface):
-    triggers = ['rainbow']
-    help = 'rainbow <text> - outputs the specified text with rainbow colours'
+    triggers = ['rainbow', 'rrainbow']
+    help = 'rainbow <text> - outputs the specified text with rainbow colours; rrainbow uses background colours'
 
     colours = [assembleFormattedText(A.fg.lightRed['']),
                #assembleFormattedText(A.fg.orange['']),
@@ -24,6 +24,15 @@ class Rainbow(CommandInterface):
                assembleFormattedText(A.fg.lightBlue['']),
                assembleFormattedText(A.fg.lightMagenta['']),
                ]
+    
+    bgcolours = [assembleFormattedText(A.bg.red['']),
+                 assembleFormattedText(A.bg.orange['']),
+                 assembleFormattedText(A.bg.yellow['']),
+                 assembleFormattedText(A.bg.green['']),
+                 assembleFormattedText(A.bg.cyan['']),
+                 assembleFormattedText(A.bg.blue['']),
+                 assembleFormattedText(A.bg.magenta['']),
+                 ]
 
     def execute(self, message):
         """
@@ -32,10 +41,14 @@ class Rainbow(CommandInterface):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say, "You didn't give me any text to rainbow!", message.ReplyTo)
 
-        outputMessage = ''
+        outputMessage = u''
 
-        for i, c in enumerate(message.Parameters):
-            outputMessage += self.colours[i % len(self.colours)] + c
+        if message.Command == 'rainbow':
+            for i, c in enumerate(message.Parameters.decode('utf-8')):
+                outputMessage += self.colours[i % len(self.colours)] + c
+        else:
+            for i, c in enumerate(message.Parameters.decode('utf-8')):
+                outputMessage += self.bgcolours[i % len(self.bgcolours)] + c
 
         outputMessage += assembleFormattedText(A.normal[''])
 
