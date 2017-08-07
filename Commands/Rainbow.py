@@ -44,10 +44,10 @@ class Rainbow(CommandInterface):
         outputMessage = u''
 
         if message.Command == 'rainbow':
-            for i, c in enumerate(message.Parameters.decode('utf-8')):
+            for i, c in enumerate(message.Parameters):
                 outputMessage += self.colours[i % len(self.colours)] + c
         else:
-            for i, c in enumerate(message.Parameters.decode('utf-8')):
+            for i, c in enumerate(message.Parameters):
                 outputMessage += self.bgcolours[i % len(self.bgcolours)] + c
 
         outputMessage += assembleFormattedText(A.normal[''])
