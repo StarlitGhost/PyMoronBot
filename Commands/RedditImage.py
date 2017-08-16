@@ -66,11 +66,11 @@ class RedditImage(CommandInterface):
         image = random.choice(images)
 
         data = []
-        if image['title'] is not None:
+        if 'title' in image and image['title'] is not None:
             data.append(image['title'])
-        if image['nsfw']:
+        if 'nsfw' in image and image['nsfw']:
             data.append(u'\x034\x02NSFW!\x0F')
-        if image['animated']:
+        if 'animated' in image and image['animated']:
             data.append(u'\x032\x02Animated!\x0F')
         if 'gifv' in image:
             data.append(image['gifv'])
