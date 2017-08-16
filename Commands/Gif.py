@@ -23,7 +23,7 @@ class Gif(CommandInterface):
         """
 
         baseURL = "http://greywool.com/desertbus/{}/gifs/random.php"
-        years = range(7, 9)
+        years = range(7, 11)
 
         if len(message.ParameterList) > 0:
             invalid = u"'{}' is not a valid year, valid years are {} to {}"\
