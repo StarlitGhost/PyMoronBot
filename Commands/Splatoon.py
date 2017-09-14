@@ -63,7 +63,7 @@ class Splatoon(CommandInterface):
         @type message: IRCMessage
         """
 
-        url = "https://splatoon.ink/schedule2.json"
+        url = "https://splatoon2.ink/data/schedules.json"
         response = WebUtils.fetchURL(url)
         jsonResponse = json.loads(response.body)
 
