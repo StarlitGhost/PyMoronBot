@@ -12,7 +12,7 @@ pycrypto==2.6.1
 pyasn1==0.3.6
 isodate==0.5.4
 jq==0.1.6
-google-api-python-client==1.6.3
+google-api-python-client==1.6.4
 pyxDamerauLevenshtein==1.4.1
 re2==0.2.22
 parsedatetime==2.4
