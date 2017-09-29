@@ -319,7 +319,7 @@ class URLFollow(CommandInterface):
             if metaScore < 50:
                 metacritic = assembleFormattedText(A.normal[A.fg.red[str(metaScore)]])
             elif metaScore < 75:
-                metacritic = assembleFormattedText(A.normal[A.fg.yellow[str(metaScore)]])
+                metacritic = assembleFormattedText(A.normal[A.fg.orange[str(metaScore)]])
             else:
                 metacritic = assembleFormattedText(A.normal[A.fg.green[str(metaScore)]])
             data.append(u'Metacritic: {0}'.format(metacritic))
