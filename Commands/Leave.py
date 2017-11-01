@@ -20,10 +20,10 @@ class Leave(CommandInterface):
         @type message: IRCMessage
         """
         if message.User.Name not in GlobalVars.admins:
-            if message.Command == triggers[1]:
-                return IRCResponse(ResponseType.Say, 'Wow, rude? Only my admins can tell me to {}'.format(message.Command), message.ReplyTo)
-            else:
-                return IRCResponse(ResponseType.Say, 'Only my admins can tell me to {}'.format(message.Command), message.ReplyTo)
+                return IRCResponse(ResponseType.Say,
+                                   '{}Only my admins can tell me to {}'.format('Wow, rude? ' if message.Command == 'gtfo' else '',
+                                                                               message.Command),
+                                   message.ReplyTo)
         
         if len(message.ParameterList) > 0:
             return IRCResponse(ResponseType.Raw, 'PART {} :{}'.format(message.ReplyTo, message.Parameters), '')
