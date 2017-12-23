@@ -357,7 +357,7 @@ class Hangman(CommandInterface):
         if subCommand in self.subCommands:
             if getattr(self.subCommands[subCommand], '__doc__'):
                 docstring = self.subCommands[subCommand].__doc__
-                docstring = re.sub(ur'\s+', u' ', docstring)
+                docstring = re.sub(r'\s+', u' ', docstring)
                 return u'{1}hangman {0}'.format(docstring, self.bot.commandChar)
             else:
                 return u"Oops! The help text for 'hangman {}' seems to be missing. "\

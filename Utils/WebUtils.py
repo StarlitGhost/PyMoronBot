@@ -10,9 +10,11 @@ def getAddrInfoWrapper(host, port, _=0, socktype=0, proto=0, flags=0):
 
 socket.getaddrinfo = getAddrInfoWrapper
 
-from urllib import urlencode
-from urllib2 import build_opener, Request, urlopen, URLError
-from urlparse import urlparse
+from future.standard_library import install_aliases
+install_aliases()
+from urllib.parse import urlparse, urlencode
+
+import requests
 import json
 import re
 import time
@@ -24,11 +26,11 @@ from Data.api_keys import load_key
 
 class URLResponse(object):
     def __init__(self, response):
-        self.domain = urlparse(response.geturl()).hostname
+        self.domain = urlparse(response.url).netloc
         self._body = None
-        self._responseReader = response.read
+        self._response = response
         self._responseCloser = response.close
-        self.headers = response.info().dict
+        self.headers = response.headers
         self.responseUrl = response.url
 
     def __del__(self):
@@ -38,7 +40,7 @@ class URLResponse(object):
     @property
     def body(self):
         if self._body is None:
-            self._body = self._responseReader()
+            self._body = self._response.content
             self._responseCloser()
         return self._body
 
@@ -57,17 +59,12 @@ def fetchURL(url, extraHeaders=None):
     @type extraHeaders: list[tuple]
     @rtype: URLResponse
     """
-    headers = [("User-agent", "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0")]
+    headers = {"User-agent", "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0"}
     if extraHeaders:
-        for header in extraHeaders:
-            # For whatever reason headers are defined in a different way in opener than they are
-            # in a normal urlopen
-            headers.append(header)
+        headers.update(extraHeaders)
     try:
-        opener = build_opener()
-        opener.addheaders = headers
-        response = opener.open(url)
-        responseHeaders = response.info().dict
+        response = requests.get(url, headers=headers, stream=True)
+        responseHeaders = response.headers
         #print '{} headers: {}'.format(urlparse(response.geturl()).hostname, responseHeaders)
         pageType = responseHeaders["content-type"]
 
@@ -76,17 +73,11 @@ def fetchURL(url, extraHeaders=None):
         if re.match(r"^(text/.*|application/((rss|atom|rdf)\+)?xml(;.*)?|application/(.*)json(;.*)?)$", pageType):
             urlResponse = URLResponse(response)
             return urlResponse
-        else:
-            response.close()
 
-    except URLError as e:
+    except requests.exceptions.RequestException as e:
         today = time.strftime("[%H:%M:%S]")
-        reason = None
-        if hasattr(e, "reason"):
-            reason = "We failed to reach the server, reason: {}".format(e.reason)
-        elif hasattr(e, "code"):
-            reason = "The server couldn't fulfill the request, code: {}".format(e.code)
-        print "{} *** ERROR: Fetch from \"{}\" failed: {}".format(today, url, reason)
+        reason = str(e)
+        print("{} *** ERROR: Fetch from \"{}\" failed: {}".format(today, url, reason))
 
 
 # mostly taken directly from Heufneutje's PyHeufyBot
@@ -129,7 +120,7 @@ def postURL(url, values, extraHeaders=None):
             reason = "We failed to reach the server, reason: {}".format(e.reason)
         elif hasattr(e, "code"):
             reason = "The server couldn't fulfill the request, code: {}".format(e.code)
-        print "{} *** ERROR: Post to \"{}\" failed: {}".format(today, url, reason)
+        print("{} *** ERROR: Post to \"{}\" failed: {}".format(today, url, reason))
 
 
 def shortenGoogl(url):
@@ -153,8 +144,8 @@ def shortenGoogl(url):
         response = json.loads(urlopen(request).read())
         return response['id']
 
-    except Exception, e:
-        print "Goo.gl error: %s" % e
+    except Exception as e:
+        print("Goo.gl error: {}".format(e))
 
 
 def googleSearch(query):

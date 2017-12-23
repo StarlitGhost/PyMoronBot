@@ -34,7 +34,7 @@ class Slurp(CommandInterface):
 
         prop, url, selector = (message.ParameterList[0], message.ParameterList[1], u" ".join(message.ParameterList[2:]))
 
-        if not re.match(ur'^\w+://', url):
+        if not re.match(r'^\w+://', url):
             url = u"http://{}".format(url)
 
         if 'slurp' in message.Metadata and url in message.Metadata['slurp']:
@@ -73,8 +73,8 @@ class Slurp(CommandInterface):
 
         # sanitize the value
         value = value.strip()
-        value = re.sub(ur'[\r\n]+', u' ', value)
-        value = re.sub(ur'\s+', u' ', value)
+        value = re.sub(r'[\r\n]+', u' ', value)
+        value = re.sub(r'\s+', u' ', value)
         value = self.htmlParser.unescape(value)
 
         return IRCResponse(ResponseType.Say, value, message.ReplyTo,

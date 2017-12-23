@@ -36,6 +36,6 @@ class Find(CommandInterface):
             replyText = u'{1}{0}{2}{0}{3}'.format(StringUtils.graySplitter, title, content, url)
 
             return IRCResponse(ResponseType.Say, replyText, message.ReplyTo)
-        except Exception, x:
-            print str(x)
+        except Exception as x:
+            print(str(x))
             return IRCResponse(ResponseType.Say, x.args, message.ReplyTo)

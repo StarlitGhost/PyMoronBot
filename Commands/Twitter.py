@@ -208,7 +208,7 @@ class Twitter(CommandInterface):
         checks each followed twitter account for new tweets and reports them to all channels the bot is in
         """
         for user, lastTweetTimestamp in self.follows.iteritems():
-            print "[Twitter] Scanning {} for new tweets...".format(user)
+            print("[Twitter] Scanning {} for new tweets...".format(user))
             
             timeline = self.twitter.statuses.user_timeline(screen_name=user)
 
@@ -226,7 +226,7 @@ class Twitter(CommandInterface):
                     break
 
             if len(newTweets) > 0:
-                print "[Twitter] {} has made {} new tweets, sending...".format(user, len(newTweets))
+                print("[Twitter] {} has made {} new tweets, sending...".format(user, len(newTweets)))
                 newTweets = newTweets[::-1]  # reverse the list so oldest tweets are first
 
                 for tweet in newTweets:

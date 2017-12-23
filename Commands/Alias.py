@@ -293,7 +293,7 @@ class Alias(CommandInterface):
             if len(message.ParameterList) > 1:
                 subCommand = message.ParameterList[1].lower()
                 if subCommand in self.subCommands:
-                    return u'{1}alias {0}'.format(re.sub(ur"\s+", u" ", self.subCommands[subCommand].__doc__),
+                    return u'{1}alias {0}'.format(re.sub(r"\s+", u" ", self.subCommands[subCommand].__doc__),
                                                   self.bot.commandChar)
                 else:
                     return self._unrecognizedSubcommand(subCommand)

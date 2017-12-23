@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
-import htmlentitydefs
+from html.entities import codepoint2name, entitydefs, name2codepoint
 import re
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
@@ -91,7 +91,7 @@ def unescapeXHTML(text):
         else:
             # named entity
             try:
-                escapeText = unichr(htmlentitydefs.name2codepoint[escapeText[1:-1]])
+                escapeText = unichr(name2codepoint[escapeText[1:-1]])
             except KeyError:
                 pass
         return escapeText  # leave as is

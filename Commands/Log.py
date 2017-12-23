@@ -34,7 +34,7 @@ def log(text, target):
     now = datetime.datetime.utcnow()
     time = now.strftime("[%H:%M]")
     data = u'{0} {1}'.format(time, text)
-    print target, data
+    print(target, data)
 
     fileName = "{0}{1}.txt".format(target, now.strftime("-%Y%m%d"))
     fileDirs = os.path.join(GlobalVars.logPath, cmdArgs.server)

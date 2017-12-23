@@ -38,7 +38,7 @@ class GPSLookup(CommandInterface):
             result = json.loads(page.body)
 
             if result['resourceSets'][0]['estimatedTotal'] == 0:
-                print result
+                print(result)
                 return IRCResponse(ResponseType.Say,
                                    "Couldn't find GPS coords for '{0}', sorry!".format(message.Parameters),
                                    message.ReplyTo)

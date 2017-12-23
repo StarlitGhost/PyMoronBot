@@ -296,16 +296,16 @@ class MoronBotFactory(protocol.ReconnectingClientFactory):
         self.protocol = MoronBot
 
     def startedConnecting(self, connector):
-        print '-#- Started to connect.'
+        print('-#- Started to connect.')
 
     def buildProtocol(self, addr):
-        print '-#- Connected.'
-        print '-#- Resetting reconnection delay'
+        print('-#- Connected.')
+        print('-#- Resetting reconnection delay')
         self.resetDelay()
         return MoronBot()
 
     def clientConnectionLost(self, connector, reason):
-        print '-!- Lost connection.  Reason:', reason
+        print('-!- Lost connection.  Reason:', reason)
         if restarting:
             python = sys.executable
             os.execl(python, python, *sys.argv)
@@ -314,7 +314,7 @@ class MoronBotFactory(protocol.ReconnectingClientFactory):
         protocol.ReconnectingClientFactory.clientConnectionLost(self, connector, reason)
 
     def clientConnectionFailed(self, connector, reason):
-        print '-!- Connection failed. Reason:', reason
+        print('-!- Connection failed. Reason:', reason)
         protocol.ReconnectingClientFactory.clientConnectionFailed(self, connector, reason)
 
 

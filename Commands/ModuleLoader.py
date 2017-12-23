@@ -91,7 +91,7 @@ class ModuleLoader(CommandInterface):
                 except Exception as x:
                     xName = x.__class__.__name__
                     exceptions.append(u"{} ({})".format(commandNameCaseMap[commandName], xName))
-                    print xName, x.args
+                    print(xName, x.args)
                     traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions
@@ -126,7 +126,7 @@ class ModuleLoader(CommandInterface):
             except Exception as x:
                 xName = x.__class__.__name__
                 exceptions.append(u"{} ({})".format(postProcessNameCaseMap[postProcessName], xName))
-                print xName, x.args
+                print(xName, x.args)
                 traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions
@@ -155,7 +155,7 @@ class ModuleLoader(CommandInterface):
             except Exception as x:
                 xName = x.__class__.__name__
                 exceptions.append(u"{} ({})".format(commandNameCaseMap[commandName], xName))
-                print xName, x.args
+                print(xName, x.args)
                 traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions
@@ -184,7 +184,7 @@ class ModuleLoader(CommandInterface):
             except Exception as x:
                 xName = x.__class__.__name__
                 exceptions.append(u"{} ({})".format(postProcessNameCaseMap[postProcessName], xName))
-                print xName, x.args
+                print(xName, x.args)
                 traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions

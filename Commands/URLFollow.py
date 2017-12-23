@@ -255,7 +255,7 @@ class URLFollow(CommandInterface):
             tweetTimeText = time.strftime('%Y/%m/%d %H:%M', time.strptime(tweetTimeText, '%I:%M %p - %d %b %Y'))
         except ValueError:
             pass
-        tweetTimeText = re.sub(ur'[\r\n\s]+', u' ', tweetTimeText)
+        tweetTimeText = re.sub(r'[\r\n\s]+', u' ', tweetTimeText)
 
         links = tweetText.find_all('a', {'data-expanded-url': True})
         for link in links:
@@ -448,8 +448,8 @@ class URLFollow(CommandInterface):
             if money:
                 pledgedString = money[1].text.strip()
                 goalString = money[2].text.strip()
-                pledged = float(re.sub(ur'[^0-9.]', u'', pledgedString))
-                goal = float(re.sub(ur'[^0-9.]', u'', goalString))
+                pledged = float(re.sub(r'[^0-9.]', u'', pledgedString))
+                goal = float(re.sub(r'[^0-9.]', u'', goalString))
                 percentage = (pledged / goal)
                 if backerCount > 0:
                     pledgePerBacker = pledged / backerCount

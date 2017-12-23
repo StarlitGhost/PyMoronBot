@@ -390,8 +390,8 @@ class Responses(CommandInterface):
             #   OK I'VE GOT THIS NOW, BRO    #
             #                                #
             ##################################
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
 
     def shouldExecute(self, message):
         """

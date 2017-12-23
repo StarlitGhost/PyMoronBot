@@ -64,7 +64,7 @@ class ModuleHandler(object):
                     self.bot.sendLine(response.Response.encode('utf-8'))
             except Exception:
                 # ^ dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
-                print "Python Execution Error sending responses '{0}': {1}".format(responses, str(sys.exc_info()))
+                print("Python Execution Error sending responses '{0}': {1}".format(responses, str(sys.exc_info())))
                 traceback.print_tb(sys.exc_info()[2])
 
     def postProcess(self, response):
@@ -78,13 +78,13 @@ class ModuleHandler(object):
                     newResponse = post.execute(newResponse)
             except Exception:
                 # ^ dirty, but I don't want any responses to kill the bot, especially if I'm working on it live
-                print "Python Execution Error in '{0}': {1}".format(post.__class__.__name__, str(sys.exc_info()))
+                print("Python Execution Error in '{0}': {1}".format(post.__class__.__name__, str(sys.exc_info())))
                 traceback.print_tb(sys.exc_info()[2])
 
         return newResponse
     
     def _deferredError(self, failure):
-        print str(failure)
+        print(str(failure))
 
     def handleMessage(self, message):
         for command in sorted(self.commands.values(), key=operator.attrgetter('priority')):
@@ -99,7 +99,7 @@ class ModuleHandler(object):
                         d.addErrback(self._deferredError)
             except Exception:
                 # ^ dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
-                print "Python Execution Error in '{0}': {1}".format(command.__class__.__name__, str(sys.exc_info()))
+                print("Python Execution Error in '{0}': {1}".format(command.__class__.__name__, str(sys.exc_info())))
                 traceback.print_tb(sys.exc_info()[2])
 
     def _load(self, name, category, categoryDict, categoryCaseMap):
@@ -119,14 +119,14 @@ class ModuleHandler(object):
 
         module = importlib.import_module(category + '.' + catListCaseMap[name])
 
-        reload(module)
+        importlib.reload(module)
 
         class_ = getattr(module, catListCaseMap[name])
 
         if alreadyExisted:
-            print '-- {0} reloaded'.format(module.__name__)
+            print('-- {0} reloaded'.format(module.__name__))
         else:
-            print '-- {0} loaded'.format(module.__name__)
+            print('-- {0} loaded'.format(module.__name__))
 
         constructedModule = class_(self.bot)
 
@@ -165,14 +165,14 @@ class ModuleHandler(object):
         for command in self.getDirList('Commands'):
             try:
                 self.loadCommand(command)
-            except Exception, x:
-                print x.args
+            except Exception as x:
+                print(x.args)
 
         for post in self.getDirList('PostProcesses'):
             try:
                 self.loadPostProcess(post)
-            except Exception, x:
-                print x.args
+            except Exception as x:
+                print(x.args)
 
     @classmethod
     def getDirList(cls, category):
