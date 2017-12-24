@@ -10,14 +10,16 @@ def getAddrInfoWrapper(host, port, _=0, socktype=0, proto=0, flags=0):
 
 socket.getaddrinfo = getAddrInfoWrapper
 
-from future.standard_library import install_aliases
-install_aliases()
-from urllib.parse import urlparse, urlencode
-
 import requests
 import json
 import re
 import time
+
+from builtins import str
+from future.standard_library import install_aliases
+install_aliases()
+from urllib.parse import urlparse, urlencode
+from six import iteritems
 
 from apiclient.discovery import build
 
@@ -59,13 +61,12 @@ def fetchURL(url, extraHeaders=None):
     @type extraHeaders: list[tuple]
     @rtype: URLResponse
     """
-    headers = {"User-agent", "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0"}
+    headers = {"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0"}
     if extraHeaders:
         headers.update(extraHeaders)
     try:
         response = requests.get(url, headers=headers, stream=True)
         responseHeaders = response.headers
-        #print '{} headers: {}'.format(urlparse(response.geturl()).hostname, responseHeaders)
         pageType = responseHeaders["content-type"]
 
         # Make sure we don't download any unwanted things
@@ -73,6 +74,8 @@ def fetchURL(url, extraHeaders=None):
         if re.match(r"^(text/.*|application/((rss|atom|rdf)\+)?xml(;.*)?|application/(.*)json(;.*)?)$", pageType):
             urlResponse = URLResponse(response)
             return urlResponse
+        else:
+            response.close()
 
     except requests.exceptions.RequestException as e:
         today = time.strftime("[%H:%M:%S]")
@@ -89,20 +92,16 @@ def postURL(url, values, extraHeaders=None):
     @type extraHeaders: dict[unicode, unicode]
     @rtype: URLResponse
     """
-    headers = {"User-agent": "Mozilla/5.0"}
+    headers = {"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0"}
     if extraHeaders:
-        for header in extraHeaders:
-            headers[header] = extraHeaders[header]
+        headers.update(extraHeaders)
 
-    # urlencode only take str objects, so encode our unicode values first
-    for k, v in values.iteritems():
-        values[k] = unicode(v).encode('utf-8')
-    data = urlencode(values)
+    for k, v in iteritems(values):
+        values[k] = str(v)
 
     try:
-        request = Request(url, data, headers)
-        response = urlopen(request)
-        responseHeaders = response.info().dict
+        response = requests.post(url, data=values, headers=headers, stream=True)
+        responseHeaders = response.headers
         pageType = responseHeaders["content-type"]
 
         # Make sure we don't download any unwanted things
@@ -113,13 +112,9 @@ def postURL(url, values, extraHeaders=None):
         else:
             response.close()
 
-    except URLError as e:
+    except requests.exceptions.RequestException as e:
         today = time.strftime("[%H:%M:%S]")
-        reason = None
-        if hasattr(e, "reason"):
-            reason = "We failed to reach the server, reason: {}".format(e.reason)
-        elif hasattr(e, "code"):
-            reason = "The server couldn't fulfill the request, code: {}".format(e.code)
+        reason = str(e)
         print("{} *** ERROR: Post to \"{}\" failed: {}".format(today, url, reason))
 
 
@@ -140,11 +135,11 @@ def shortenGoogl(url):
     headers = {"Content-Type": "application/json"}
 
     try:
-        request = Request(apiURL, post, headers)
-        response = json.loads(urlopen(request).read())
-        return response['id']
+        response = requests.post(apiURL, data=post, headers=headers)
+        responseJson = response.json()
+        return responseJson['id']
 
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
         print("Goo.gl error: {}".format(e))
 
 
@@ -173,7 +168,9 @@ def pasteEE(data, description, expire, raw=True):
     @type raw: bool
     @rtype: unicode
     """
-    values = {u"key": u"public",
+    pasteEEKey = load_key(u'Paste.ee')
+
+    values = {u"key": "public",
               u"description": description,
               u"paste": data,
               u"expiration": expire,

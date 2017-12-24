@@ -4,7 +4,7 @@ Created on Sep 07, 2015
 
 @author: Tyranic-Moron
 """
-import HTMLParser
+from html.parser import HTMLParser
 import re
 
 from IRCMessage import IRCMessage
@@ -23,7 +23,7 @@ filter syntax here: https://stedolan.github.io/jq/manual/#Basicfilters"
 
     runInThread = True
 
-    htmlParser = HTMLParser.HTMLParser()
+    htmlParser = HTMLParser()
 
     def execute(self, message):
         """

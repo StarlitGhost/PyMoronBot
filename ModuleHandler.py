@@ -55,13 +55,13 @@ class ModuleHandler(object):
                 response = self.postProcess(response)
 
                 if response.Type == ResponseType.Say:
-                    self.bot.msg(response.Target.encode('utf-8'), response.Response.encode('utf-8'))
+                    self.bot.msg(response.Target, response.Response)
                 elif response.Type == ResponseType.Do:
-                    self.bot.describe(response.Target.encode('utf-8'), response.Response.encode('utf-8'))
+                    self.bot.describe(response.Target, response.Response)
                 elif response.Type == ResponseType.Notice:
-                    self.bot.notice(response.Target.encode('utf-8'), response.Response.encode('utf-8'))
+                    self.bot.notice(response.Target, response.Response)
                 elif response.Type == ResponseType.Raw:
-                    self.bot.sendLine(response.Response.encode('utf-8'))
+                    self.bot.sendLine(response.Response)
             except Exception:
                 # ^ dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
                 print("Python Execution Error sending responses '{0}': {1}".format(responses, str(sys.exc_info())))

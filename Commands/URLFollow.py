@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import HTMLParser
+from html.parser import HTMLParser
 import json
 import math
 import re
 import time
 import datetime
+
+from builtins import str
+from six import iteritems
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -28,7 +31,7 @@ class URLFollow(CommandInterface):
     help = 'automatic function that follows urls and grabs information about the resultant webpage'
     runInThread = True
 
-    htmlParser = HTMLParser.HTMLParser()
+    htmlParser = HTMLParser()
     
     graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
@@ -73,7 +76,7 @@ class URLFollow(CommandInterface):
         if not match:
             return
 
-        for module, patterns in self.handledExternally.iteritems():
+        for module, patterns in iteritems(self.handledExternally):
             for pattern in patterns:
                 if re.search(pattern, message.MessageString):
                     return  # url will be handled by another module
@@ -150,7 +153,7 @@ class URLFollow(CommandInterface):
             data.append(timeString)
             pass # time till stream starts, indicate it's upcoming
         elif vid['snippet']['liveBroadcastContent'] == 'live':
-            status = unicode(assembleFormattedText(A.normal[A.fg.red[A.bold['{} Live']]]))
+            status = str(assembleFormattedText(A.normal[A.fg.red[A.bold['{} Live']]]))
             status = status.format(u'●')
             data.append(status)
         else:
@@ -268,7 +271,7 @@ class URLFollow(CommandInterface):
         text = StringUtils.unescapeXHTML(tweetText.text)
         text = re.sub('[\r\n]+', self.graySplitter, text)
 
-        formatString = unicode(assembleFormattedText(A.normal[A.fg.gray['[{0}]'], A.bold[' {1}:'], ' {2}']))
+        formatString = str(assembleFormattedText(A.normal[A.fg.gray['[{0}]'], A.bold[' {1}:'], ' {2}']))
 
         return IRCResponse(ResponseType.Say,
                            formatString.format(tweetTimeText, user, text),
@@ -341,9 +344,9 @@ class URLFollow(CommandInterface):
                 del prices['AUD']
             
             # filter out any missing prices
-            prices = {key: val for key, val in prices.iteritems() if val}
+            prices = {key: val for key, val in iteritems(prices) if val}
 
-            priceString = u'/'.join([currencies[val['currency']] + unicode(val['final'] / 100.0) for val in prices.values()])
+            priceString = u'/'.join([currencies[val['currency']] + str(val['final'] / 100.0) for val in prices.values()])
             if prices['USD']['discount_percent'] > 0:
                 priceString += assembleFormattedText(A.normal[A.fg.green[A.bold[' ({0}% sale!)'.format(prices['USD']['discount_percent'])]]])
 
@@ -412,7 +415,7 @@ class URLFollow(CommandInterface):
             if creator is None or not creator.text:
                 creator = soup.find(class_='green-dark', attrs={'data-modal-class': 'modal_project_by'})
             if creator is not None:
-                data.append(unicode(assembleFormattedText(A.normal['{0}',
+                data.append(str(assembleFormattedText(A.normal['{0}',
                                                                    A.fg.gray[' by '],
                                                                    '{1}'])).format(title['content'].strip(),
                                                                                    creator.text.strip()))

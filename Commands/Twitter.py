@@ -7,8 +7,9 @@ Created on May 18, 2014
 import base64
 import json
 import re
-from urllib2 import Request, urlopen
 import datetime
+from builtins import str
+
 from dateutil import parser
 from twisted.internet import task, threads
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
@@ -291,7 +292,7 @@ class Twitter(CommandInterface):
         link = u'https://twitter.com/{}/status/{}'.format(tweet['user']['screen_name'], tweet['id_str'])
         link = WebUtils.shortenGoogl(link)
 
-        formatString = unicode(assembleFormattedText(A.normal[A.bold['@{0}>'], ' {1} {2}']))
+        formatString = str(assembleFormattedText(A.normal[A.bold['@{0}>'], ' {1} {2}']))
         newTweet = formatString.format(user, tweetText, link)
         return newTweet
 

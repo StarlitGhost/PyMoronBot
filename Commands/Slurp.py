@@ -4,8 +4,9 @@ Created on Aug 31, 2015
 
 @author: Tyranic-Moron
 """
-import HTMLParser
+from html.parser import HTMLParser
 import re
+from six import string_types
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -23,7 +24,7 @@ class Slurp(CommandInterface):
 
     runInThread = True
 
-    htmlParser = HTMLParser.HTMLParser()
+    htmlParser = HTMLParser()
 
     def execute(self, message):
         """
@@ -68,7 +69,7 @@ class Slurp(CommandInterface):
                                                                                                     prop),
                                message.ReplyTo)
 
-        if not isinstance(value, basestring):
+        if not isinstance(value, string_types):
             value = u" ".join(value)
 
         # sanitize the value

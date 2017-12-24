@@ -7,6 +7,7 @@ Created on Jan 24, 2014
 
 import urllib
 import json
+from builtins import str
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -65,9 +66,9 @@ class Urban(CommandInterface):
         if word.lower() != message.Parameters.lower():
             word = "{0} (Contains '{1}')".format(word, message.Parameters)
 
-        defFormatString = unicode(assembleFormattedText(A.normal[A.bold["{0}:"], " {1}"]))
-        exampleFormatString = unicode(assembleFormattedText(A.normal[A.bold["Example(s):"], " {0}"]))
-        byFormatString = unicode(assembleFormattedText(A.normal["{0}",
+        defFormatString = str(assembleFormattedText(A.normal[A.bold["{0}:"], " {1}"]))
+        exampleFormatString = str(assembleFormattedText(A.normal[A.bold["Example(s):"], " {0}"]))
+        byFormatString = str(assembleFormattedText(A.normal["{0}",
                                                                 graySplitter,
                                                                 A.fg.lightGreen["+{1}"],
                                                                 A.fg.gray["/"],

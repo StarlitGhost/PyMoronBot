@@ -9,6 +9,8 @@ import random
 import re
 from collections import OrderedDict
 from unicodedata import category as unicodeCategory
+from builtins import str
+from builtins import range
 
 import GlobalVars
 from IRCMessage import IRCMessage
@@ -127,7 +129,7 @@ class GameState(object):
     def _renderBadGuessIndicator(self):
         trail = []
 
-        for pos in xrange(self.maxBadGuesses):
+        for pos in range(self.maxBadGuesses):
             if pos - self.badGuesses == 0:
                 # spark
                 trail.append(u'*')
@@ -189,7 +191,7 @@ class PhraseList(object):
     def _loadPhrases(self):
         try:
             with open(self.dataPath, 'r') as f:
-                return [unicode(line.rstrip()) for line in f]
+                return [str(line.rstrip()) for line in f]
         except IOError:
             return [u'hangman.txt is missing!']
 

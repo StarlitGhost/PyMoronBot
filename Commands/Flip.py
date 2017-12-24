@@ -10,6 +10,7 @@ from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
 
+
 class Flip(CommandInterface):
     triggers = ['flip']
     help = 'flip <text> - flips the text given to it'

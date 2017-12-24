@@ -3,6 +3,8 @@ from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 
+from six import string_types
+
 
 class Help(CommandInterface):
     triggers = ['help', 'command', 'commands']
@@ -18,14 +20,14 @@ class Help(CommandInterface):
         if len(message.ParameterList) > 0:
             if message.ParameterList[0].lower() in moduleHandler.mappedTriggers:
                 funcHelp = moduleHandler.mappedTriggers[message.ParameterList[0].lower()].help
-                if isinstance(funcHelp, basestring):
+                if isinstance(funcHelp, string_types):
                     return IRCResponse(ResponseType.Say, funcHelp, message.ReplyTo)
                 else:
                     return IRCResponse(ResponseType.Say, funcHelp(message), message.ReplyTo)
 
             elif message.ParameterList[0].lower() in moduleHandler.commandCaseMapping:
                 func = moduleHandler.commands[moduleHandler.commandCaseMapping[message.ParameterList[0].lower()]]
-                if isinstance(func.help, basestring):
+                if isinstance(func.help, string_types):
                     return IRCResponse(ResponseType.Say, func.help, message.ReplyTo)
                 else:
                     return IRCResponse(ResponseType.Say, func.help(message), message.ReplyTo)
@@ -37,7 +39,7 @@ class Help(CommandInterface):
                                                                                  message.Command),
                                    message.ReplyTo)
         else:
-            funcs = ', '.join(sorted(moduleHandler.commands.iterkeys(), key=lambda s: s.lower()))
+            funcs = ', '.join(sorted(moduleHandler.commands, key=lambda s: s.lower()))
             return [IRCResponse(ResponseType.Say,
                                 "Command modules loaded are (use 'help <module>' to get help for that module):",
                                 message.ReplyTo),
