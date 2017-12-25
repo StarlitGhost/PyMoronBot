@@ -7,8 +7,10 @@ Created on May 18, 2014
 import base64
 import json
 import re
-from urllib2 import Request, urlopen
 import datetime
+from builtins import str
+from six import iteritems
+
 from dateutil import parser
 from twisted.internet import task, threads
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
@@ -207,8 +209,8 @@ class Twitter(CommandInterface):
         """
         checks each followed twitter account for new tweets and reports them to all channels the bot is in
         """
-        for user, lastTweetTimestamp in self.follows.iteritems():
-            print "[Twitter] Scanning {} for new tweets...".format(user)
+        for user, lastTweetTimestamp in iteritems(self.follows):
+            print("[Twitter] Scanning {} for new tweets...".format(user))
             
             timeline = self.twitter.statuses.user_timeline(screen_name=user)
 
@@ -226,7 +228,7 @@ class Twitter(CommandInterface):
                     break
 
             if len(newTweets) > 0:
-                print "[Twitter] {} has made {} new tweets, sending...".format(user, len(newTweets))
+                print("[Twitter] {} has made {} new tweets, sending...".format(user, len(newTweets)))
                 newTweets = newTweets[::-1]  # reverse the list so oldest tweets are first
 
                 for tweet in newTweets:
@@ -236,7 +238,7 @@ class Twitter(CommandInterface):
 
                     newTweet = self._stringifyTweet(tweet)
 
-                    for channel, _ in self.bot.channels.iteritems():
+                    for channel, _ in iteritems(self.bot.channels):
                         self.bot.sendResponse(IRCResponse(ResponseType.Say,
                                                           u'Tweet! {}'.format(newTweet),
                                                           channel))
@@ -291,7 +293,7 @@ class Twitter(CommandInterface):
         link = u'https://twitter.com/{}/status/{}'.format(tweet['user']['screen_name'], tweet['id_str'])
         link = WebUtils.shortenGoogl(link)
 
-        formatString = unicode(assembleFormattedText(A.normal[A.bold['@{0}>'], ' {1} {2}']))
+        formatString = str(assembleFormattedText(A.normal[A.bold['@{0}>'], ' {1} {2}']))
         newTweet = formatString.format(user, tweetText, link)
         return newTweet
 

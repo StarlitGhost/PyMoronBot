@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import xml.etree.ElementTree as ET
+from six import iteritems
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -27,7 +28,7 @@ class LRRChecker(CommandInterface):
         @type message: IRCMessage
         """
         responses = []
-        for feedName, feedDeets in DataStore.LRRChecker.iteritems():
+        for feedName, feedDeets in iteritems(DataStore.LRRChecker):
             if feedDeets['lastCheck'] > datetime.datetime.utcnow() - datetime.timedelta(minutes=10):
                 continue
             

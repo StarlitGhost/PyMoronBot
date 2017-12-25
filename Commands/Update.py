@@ -59,7 +59,7 @@ class Update(CommandInterface):
             subprocess.check_call([os.path.join(os.path.dirname(sys.executable), 'pip'),
                                    'install', '-r', 'requirements.txt', '-U'])
         except OSError:
-            print 'pip not found, requirements not updated'
+            print('pip not found, requirements not updated')
         
         return IRCResponse(ResponseType.Say,
                            response,

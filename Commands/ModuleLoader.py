@@ -8,6 +8,8 @@ import GlobalVars
 import sys
 import traceback
 
+from six import iteritems
+
 
 class ModuleLoader(CommandInterface):
     triggers = ['load', 'reload', 'unload',
@@ -67,7 +69,7 @@ class ModuleLoader(CommandInterface):
         exceptions = []
 
         if len(commandNames) == 1 and 'all' in commandNameCaseMap:
-            for name, _ in moduleHandler.commands.iteritems():
+            for name, _ in iteritems(moduleHandler.commands):
                 if name == 'ModuleLoader':
                     continue
 
@@ -91,7 +93,7 @@ class ModuleLoader(CommandInterface):
                 except Exception as x:
                     xName = x.__class__.__name__
                     exceptions.append(u"{} ({})".format(commandNameCaseMap[commandName], xName))
-                    print xName, x.args
+                    print(xName, x.args)
                     traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions
@@ -110,7 +112,7 @@ class ModuleLoader(CommandInterface):
         exceptions = []
 
         if len(postProcessNames) == 1 and 'all' in postProcessNameCaseMap:
-            for name, _ in moduleHandler.postProcesses.iteritems():
+            for name, _ in iteritems(moduleHandler.postProcesses):
                 moduleHandler.loadPostProcess(name)
 
             return ['all post processes'], [], []
@@ -126,7 +128,7 @@ class ModuleLoader(CommandInterface):
             except Exception as x:
                 xName = x.__class__.__name__
                 exceptions.append(u"{} ({})".format(postProcessNameCaseMap[postProcessName], xName))
-                print xName, x.args
+                print(xName, x.args)
                 traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions
@@ -155,7 +157,7 @@ class ModuleLoader(CommandInterface):
             except Exception as x:
                 xName = x.__class__.__name__
                 exceptions.append(u"{} ({})".format(commandNameCaseMap[commandName], xName))
-                print xName, x.args
+                print(xName, x.args)
                 traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions
@@ -184,7 +186,7 @@ class ModuleLoader(CommandInterface):
             except Exception as x:
                 xName = x.__class__.__name__
                 exceptions.append(u"{} ({})".format(postProcessNameCaseMap[postProcessName], xName))
-                print xName, x.args
+                print(xName, x.args)
                 traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions

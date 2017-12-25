@@ -4,8 +4,9 @@ Created on Aug 31, 2015
 
 @author: Tyranic-Moron
 """
-import HTMLParser
+from html.parser import HTMLParser
 import re
+from six import string_types
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -23,7 +24,7 @@ class Slurp(CommandInterface):
 
     runInThread = True
 
-    htmlParser = HTMLParser.HTMLParser()
+    htmlParser = HTMLParser()
 
     def execute(self, message):
         """
@@ -34,7 +35,7 @@ class Slurp(CommandInterface):
 
         prop, url, selector = (message.ParameterList[0], message.ParameterList[1], u" ".join(message.ParameterList[2:]))
 
-        if not re.match(ur'^\w+://', url):
+        if not re.match(r'^\w+://', url):
             url = u"http://{}".format(url)
 
         if 'slurp' in message.Metadata and url in message.Metadata['slurp']:
@@ -68,13 +69,13 @@ class Slurp(CommandInterface):
                                                                                                     prop),
                                message.ReplyTo)
 
-        if not isinstance(value, basestring):
+        if not isinstance(value, string_types):
             value = u" ".join(value)
 
         # sanitize the value
         value = value.strip()
-        value = re.sub(ur'[\r\n]+', u' ', value)
-        value = re.sub(ur'\s+', u' ', value)
+        value = re.sub(r'[\r\n]+', u' ', value)
+        value = re.sub(r'\s+', u' ', value)
         value = self.htmlParser.unescape(value)
 
         return IRCResponse(ResponseType.Say, value, message.ReplyTo,

@@ -12,6 +12,8 @@ from IRCResponse import IRCResponse, ResponseType
 from Utils import StringUtils
 
 import re
+from builtins import str
+from six import iteritems
 
 
 class Chain(CommandInterface):
@@ -42,7 +44,7 @@ class Chain(CommandInterface):
                                        message.ReplyTo)
                 link = link.replace('$output', response.Response)  # replace $output with output of previous command
                 extraVars.update(response.ExtraVars)
-                for var, value in extraVars.iteritems():
+                for var, value in iteritems(extraVars):
                     link = re.sub(r'\$\b{}\b'.format(re.escape(var)), '{}'.format(value), link)
             else:
                 # replace $output with empty string if previous command had no output
@@ -71,5 +73,5 @@ class Chain(CommandInterface):
         if response.Response is not None:
             # limit response length (chains can get pretty large)
             response.Response = list(StringUtils.splitUTF8(response.Response.encode('utf-8'), 700))[0]
-            response.Response = unicode(response.Response, 'utf-8')
+            response.Response = str(response.Response, 'utf-8')
         return response

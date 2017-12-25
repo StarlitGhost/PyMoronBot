@@ -6,6 +6,7 @@ Created on May 21, 2014
 """
 import re
 from collections import OrderedDict
+from six import iteritems
 
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
@@ -185,10 +186,10 @@ class Alias(CommandInterface):
 
         addCommands = [u"{}alias add {} {}".format(self.bot.commandChar,
                                                    name, u" ".join(command))
-                       for name, command in aliases.iteritems()]
+                       for name, command in iteritems(aliases)]
         helpCommands = [u"{}alias help {} {}".format(self.bot.commandChar,
                                                      name, helpText)
-                        for name, helpText in aliasHelp.iteritems()]
+                        for name, helpText in iteritems(aliasHelp)]
 
         export = u"{}\n\n{}".format(u"\n".join(sorted(addCommands)),
                                     u"\n".join(sorted(helpCommands)))
@@ -293,7 +294,7 @@ class Alias(CommandInterface):
             if len(message.ParameterList) > 1:
                 subCommand = message.ParameterList[1].lower()
                 if subCommand in self.subCommands:
-                    return u'{1}alias {0}'.format(re.sub(ur"\s+", u" ", self.subCommands[subCommand].__doc__),
+                    return u'{1}alias {0}'.format(re.sub(r"\s+", u" ", self.subCommands[subCommand].__doc__),
                                                   self.bot.commandChar)
                 else:
                     return self._unrecognizedSubcommand(subCommand)

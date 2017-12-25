@@ -4,11 +4,12 @@ Created on Nov 07, 2014
 @author: Tyranic-Moron
 """
 
+from future.utils import iteritems
+
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
 
-from string import maketrans
 
 class Flip(CommandInterface):
     triggers = ['flip']
@@ -71,8 +72,8 @@ class Flip(CommandInterface):
             u'‿': u'⁀',
         }
         # Create and append the inverse dictionary
-        table.update({v: k for k,v in table.iteritems()})
-        self.translation = {ord(k): v for k,v in table.iteritems()}
+        table.update({v: k for k,v in iteritems(table)})
+        self.translation = {ord(k): v for k,v in iteritems(table)}
 
     def execute(self, message):
         """

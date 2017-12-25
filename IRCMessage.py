@@ -71,9 +71,9 @@ class IRCMessage(object):
             metadata = {}
         self.Metadata = metadata
 
-        try:
+        if isinstance(message, bytes):
             unicodeMessage = message.decode('utf-8', 'ignore')
-        except UnicodeEncodeError:  # Already utf-8?
+        else:  # Already utf-8?
             unicodeMessage = message
         self.Type = msgType
         self.MessageList = unicodeMessage.strip().split(' ')
