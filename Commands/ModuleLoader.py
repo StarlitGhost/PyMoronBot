@@ -8,6 +8,8 @@ import GlobalVars
 import sys
 import traceback
 
+from six import iteritems
+
 
 class ModuleLoader(CommandInterface):
     triggers = ['load', 'reload', 'unload',
@@ -67,7 +69,7 @@ class ModuleLoader(CommandInterface):
         exceptions = []
 
         if len(commandNames) == 1 and 'all' in commandNameCaseMap:
-            for name, _ in moduleHandler.commands.iteritems():
+            for name, _ in iteritems(moduleHandler.commands):
                 if name == 'ModuleLoader':
                     continue
 
@@ -110,7 +112,7 @@ class ModuleLoader(CommandInterface):
         exceptions = []
 
         if len(postProcessNames) == 1 and 'all' in postProcessNameCaseMap:
-            for name, _ in moduleHandler.postProcesses.iteritems():
+            for name, _ in iteritems(moduleHandler.postProcesses):
                 moduleHandler.loadPostProcess(name)
 
             return ['all post processes'], [], []

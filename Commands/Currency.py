@@ -5,6 +5,7 @@ Created on Dec 06, 2016
 @author: Tyranic-Moron
 """
 import json
+from six import iteritems
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -51,7 +52,7 @@ class Currency(CommandInterface):
                                message.ReplyTo)
 
         data = []
-        for curr,rate in rates.iteritems():
+        for curr,rate in iteritems(rates):
             data.append("{} {}".format(rate*amount, curr))
 
         graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])

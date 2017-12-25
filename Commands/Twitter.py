@@ -9,6 +9,7 @@ import json
 import re
 import datetime
 from builtins import str
+from six import iteritems
 
 from dateutil import parser
 from twisted.internet import task, threads
@@ -208,7 +209,7 @@ class Twitter(CommandInterface):
         """
         checks each followed twitter account for new tweets and reports them to all channels the bot is in
         """
-        for user, lastTweetTimestamp in self.follows.iteritems():
+        for user, lastTweetTimestamp in iteritems(self.follows):
             print("[Twitter] Scanning {} for new tweets...".format(user))
             
             timeline = self.twitter.statuses.user_timeline(screen_name=user)
@@ -237,7 +238,7 @@ class Twitter(CommandInterface):
 
                     newTweet = self._stringifyTweet(tweet)
 
-                    for channel, _ in self.bot.channels.iteritems():
+                    for channel, _ in iteritems(self.bot.channels):
                         self.bot.sendResponse(IRCResponse(ResponseType.Say,
                                                           u'Tweet! {}'.format(newTweet),
                                                           channel))

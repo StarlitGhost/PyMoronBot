@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+from six import iteritems
 
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
@@ -44,7 +45,7 @@ class LRR(CommandInterface):
             latestFeed = None
             latestTitle = None
             latestLink = None
-            for feedName, feedDeets in DataStore.LRRChecker.iteritems():
+            for feedName, feedDeets in iteritems(DataStore.LRRChecker):
                 if feedDeets['lastUpdate'] > latestDate:
                     latestDate = feedDeets['lastUpdate']
                     latestFeed = feedName
@@ -56,7 +57,7 @@ class LRR(CommandInterface):
 
     @classmethod
     def handleAliases(cls, series):
-        for feedName, feedDeets in DataStore.LRRChecker.iteritems():
+        for feedName, feedDeets in iteritems(DataStore.LRRChecker):
             if series.lower() in feedDeets['aliases']:
                 return feedName
         return series
