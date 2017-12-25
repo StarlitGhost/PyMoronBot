@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import importlib
+from importlib import reload, import_module
 import sys
 import traceback
 import operator
@@ -117,9 +117,9 @@ class ModuleHandler(object):
             self._unload(name, category, categoryDict, categoryCaseMap)
             alreadyExisted = True
 
-        module = importlib.import_module(category + '.' + catListCaseMap[name])
+        module = import_module(category + '.' + catListCaseMap[name])
 
-        importlib.reload(module)
+        reload(module)
 
         class_ = getattr(module, catListCaseMap[name])
 
