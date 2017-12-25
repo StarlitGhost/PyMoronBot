@@ -33,8 +33,8 @@ class Splatoon(CommandInterface):
         data.append(assembleFormattedText(t))
         if not short:
             # include next maps
-	    now = int(time.time())
-	    startTime = r[1]['startTime']
+            now = int(time.time())
+            startTime = r[1]['startTime']
             delta = startTime - now
             d = datetime.timedelta(seconds=delta)
             deltaStr = StringUtils.deltaTimeToString(d, resolution='m')

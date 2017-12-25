@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
-import htmlentitydefs
+from html.entities import name2codepoint
+from builtins import chr
+from six import iteritems
 import re
+
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
@@ -68,7 +71,7 @@ def deltaTimeToString(timeDelta, resolution='m'):
         else:
             return '{0} {1}'.format(duration, durationWord)
 
-    deltaString = ' '.join([lex(word, number) for word, number in d.iteritems() if number > 0])
+    deltaString = ' '.join([lex(word, number) for word, number in iteritems(d) if number > 0])
     return deltaString if len(deltaString) > 0 else 'seconds'
 
 
@@ -83,15 +86,15 @@ def unescapeXHTML(text):
             # character reference
             try:
                 if escapeText[:3] == '&#x':
-                    return unichr(int(escapeText[3:-1], 16))
+                    return chr(int(escapeText[3:-1], 16))
                 else:
-                    return unichr(int(escapeText[2:-1]))
+                    return chr(int(escapeText[2:-1]))
             except ValueError:
                 pass
         else:
             # named entity
             try:
-                escapeText = unichr(htmlentitydefs.name2codepoint[escapeText[1:-1]])
+                escapeText = chr(name2codepoint[escapeText[1:-1]])
             except KeyError:
                 pass
         return escapeText  # leave as is

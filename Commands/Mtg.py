@@ -6,6 +6,7 @@ from CommandInterface import CommandInterface
 from Utils import WebUtils
 
 import re
+from builtins import str
 
 from bs4 import BeautifulSoup
 
@@ -43,7 +44,7 @@ class Mtg(CommandInterface):
 
         manaCost = soup.find('div', {'id': 'ctl00_ctl00_ctl00_MainContent_SubContent_SubContent_manaRow'})
         if manaCost is not None:
-            manaCost = unicode(manaCost.find('div', 'value'))
+            manaCost = str(manaCost.find('div', 'value'))
             manaCost = u' | MC: ' + self.translateSymbols(manaCost)
             manaCost = re.sub('<[^>]+?>', '', manaCost)
             manaCost = manaCost.replace('\n', '')
@@ -73,7 +74,7 @@ class Mtg(CommandInterface):
             flavTexts = flavText.find_all('div', 'cardtextbox')
             texts = []
             for text in flavTexts:
-                texts.append(unicode(text.text))
+                texts.append(str(text.text))
             flavText = u' | FT: ' + ' > '.join(texts)
         else:
             flavText = u''
@@ -90,7 +91,7 @@ class Mtg(CommandInterface):
 
     @classmethod
     def translateSymbols(cls, text):
-        text = unicode(text)
+        text = str(text)
         text = re.sub(r'<img.+?name=(tap).+?>', r'Tap', text)  # tap
         text = re.sub(r'<img.+?name=([0-9]{2,}).+?>', r'\1', text)  # long numbers
         text = re.sub(r'<img.+?name=([^&"])([^&"]).+?>', r'{\1/\2}', text)  # hybrids

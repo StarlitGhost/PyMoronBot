@@ -3,6 +3,8 @@ import random
 import datetime
 import re
 
+from six import iteritems
+
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import ResponseType, IRCResponse
@@ -173,7 +175,7 @@ class Responses(CommandInterface):
                 }
 
                 self.animal = None
-                for match, animal in matchDict.iteritems():
+                for match, animal in iteritems(matchDict):
                     if re.search(r'^{}([^\s\w]+)?$'.format(match), message, re.IGNORECASE):
                         self.animal = animal
                         return True
@@ -390,8 +392,8 @@ class Responses(CommandInterface):
             #   OK I'VE GOT THIS NOW, BRO    #
             #                                #
             ##################################
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
 
     def shouldExecute(self, message):
         """
@@ -421,7 +423,7 @@ class Responses(CommandInterface):
             else:
                 enabled = []
                 disabled = []
-                for name, response in self.responses.dict.iteritems():
+                for name, response in iteritems(self.responses.dict):
                     if response.enabled:
                         enabled.append(name)
                     else:

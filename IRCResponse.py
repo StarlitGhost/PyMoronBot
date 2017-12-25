@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
+from builtins import str
 
 
 class ResponseType(Enum):
@@ -28,11 +29,11 @@ class IRCResponse(object):
             metadata = {}
         self.Type = messageType
         try:
-            self.Response = unicode(response, 'utf-8')
+            self.Response = str(response, 'utf-8')
         except TypeError:  # Already utf-8?
             self.Response = response
         try:
-            self.Target = unicode(target, 'utf-8')
+            self.Target = str(target, 'utf-8')
         except TypeError:  # Already utf-8?
             self.Target = target
 

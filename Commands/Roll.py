@@ -7,6 +7,7 @@ Created on May 10, 2014
 
 import random
 import operator
+from builtins import range
 
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -169,7 +170,7 @@ class Roll(CommandInterface):
                 raise ZeroSidesException(u'attempted to roll a die with zero sides')
 
             rolls = []
-            for dice in xrange(0, numDice):
+            for dice in range(0, numDice):
                 rolls.append(random.randint(1, numSides))
 
             self.yaccer.rolls.append((u'{0}d{1}'.format(numDice, numSides), rolls))

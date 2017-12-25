@@ -12,6 +12,7 @@ from IRCResponse import IRCResponse, ResponseType
 from Utils import StringUtils
 
 import re
+from builtins import str
 
 
 class Chain(CommandInterface):
@@ -71,5 +72,5 @@ class Chain(CommandInterface):
         if response.Response is not None:
             # limit response length (chains can get pretty large)
             response.Response = list(StringUtils.splitUTF8(response.Response.encode('utf-8'), 700))[0]
-            response.Response = unicode(response.Response, 'utf-8')
+            response.Response = str(response.Response, 'utf-8')
         return response

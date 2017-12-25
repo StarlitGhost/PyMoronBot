@@ -4,7 +4,7 @@ Created on Sep 07, 2015
 
 @author: Tyranic-Moron
 """
-import HTMLParser
+from html.parser import HTMLParser
 import re
 
 from IRCMessage import IRCMessage
@@ -23,7 +23,7 @@ filter syntax here: https://stedolan.github.io/jq/manual/#Basicfilters"
 
     runInThread = True
 
-    htmlParser = HTMLParser.HTMLParser()
+    htmlParser = HTMLParser()
 
     def execute(self, message):
         """
@@ -34,7 +34,7 @@ filter syntax here: https://stedolan.github.io/jq/manual/#Basicfilters"
 
         url, jqfilter = (message.ParameterList[0], u" ".join(message.ParameterList[1:]))
 
-        if not re.match(ur'^\w+://', url):
+        if not re.match(r'^\w+://', url):
             url = u"http://{}".format(url)
 
         if 'jq' in message.Metadata and url in message.Metadata['jq']:
@@ -47,7 +47,7 @@ filter syntax here: https://stedolan.github.io/jq/manual/#Basicfilters"
         try:
             value = jq(jqfilter).transform(text=page.body)
         except ValueError as e:
-            response = re.sub(ur'[\r\n]+', u' ', e.message)
+            response = re.sub(r'[\r\n]+', u' ', e.message)
             return IRCResponse(ResponseType.Say, response, message.ReplyTo)
 
         if value is None:
@@ -66,8 +66,8 @@ filter syntax here: https://stedolan.github.io/jq/manual/#Basicfilters"
         # sanitize the value
         value = u'{}'.format(value)
         value = value.strip()
-        value = re.sub(ur'[\r\n]+', u' ', value)
-        value = re.sub(ur'\s+', u' ', value)
+        value = re.sub(r'[\r\n]+', u' ', value)
+        value = re.sub(r'\s+', u' ', value)
         value = self.htmlParser.unescape(value)
 
         return IRCResponse(ResponseType.Say, value, message.ReplyTo,

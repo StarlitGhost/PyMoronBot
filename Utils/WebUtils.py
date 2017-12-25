@@ -10,12 +10,16 @@ def getAddrInfoWrapper(host, port, _=0, socktype=0, proto=0, flags=0):
 
 socket.getaddrinfo = getAddrInfoWrapper
 
-from urllib import urlencode
-from urllib2 import build_opener, Request, urlopen, URLError
-from urlparse import urlparse
+import requests
 import json
 import re
 import time
+
+from builtins import str
+from future.standard_library import install_aliases
+install_aliases()
+from urllib.parse import urlparse, urlencode
+from six import iteritems
 
 from apiclient.discovery import build
 
@@ -24,11 +28,11 @@ from Data.api_keys import load_key
 
 class URLResponse(object):
     def __init__(self, response):
-        self.domain = urlparse(response.geturl()).hostname
+        self.domain = urlparse(response.url).netloc
         self._body = None
-        self._responseReader = response.read
+        self._response = response
         self._responseCloser = response.close
-        self.headers = response.info().dict
+        self.headers = response.headers
         self.responseUrl = response.url
 
     def __del__(self):
@@ -38,7 +42,7 @@ class URLResponse(object):
     @property
     def body(self):
         if self._body is None:
-            self._body = self._responseReader()
+            self._body = self._response.content
             self._responseCloser()
         return self._body
 
@@ -57,18 +61,12 @@ def fetchURL(url, extraHeaders=None):
     @type extraHeaders: list[tuple]
     @rtype: URLResponse
     """
-    headers = [("User-agent", "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0")]
+    headers = {"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0"}
     if extraHeaders:
-        for header in extraHeaders:
-            # For whatever reason headers are defined in a different way in opener than they are
-            # in a normal urlopen
-            headers.append(header)
+        headers.update(extraHeaders)
     try:
-        opener = build_opener()
-        opener.addheaders = headers
-        response = opener.open(url)
-        responseHeaders = response.info().dict
-        #print '{} headers: {}'.format(urlparse(response.geturl()).hostname, responseHeaders)
+        response = requests.get(url, headers=headers, stream=True)
+        responseHeaders = response.headers
         pageType = responseHeaders["content-type"]
 
         # Make sure we don't download any unwanted things
@@ -79,14 +77,10 @@ def fetchURL(url, extraHeaders=None):
         else:
             response.close()
 
-    except URLError as e:
+    except requests.exceptions.RequestException as e:
         today = time.strftime("[%H:%M:%S]")
-        reason = None
-        if hasattr(e, "reason"):
-            reason = "We failed to reach the server, reason: {}".format(e.reason)
-        elif hasattr(e, "code"):
-            reason = "The server couldn't fulfill the request, code: {}".format(e.code)
-        print "{} *** ERROR: Fetch from \"{}\" failed: {}".format(today, url, reason)
+        reason = str(e)
+        print("{} *** ERROR: Fetch from \"{}\" failed: {}".format(today, url, reason))
 
 
 # mostly taken directly from Heufneutje's PyHeufyBot
@@ -98,20 +92,16 @@ def postURL(url, values, extraHeaders=None):
     @type extraHeaders: dict[unicode, unicode]
     @rtype: URLResponse
     """
-    headers = {"User-agent": "Mozilla/5.0"}
+    headers = {"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0"}
     if extraHeaders:
-        for header in extraHeaders:
-            headers[header] = extraHeaders[header]
+        headers.update(extraHeaders)
 
-    # urlencode only take str objects, so encode our unicode values first
-    for k, v in values.iteritems():
-        values[k] = unicode(v).encode('utf-8')
-    data = urlencode(values)
+    for k, v in iteritems(values):
+        values[k] = str(v)
 
     try:
-        request = Request(url, data, headers)
-        response = urlopen(request)
-        responseHeaders = response.info().dict
+        response = requests.post(url, data=values, headers=headers, stream=True)
+        responseHeaders = response.headers
         pageType = responseHeaders["content-type"]
 
         # Make sure we don't download any unwanted things
@@ -122,14 +112,10 @@ def postURL(url, values, extraHeaders=None):
         else:
             response.close()
 
-    except URLError as e:
+    except requests.exceptions.RequestException as e:
         today = time.strftime("[%H:%M:%S]")
-        reason = None
-        if hasattr(e, "reason"):
-            reason = "We failed to reach the server, reason: {}".format(e.reason)
-        elif hasattr(e, "code"):
-            reason = "The server couldn't fulfill the request, code: {}".format(e.code)
-        print "{} *** ERROR: Post to \"{}\" failed: {}".format(today, url, reason)
+        reason = str(e)
+        print("{} *** ERROR: Post to \"{}\" failed: {}".format(today, url, reason))
 
 
 def shortenGoogl(url):
@@ -149,12 +135,12 @@ def shortenGoogl(url):
     headers = {"Content-Type": "application/json"}
 
     try:
-        request = Request(apiURL, post, headers)
-        response = json.loads(urlopen(request).read())
-        return response['id']
+        response = requests.post(apiURL, data=post, headers=headers)
+        responseJson = response.json()
+        return responseJson['id']
 
-    except Exception, e:
-        print "Goo.gl error: %s" % e
+    except requests.exceptions.RequestException as e:
+        print("Goo.gl error: {}".format(e))
 
 
 def googleSearch(query):
@@ -182,7 +168,9 @@ def pasteEE(data, description, expire, raw=True):
     @type raw: bool
     @rtype: unicode
     """
-    values = {u"key": u"public",
+    pasteEEKey = load_key(u'Paste.ee')
+
+    values = {u"key": "public",
               u"description": description,
               u"paste": data,
               u"expiration": expire,
