@@ -267,6 +267,13 @@ class MoronBot(irc.IRCClient):
 
         self.handleMessage(message)
 
+    def lineReceived(self, line):
+        # decode bytes from transport to unicode, replacing invalid unicode with escapes before twisted gets to them
+        if bytes != str and isinstance(line, bytes):
+            line = line.decode('utf-8', errors='backslashreplace')
+
+        super(MoronBot, self).lineReceived(line)
+
     def handleMessage(self, message):
         """
         @type message: IRCMessage
