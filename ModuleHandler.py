@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from importlib import reload, import_module
+from imp import reload
+from importlib import import_module
 import sys
 import traceback
 import operator
