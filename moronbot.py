@@ -27,7 +27,7 @@ restarting = False
 startTime = datetime.datetime.utcnow()
 
 
-class MoronBot(irc.IRCClient):
+class MoronBot(irc.IRCClient, object):
 
     def __init__(self):
         self.nickname = cmdArgs.nick
