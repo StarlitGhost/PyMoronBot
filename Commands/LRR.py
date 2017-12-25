@@ -25,7 +25,7 @@ class LRR(CommandInterface):
         """
         if len(message.Parameters.strip()) > 0:
             feed = self.handleAliases(message.Parameters)
-            lowerMap = {key.lower(): key for key in DataStore.LRRChecker.iterkeys()}
+            lowerMap = {key.lower(): key for key in DataStore.LRRChecker}
             if feed.lower() in lowerMap:
                 feedName = lowerMap[feed.lower()]
                 feedLatest = DataStore.LRRChecker[feedName]['lastTitle']
