@@ -172,6 +172,7 @@ class Responses(CommandInterface):
                     r'bu*zz+': 'bee',
                     r'boo+': 'ghost',
                     r'(noo+t ?)+': 'penguin',
+                    r'too+t': 'mastodon',
                 }
 
                 self.animal = None
