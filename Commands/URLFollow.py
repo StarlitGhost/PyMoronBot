@@ -119,7 +119,6 @@ class URLFollow(CommandInterface):
         url = 'https://www.googleapis.com/youtube/v3/videos?id={}&fields={}&part={}&key={}'.format(videoID, fields, parts, self.youtubeKey)
         
         webPage = WebUtils.fetchURL(url)
-        webPage.body = webPage.body.decode('utf-8')
         j = json.loads(webPage.body)
 
         if 'items' not in j:
@@ -567,13 +566,6 @@ class URLFollow(CommandInterface):
         return
 
     def GetTitle(self, webpage):
-        # BeautifulSoup doesn't do the right thing if you give it bytes.
-        # We're not 100% sure what the content-type of this page is meant to be,
-        # but UTF-8 is going to be right 90% of the time.
-        try:
-            webpage = webpage.decode('utf-8')
-        except UnicodeDecodeError:
-            pass
         soup = BeautifulSoup(webpage)
         title = soup.title
         if title:

@@ -54,7 +54,7 @@ class RedditImage(CommandInterface):
         url = "https://api.imgur.com/3/gallery/r/{}/time/all/{}"
         url = url.format(subreddit, random.randint(0, topRange))
         response = WebUtils.fetchURL(url, self.headers)
-        jsonResponse = json.loads(response.body.decode("utf-8", "ignore"))
+        jsonResponse = json.loads(response.body)
         images = jsonResponse['data']
 
         if not images:
