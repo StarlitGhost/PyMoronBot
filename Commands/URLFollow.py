@@ -233,7 +233,7 @@ class URLFollow(CommandInterface):
                 if imageData[u'animated']:
                     data.append(u'\x032\x02Animated!\x0F')
                 data.append(u'{0:,d}x{1:,d}'.format(imageData['width'], imageData['height']))
-                data.append(u'Size: {0:,d}kb'.format(int(imageData['size'])/1024))
+                data.append(u'Size: {0:,d}kb'.format(int(imageData['size']/1024)))
         data.append(u'Views: {0:,d}'.format(imageData['views']))
         
         return IRCResponse(ResponseType.Say,
