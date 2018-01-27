@@ -40,7 +40,7 @@ class Update(CommandInterface):
 
         output = subprocess.check_output(['git', 'log', '--no-merges',
                                           '--pretty=format:%s %b', '..origin/master'])
-        changes = [s.strip() for s in output.splitlines()]
+        changes = [s.strip().decode('utf-8', 'ignore') for s in output.splitlines()]
 
         if len(changes) == 0:
             return IRCResponse(ResponseType.Say, 'The bot is already up to date', message.ReplyTo)
