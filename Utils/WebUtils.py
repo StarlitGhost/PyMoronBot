@@ -42,7 +42,7 @@ class URLResponse(object):
     @property
     def body(self):
         if self._body is None:
-            self._body = self._response.content
+            self._body = self._response.content.decode('utf-8', 'ignore')
             self._responseCloser()
         return self._body
 
