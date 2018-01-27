@@ -26,20 +26,20 @@ class Splatoon(CommandInterface):
     graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
     def _fetch(self, j, short, mode, label):
-        r = j['modes'][mode]
+        r = j[mode]
         data = []
         t = A.normal[A.bold['{} {}: '.format(label, r[0]['rule']['name'])],
-                     '/'.join(r[0]['maps'])]
+                     '/'.join([r[0]['stage_a']['name'], r[0]['stage_b']['name']])]
         data.append(assembleFormattedText(t))
         if not short:
             # include next maps
-            now = int(time.time())
-            startTime = r[1]['startTime']
+	    now = int(time.time())
+	    startTime = r[1]['start_time']
             delta = startTime - now
             d = datetime.timedelta(seconds=delta)
             deltaStr = StringUtils.deltaTimeToString(d, resolution='m')
             t = A.normal[A.bold['{} {} in {}: '.format(label, r[1]['rule']['name'], deltaStr)],
-                         '/'.join(r[1]['maps'])]
+                         '/'.join([r[1]['stage_a']['name'], r[1]['stage_b']['name']])]
             data.append(assembleFormattedText(t))
         return ' | '.join(data)
 
