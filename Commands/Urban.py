@@ -5,7 +5,7 @@ Created on Jan 24, 2014
 @author: Tyranic-Moron
 """
 
-import urllib
+from future.moves.urllib.parse import quote
 import json
 from builtins import str
 
@@ -31,7 +31,7 @@ class Urban(CommandInterface):
                                "You didn't give a word! Usage: {0}".format(self.help),
                                message.ReplyTo)
         
-        search = urllib.quote(message.Parameters)
+        search = quote(message.Parameters)
 
         url = 'http://api.urbandictionary.com/v0/define?term={0}'.format(search)
         
