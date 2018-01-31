@@ -45,7 +45,7 @@ class ZeroSidesException(Exception):
 
 class Roll(CommandInterface):
     triggers = ['roll', 'rollv']
-    help = 'roll(v) - dice roller, \'rollv\' outputs every roll. supported operators are NdN, dN, + - * / ( ) #comments\n' \
+    help = 'roll(v) - dice roller, \'rollv\' outputs every roll. supported operators are NdN, dN, + - * / ^ ( ) #comments\n' \
            'example usage: rollv 5d6 + ((5d(2d10)) - d10) * (d20 / 5) #unnecessarily complicated roll\n' \
            'output: User rolled: [5d6: 3,1,5,4,4 (17) | 2d10: 5,3 (8) | 5d8: 5,1,3,7,2 (18) | 1d10: 7 (7) | 1d20: 4 (4)] 17'
 
@@ -53,7 +53,7 @@ class Roll(CommandInterface):
     def onLoad(self):
 
         tokens = ('NUMBER',
-                  'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'DICE',
+                  'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'EXPONENT', 'DICE',
                   'LPAREN', 'RPAREN', 'POINT')
 
         # Tokens
@@ -62,6 +62,7 @@ class Roll(CommandInterface):
         t_MINUS = r'-'
         t_TIMES = r'\*'
         t_DIVIDE = r'/'
+        t_EXPONENT = r'\^'
         t_DICE = r'd'
         t_LPAREN = r'\('
         t_RPAREN = r'\)'
@@ -108,6 +109,7 @@ class Roll(CommandInterface):
         # Parsing rules
         precedence = (('left', 'PLUS', 'MINUS'),
                       ('left', 'TIMES', 'DIVIDE'),
+                      ('left', 'EXPONENT'),
                       ('left', 'DICE'),
                       ('right', 'UMINUS'),
                       ('right', 'UDICE'))
@@ -120,7 +122,8 @@ class Roll(CommandInterface):
             """expression : expression PLUS expression
                           | expression MINUS expression
                           | expression TIMES expression
-                          | expression DIVIDE expression"""
+                          | expression DIVIDE expression
+                          | expression EXPONENT expression"""
             if p[2] == '+':
                 p[0] = operator.add(p[1], p[3])
             elif p[2] == '-':
@@ -129,6 +132,8 @@ class Roll(CommandInterface):
                 p[0] = operator.mul(p[1], p[3])
             elif p[2] == '/':
                 p[0] = operator.div(p[1], p[3])
+            elif p[2] == '^':
+                p[0] = operator.pow(p[1], p[3])
 
         def p_expression_dice(p):
             """expression : expression DICE expression"""
