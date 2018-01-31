@@ -131,7 +131,7 @@ class Roll(CommandInterface):
             elif p[2] == '*':
                 p[0] = operator.mul(p[1], p[3])
             elif p[2] == '/':
-                p[0] = operator.div(p[1], p[3])
+                p[0] = operator.floordiv(p[1], p[3])
             elif p[2] == '^':
                 p[0] = operator.pow(p[1], p[3])
 
