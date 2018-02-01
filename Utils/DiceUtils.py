@@ -52,6 +52,7 @@ class DiceParser(object):
         self.yaccer = yacc.yacc(module=self)
 
         self.rolls = []
+        self.description = None
 
     def parse(self, diceexpr):
         self.rolls = []
@@ -108,8 +109,7 @@ class DiceParser(object):
 
     @TOKEN(r'\#.*')
     def t_COMMENT(self, t):
-        pass
-        # No return value. Token discarded
+        self.description = str(t.value)[1:].strip()
 
     # Calculate the column position of the given token.
     #     input is the input text string

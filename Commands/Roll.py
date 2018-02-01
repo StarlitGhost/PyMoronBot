@@ -61,4 +61,7 @@ class Roll(CommandInterface):
         else:
             response = u'{} rolled: {}'.format(message.User.Name, result)
 
+        if self.roller.description:
+            response += u' {}'.format(self.roller.description)
+
         return IRCResponse(ResponseType.Say, response, message.ReplyTo, {'rollTotal': result})
