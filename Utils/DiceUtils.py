@@ -58,15 +58,15 @@ class DiceParser(object):
 
         result = self.yaccer.parse(diceexpr)
         if isinstance(result, collections.Iterable):
-            result = sum(result)
+            result = self._sumDiceRolls(result)
         return result
 
     def getRollStrings(self):
         rollStrings = []
-        for dice, rollList in self.rolls:
-            rollStrings.append(u'{}: {} ({})'.format(dice,
-                                                     u','.join(u'{}'.format(roll) for roll in rollList),
-                                                     sum([r for r in rollList if isinstance(r, int)])))
+        for diceRoll in self.rolls:
+            rollStrings.append(u'{}d{}: {} ({})'.format(diceRoll['numDice'], diceRoll['numSides'],
+                                                        u','.join(u'{}'.format(roll) for roll in diceRoll['rolls']),
+                                                        sum(r for r in diceRoll['rolls'] if isinstance(r, int))))
         return rollStrings
 
     tokens = ('NUMBER',
@@ -128,7 +128,6 @@ class DiceParser(object):
         col = self._findColumn(t)
         raise UnknownCharacterException(u"unknown character '{}' (col {})".format(t.value[0], col))
 
-
     # Parsing rules
     precedence = (('left', 'PLUS', 'MINUS'),
                   ('left', 'TIMES', 'DIVIDE'),
@@ -150,8 +149,8 @@ class DiceParser(object):
                       | expression EXPONENT expression"""
 
         op = p[2]
-        left = self._sumList(p[1])
-        right = self._sumList(p[3])
+        left = self._sumDiceRolls(p[1])
+        right = self._sumDiceRolls(p[3])
 
         if op == '+':
             p[0] = operator.add(left, right)
@@ -177,24 +176,26 @@ class DiceParser(object):
                      | dice_expr KEEPLOWEST expression"""
         rolls = p[1]
         op = p[2]
-        keep = self._sumList(p[3])
+        keep = self._sumDiceRolls(p[3])
 
         if len(rolls) < keep:
-            raise NotEnoughDiceException(u'attempted to keep {} dice when only {} were rolled'.format(keep, len(rolls)))
+            raise NotEnoughDiceException(u'attempted to keep {} dice when only {} were rolled'.format(keep, len(rolls['rolls'])))
 
         if op == 'kh':
-            p[0] = heapq.nlargest(keep, rolls)
+            keptRolls = heapq.nlargest(keep, rolls['rolls'])
         elif op == 'kl':
-            p[0] = heapq.nsmallest(keep, rolls)
+            keptRolls = heapq.nsmallest(keep, rolls['rolls'])
 
-        dropped = list((mset(rolls) - mset(p[0])).elements())
+        dropped = list((mset(rolls['rolls']) - mset(keptRolls)).elements())
         for drop in dropped:
-            index = self.rolls[-1][1].index(drop)
-            self.rolls[-1][1][index] = u'-{}-'.format(drop)
+            index = rolls['rolls'].index(drop)
+            rolls['rolls'][index] = u'-{}-'.format(drop)
+
+        p[0] = rolls
 
     def p_expression_uminus(self, p):
         """expression : MINUS expression %prec UMINUS"""
-        p[0] = operator.neg(self._sumList(p[2]))
+        p[0] = operator.neg(self._sumDiceRolls(p[2]))
 
     def p_expression_udice(self, p):
         """expression : DICE expression %prec UDICE"""
@@ -216,8 +217,8 @@ class DiceParser(object):
         raise SyntaxErrorException(u"syntax error at '{}' (col {})".format(p.value, col))
 
     def _rollDice(self, numDice, numSides):
-        numDice = self._sumList(numDice)
-        numSides = self._sumList(numSides)
+        numDice = self._sumDiceRolls(numDice)
+        numSides = self._sumDiceRolls(numSides)
 
         if numDice > self._MAX_DICE:
             raise TooManyDiceException(u'attempted to roll more than {} dice in a single d expression'.format(self._MAX_DICE))
@@ -234,15 +235,18 @@ class DiceParser(object):
         for dice in range(0, numDice):
             rolls.append(random.randint(1, numSides))
 
-        self.rolls.append((u'{}d{}'.format(numDice, numSides), rolls))
+        return {
+            'numDice': numDice,
+            'numSides': numSides,
+            'rolls': rolls
+        }
 
-        return rolls
-
-    def _sumList(self, rolls):
-        if isinstance(rolls, collections.Iterable):
-            return sum(rolls)
+    def _sumDiceRolls(self, diceRolls):
+        if isinstance(diceRolls, collections.Iterable):
+            self.rolls.append(diceRolls)
+            return sum(r for r in diceRolls['rolls'] if isinstance(r, int))
         else:
-            return rolls
+            return diceRolls
 
 
 def main():
