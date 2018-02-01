@@ -7,6 +7,7 @@ Created on May 10, 2014
 
 import random
 import operator
+import collections
 from builtins import range
 
 from IRCMessage import IRCMessage
@@ -124,16 +125,20 @@ class Roll(CommandInterface):
                           | expression TIMES expression
                           | expression DIVIDE expression
                           | expression EXPONENT expression"""
-            if p[2] == '+':
-                p[0] = operator.add(p[1], p[3])
-            elif p[2] == '-':
-                p[0] = operator.sub(p[1], p[3])
-            elif p[2] == '*':
-                p[0] = operator.mul(p[1], p[3])
-            elif p[2] == '/':
-                p[0] = operator.floordiv(p[1], p[3])
-            elif p[2] == '^':
-                p[0] = operator.pow(p[1], p[3])
+            op = p[2]
+            left = sumList(p[1])
+            right = sumList(p[3])
+
+            if op == '+':
+                p[0] = operator.add(left, right)
+            elif op == '-':
+                p[0] = operator.sub(left, right)
+            elif op == '*':
+                p[0] = operator.mul(left, right)
+            elif op == '/':
+                p[0] = operator.floordiv(left, right)
+            elif op == '^':
+                p[0] = operator.pow(left, right)
 
         def p_expression_dice(p):
             """expression : expression DICE expression"""
@@ -141,7 +146,7 @@ class Roll(CommandInterface):
 
         def p_expression_uminus(p):
             """expression : MINUS expression %prec UMINUS"""
-            p[0] = operator.neg(p[2])
+            p[0] = operator.neg(sumList(p[2]))
 
         def p_expression_udice(p):
             """expression : DICE expression %prec UDICE"""
@@ -163,6 +168,9 @@ class Roll(CommandInterface):
             raise SyntaxErrorException(u"syntax error at '{0}' (col {1})".format(p.value, col))
 
         def rollDice(numDice, numSides):
+            numDice = sumList(numDice)
+            numSides = sumList(numSides)
+
             if numDice > MAX_DICE:
                 raise TooManyDiceException(u'attempted to roll more than {0} dice in a single d expression'.format(MAX_DICE))
             if numSides > MAX_SIDES:
@@ -180,7 +188,13 @@ class Roll(CommandInterface):
 
             self.yaccer.rolls.append((u'{0}d{1}'.format(numDice, numSides), rolls))
 
-            return sum(rolls)
+            return rolls
+
+        def sumList(rolls):
+            if isinstance(rolls, collections.Iterable):
+                return sum(rolls)
+            else:
+                return rolls
 
         self.yaccer = yacc.yacc()
         self.yaccer.rolls = []
@@ -196,6 +210,8 @@ class Roll(CommandInterface):
 
         try:
             result = self.yaccer.parse(message.Parameters)
+            if isinstance(result, collections.Iterable):
+                result = sum(result)
         except OverflowError:
             self.yaccer.rolls = []
 
