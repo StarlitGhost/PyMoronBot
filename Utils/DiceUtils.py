@@ -9,6 +9,8 @@ import random
 import operator
 import collections
 from builtins import range
+import heapq
+from collections import Counter as mset
 
 import ply.lex as lex
 from ply.lex import TOKEN
@@ -36,6 +38,9 @@ class NegativeSidesException(Exception):
 class ZeroSidesException(Exception):
     pass
 
+class NotEnoughDiceException(Exception):
+    pass
+
 
 class DiceParser(object):
 
@@ -61,13 +66,14 @@ class DiceParser(object):
         for dice, rollList in self.rolls:
             rollStrings.append(u'{}: {} ({})'.format(dice,
                                                      u','.join(u'{}'.format(roll) for roll in rollList),
-                                                     sum(rollList)))
+                                                     sum([r for r in rollList if isinstance(r, int)])))
         return rollStrings
 
     tokens = ('NUMBER',
               'PLUS', 'MINUS',
               'TIMES', 'DIVIDE',
               'EXPONENT',
+              'KEEPHIGHEST', 'KEEPLOWEST',
               'DICE',
               'LPAREN', 'RPAREN',
               'POINT')
@@ -79,6 +85,8 @@ class DiceParser(object):
     t_TIMES = r'\*'
     t_DIVIDE = r'/'
     t_EXPONENT = r'\^'
+    t_KEEPHIGHEST = r'kh'
+    t_KEEPLOWEST = r'kl'
     t_DICE = r'd'
     t_LPAREN = r'\('
     t_RPAREN = r'\)'
@@ -125,6 +133,7 @@ class DiceParser(object):
     precedence = (('left', 'PLUS', 'MINUS'),
                   ('left', 'TIMES', 'DIVIDE'),
                   ('left', 'EXPONENT'),
+                  ('left', 'KEEPHIGHEST', 'KEEPLOWEST'),
                   ('left', 'DICE'),
                   ('right', 'UMINUS'),
                   ('right', 'UDICE'))
@@ -155,9 +164,33 @@ class DiceParser(object):
         elif op == '^':
             p[0] = operator.pow(left, right)        
 
-    def p_expression_dice(self, p):
-        """expression : expression DICE expression"""
+    def p_expr_diceexpr(self, p):
+        """expression : dice_expr"""
+        p[0] = p[1]
+
+    def p_dice_expr(self, p):
+        """dice_expr : expression DICE expression"""
         p[0] = self._rollDice(p[1], p[3])
+
+    def p_keep_expr(self, p):
+        """dice_expr : dice_expr KEEPHIGHEST expression
+                     | dice_expr KEEPLOWEST expression"""
+        rolls = p[1]
+        op = p[2]
+        keep = self._sumList(p[3])
+
+        if len(rolls) < keep:
+            raise NotEnoughDiceException(u'attempted to keep {} dice when only {} were rolled'.format(keep, len(rolls)))
+
+        if op == 'kh':
+            p[0] = heapq.nlargest(keep, rolls)
+        elif op == 'kl':
+            p[0] = heapq.nsmallest(keep, rolls)
+
+        dropped = list((mset(rolls) - mset(p[0])).elements())
+        for drop in dropped:
+            index = self.rolls[-1][1].index(drop)
+            self.rolls[-1][1][index] = u'-{}-'.format(drop)
 
     def p_expression_uminus(self, p):
         """expression : MINUS expression %prec UMINUS"""

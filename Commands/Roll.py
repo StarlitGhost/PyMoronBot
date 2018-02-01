@@ -37,13 +37,14 @@ class Roll(CommandInterface):
                                u'Error: result too large to calculate',
                                message.ReplyTo)
         except (ZeroDivisionError,
-                UnknownCharacterException,
-                SyntaxErrorException,
-                TooManyDiceException,
-                TooManySidesException,
-                NegativeDiceException,
-                NegativeSidesException,
-                ZeroSidesException) as e:
+                DiceUtils.UnknownCharacterException,
+                DiceUtils.SyntaxErrorException,
+                DiceUtils.TooManyDiceException,
+                DiceUtils.TooManySidesException,
+                DiceUtils.NegativeDiceException,
+                DiceUtils.NegativeSidesException,
+                DiceUtils.ZeroSidesException,
+                DiceUtils.NotEnoughDiceException) as e:
             return IRCResponse(ResponseType.Say,
                                u'Error: {}'.format(e),
                                message.ReplyTo)
