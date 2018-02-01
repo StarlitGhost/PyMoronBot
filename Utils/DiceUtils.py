@@ -74,7 +74,7 @@ class DiceParser(object):
               'PLUS', 'MINUS',
               'TIMES', 'DIVIDE',
               'EXPONENT',
-              'KEEPHIGHEST', 'KEEPLOWEST',
+              'KEEPHIGHEST', 'KEEPLOWEST', 'DROPHIGHEST', 'DROPLOWEST',
               'DICE',
               'LPAREN', 'RPAREN',
               'POINT')
@@ -88,6 +88,8 @@ class DiceParser(object):
     t_EXPONENT = r'\^'
     t_KEEPHIGHEST = r'kh'
     t_KEEPLOWEST = r'kl'
+    t_DROPHIGHEST = r'dh'
+    t_DROPLOWEST = r'dl'
     t_DICE = r'd'
     t_LPAREN = r'\('
     t_RPAREN = r'\)'
@@ -132,7 +134,7 @@ class DiceParser(object):
     precedence = (('left', 'PLUS', 'MINUS'),
                   ('left', 'TIMES', 'DIVIDE'),
                   ('left', 'EXPONENT'),
-                  ('left', 'KEEPHIGHEST', 'KEEPLOWEST'),
+                  ('left', 'KEEPHIGHEST', 'KEEPLOWEST', 'DROPHIGHEST', 'DROPLOWEST'),
                   ('left', 'DICE'),
                   ('right', 'UMINUS'),
                   ('right', 'UDICE'))
@@ -171,20 +173,37 @@ class DiceParser(object):
         """dice_expr : expression DICE expression"""
         p[0] = self._rollDice(p[1], p[3])
 
-    def p_keep_expr(self, p):
+    def p_keepdrop_expr(self, p):
         """dice_expr : dice_expr KEEPHIGHEST expression
-                     | dice_expr KEEPLOWEST expression"""
+                     | dice_expr KEEPLOWEST expression
+                     | dice_expr DROPHIGHEST expression
+                     | dice_expr DROPLOWEST expression
+                     | dice_expr KEEPHIGHEST
+                     | dice_expr KEEPLOWEST
+                     | dice_expr DROPHIGHEST
+                     | dice_expr DROPLOWEST"""
         rolls = p[1]
         op = p[2]
-        keep = self._sumDiceRolls(p[3])
+        if len(p) > 3:
+            keepDrop = self._sumDiceRolls(p[3])
+        else:
+            keepDrop = 1
 
-        if len(rolls) < keep:
-            raise NotEnoughDiceException(u'attempted to keep {} dice when only {} were rolled'.format(keep, len(rolls['rolls'])))
+        if op.startswith('d'):
+            opType = 'drop'
+            keepDrop = rolls['numDice'] - keepDrop
+        else:
+            opType = 'keep'
 
-        if op == 'kh':
-            keptRolls = heapq.nlargest(keep, rolls['rolls'])
-        elif op == 'kl':
-            keptRolls = heapq.nsmallest(keep, rolls['rolls'])
+        if len(rolls) < keepDrop:
+            raise NotEnoughDiceException(u'attempted to {} {} dice when only {} were rolled'.format(opType,
+                                                                                                    keepDrop,
+                                                                                                    len(rolls['rolls'])))
+
+        if op == 'kh' or op == 'dl':
+            keptRolls = heapq.nlargest(keepDrop, rolls['rolls'])
+        elif op == 'kl' or op == 'dh':
+            keptRolls = heapq.nsmallest(keepDrop, rolls['rolls'])
 
         dropped = list((mset(rolls['rolls']) - mset(keptRolls)).elements())
         for drop in dropped:
