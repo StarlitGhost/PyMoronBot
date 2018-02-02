@@ -190,20 +190,20 @@ class DiceParser(object):
             # default to 1 if no right arg was given
             keepDrop = 1
 
+        # filter out previously dropped rolls
+        validRolls = [r for r in rolls['rolls'] if isinstance(r, int)]
+
         # if it's a drop op, invert the number into a keep count
         if op.startswith('d'):
             opType = 'drop'
-            keepDrop = rolls['numDice'] - keepDrop
+            keepDrop = len(validRolls) - keepDrop
         else:
             opType = 'keep'
 
         if rolls['numDice'] < keepDrop:
             raise NotEnoughDiceException(u'attempted to {} {} dice when only {} were rolled'.format(opType,
                                                                                                     keepDrop,
-                                                                                                    rolls['numDice']))
-
-        # filter out previously dropped rolls
-        validRolls = [r for r in rolls['rolls'] if isinstance(r, int)]
+                                                                                                    len(validRolls)))
 
         if op == 'kh' or op == 'dl':
             keptRolls = heapq.nlargest(keepDrop, validRolls)
@@ -215,8 +215,6 @@ class DiceParser(object):
         for drop in dropped:
             index = rolls['rolls'].index(drop)
             rolls['rolls'][index] = u'-{}-'.format(drop)
-
-        rolls['numDice'] -= len(dropped)
 
         p[0] = rolls
 
