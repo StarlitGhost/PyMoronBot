@@ -195,20 +195,24 @@ class DiceParser(object):
         else:
             opType = 'keep'
 
-        if len(rolls) < keepDrop:
+        if rolls['numDice'] < keepDrop:
             raise NotEnoughDiceException(u'attempted to {} {} dice when only {} were rolled'.format(opType,
                                                                                                     keepDrop,
-                                                                                                    len(rolls['rolls'])))
+                                                                                                    rolls['numDice']))
+
+        validRolls = [r for r in rolls['rolls'] if isinstance(r, int)]
 
         if op == 'kh' or op == 'dl':
-            keptRolls = heapq.nlargest(keepDrop, rolls['rolls'])
+            keptRolls = heapq.nlargest(keepDrop, validRolls)
         elif op == 'kl' or op == 'dh':
-            keptRolls = heapq.nsmallest(keepDrop, rolls['rolls'])
+            keptRolls = heapq.nsmallest(keepDrop, validRolls)
 
-        dropped = list((mset(rolls['rolls']) - mset(keptRolls)).elements())
+        dropped = list((mset(validRolls) - mset(keptRolls)).elements())
         for drop in dropped:
             index = rolls['rolls'].index(drop)
             rolls['rolls'][index] = u'-{}-'.format(drop)
+
+        rolls['numDice'] -= len(dropped)
 
         p[0] = rolls
 
