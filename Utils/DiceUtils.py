@@ -187,8 +187,10 @@ class DiceParser(object):
         if len(p) > 3:
             keepDrop = self._sumDiceRolls(p[3])
         else:
+            # default to 1 if no right arg was given
             keepDrop = 1
 
+        # if it's a drop op, invert the number into a keep count
         if op.startswith('d'):
             opType = 'drop'
             keepDrop = rolls['numDice'] - keepDrop
@@ -200,6 +202,7 @@ class DiceParser(object):
                                                                                                     keepDrop,
                                                                                                     rolls['numDice']))
 
+        # filter out previously dropped rolls
         validRolls = [r for r in rolls['rolls'] if isinstance(r, int)]
 
         if op == 'kh' or op == 'dl':
@@ -207,6 +210,7 @@ class DiceParser(object):
         elif op == 'kl' or op == 'dh':
             keptRolls = heapq.nsmallest(keepDrop, validRolls)
 
+        # determine which rolls were dropped, and change them to strings
         dropped = list((mset(validRolls) - mset(keptRolls)).elements())
         for drop in dropped:
             index = rolls['rolls'].index(drop)
@@ -265,6 +269,7 @@ class DiceParser(object):
         }
 
     def _sumDiceRolls(self, diceRolls):
+        """convert from dice roll structure to a single integer result"""
         if isinstance(diceRolls, collections.Iterable):
             self.rolls.append(diceRolls)
             return sum(r for r in diceRolls['rolls'] if isinstance(r, int))
@@ -292,8 +297,12 @@ def main():
             TooManySidesException,
             NegativeDiceException,
             NegativeDiceException,
-            ZeroSidesException) as e:
+            ZeroSidesException,
+            NotEnoughDiceException) as e:
         print(u'Error: {}'.format(e))
+
+    if roller.description:
+        result = u'{} {}'.format(result, roller.description)
 
     if cmdArgs.verbose:
         rolls = roller.rolls
