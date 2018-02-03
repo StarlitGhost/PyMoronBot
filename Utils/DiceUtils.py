@@ -54,8 +54,12 @@ class DiceParser(object):
         self.rolls = []
         self.description = None
 
-    def parse(self, diceexpr):
+    def reset(self):
         self.rolls = []
+        self.description = None
+
+    def parse(self, diceexpr):
+        self.reset()
 
         result = self.yaccer.parse(diceexpr)
         if isinstance(result, collections.Iterable):
@@ -209,6 +213,8 @@ class DiceParser(object):
             keptRolls = heapq.nlargest(keepDrop, validRolls)
         elif op == 'kl' or op == 'dh':
             keptRolls = heapq.nsmallest(keepDrop, validRolls)
+        else:
+            raise NotImplementedError(u"operator '{}' is not implemented (also, this should be impossible?)")
 
         # determine which rolls were dropped, and change them to strings
         dropped = list((mset(validRolls) - mset(keptRolls)).elements())
@@ -257,7 +263,7 @@ class DiceParser(object):
             raise ZeroSidesException(u'attempted to roll a die with zero sides')
 
         rolls = []
-        for dice in range(0, numDice):
+        for _ in range(0, numDice):
             rolls.append(random.randint(1, numSides))
 
         return {
@@ -288,6 +294,7 @@ def main():
         result = roller.parse(cmdArgs.diceexpr)
     except OverflowError:
         print(u'Error: result too large to calculate')
+        return
     except (ZeroDivisionError,
             UnknownCharacterException,
             SyntaxErrorException,
@@ -296,14 +303,15 @@ def main():
             NegativeDiceException,
             NegativeDiceException,
             ZeroSidesException,
-            NotEnoughDiceException) as e:
+            NotEnoughDiceException,
+            NotImplementedError) as e:
         print(u'Error: {}'.format(e))
+        return
 
     if roller.description:
         result = u'{} {}'.format(result, roller.description)
 
     if cmdArgs.verbose:
-        rolls = roller.rolls
         rollStrings = roller.getRollStrings()
         rollString = u' | '.join(rollStrings)
 
