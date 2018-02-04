@@ -94,7 +94,7 @@ class DiceParser(object):
 
     tokens = ('NUMBER',
               'PLUS', 'MINUS',
-              'TIMES', 'DIVIDE',
+              'TIMES', 'DIVIDE', 'MODULUS',
               'EXPONENT',
               'KEEPHIGHEST', 'KEEPLOWEST',
               'DROPHIGHEST', 'DROPLOWEST',
@@ -110,6 +110,7 @@ class DiceParser(object):
     t_MINUS = r'-'
     t_TIMES = r'\*'
     t_DIVIDE = r'/'
+    t_MODULUS = r'%'
     t_EXPONENT = r'\^'
     t_KEEPHIGHEST = r'kh'
     t_KEEPLOWEST = r'kl'
@@ -159,7 +160,7 @@ class DiceParser(object):
 
     # Parsing rules
     precedence = (('left', 'PLUS', 'MINUS'),
-                  ('left', 'TIMES', 'DIVIDE'),
+                  ('left', 'TIMES', 'DIVIDE', 'MODULUS'),
                   ('left', 'EXPONENT'),
                   ('left', 'KEEPHIGHEST', 'KEEPLOWEST',
                            'DROPHIGHEST', 'DROPLOWEST',
@@ -178,6 +179,7 @@ class DiceParser(object):
                       | expression MINUS expression
                       | expression TIMES expression
                       | expression DIVIDE expression
+                      | expression MODULUS expression
                       | expression EXPONENT expression"""
 
         op = p[2]
@@ -192,6 +194,8 @@ class DiceParser(object):
             p[0] = operator.mul(left, right)
         elif op == '/':
             p[0] = operator.floordiv(left, right)
+        elif op == '%':
+            p[0] = operator.mod(left, right)
         elif op == '^':
             if -self._MAX_EXPONENT <= left <= self._MAX_EXPONENT and -self._MAX_EXPONENT <= right <= self._MAX_EXPONENT:
                 p[0] = operator.pow(left, right)
