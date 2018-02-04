@@ -202,9 +202,8 @@ class DiceParser(object):
             if -self._MAX_EXPONENT <= left <= self._MAX_EXPONENT and -self._MAX_EXPONENT <= right <= self._MAX_EXPONENT:
                 p[0] = operator.pow(left, right)
             else:
-                raise OperandsTooLargeException(u'operand {} or exponent {} is larger than the maximum {}'.format(left,
-                                                                                                                  right,
-                                                                                                                  self._MAX_EXPONENT))
+                raise OperandsTooLargeException(u'operand or exponent is larger than the maximum {}'
+                                                .format(self._MAX_EXPONENT))
 
     def p_expr_diceexpr(self, p):
         """expression : dice_expr"""
