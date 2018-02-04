@@ -114,7 +114,10 @@ class DiceParser(object):
               'PLUS', 'MINUS',
               'TIMES', 'DIVIDE',
               'EXPONENT',
-              'KEEPHIGHEST', 'KEEPLOWEST', 'DROPHIGHEST', 'DROPLOWEST', 'EXPLODE', 'SORT',
+              'KEEPHIGHEST', 'KEEPLOWEST',
+              'DROPHIGHEST', 'DROPLOWEST',
+              'EXPLODE',
+              'SORT',
               'DICE',
               'LPAREN', 'RPAREN',
               'POINT')
