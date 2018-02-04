@@ -42,8 +42,40 @@ class NotEnoughDiceException(Exception):
     pass
 
 
-class DiceParser(object):
+class Die(object):
+    def __init__(self, numSides):
+        self.numSides = numSides
+        self.value = random.randint(1, self.numSides)
+        self.exploded = False
+        self.dropped = False
 
+    def __str__(self):
+        value = str(self.value)
+        if self.exploded:
+            value = u'*{}*'.format(value)
+        if self.dropped:
+            value = u'-{}-'.format(value)
+
+        return value
+
+    def __lt__(self, other):
+        return self.value < other.value
+
+
+class RollList(object):
+    def __init__(self, numDice, numSides):
+        self.numDice = numDice
+        self.numSides = numSides
+        self.rolls = [Die(numSides) for _ in range(0, numDice)]
+
+    def sum(self):
+        return sum(r.value for r in self.rolls if not r.dropped)
+
+    def __str__(self):
+        return u'{}d{}: {} ({})'.format(self.numDice, self.numSides, u','.join(str(die) for die in self.rolls), self.sum())
+
+
+class DiceParser(object):
     def __init__(self, maxDice=10000, maxSides=10000):
         self._MAX_DICE = maxDice
         self._MAX_SIDES = maxSides
@@ -62,23 +94,18 @@ class DiceParser(object):
         self.reset()
 
         result = self.yaccer.parse(diceexpr)
-        if isinstance(result, collections.Iterable):
-            result = self._sumDiceRolls(result)
+        result = self._sumDiceRolls(result)
         return result
 
     def getRollStrings(self):
-        rollStrings = []
-        for diceRoll in self.rolls:
-            rollStrings.append(u'{}d{}: {} ({})'.format(diceRoll['numDice'], diceRoll['numSides'],
-                                                        u','.join(u'{}'.format(roll) for roll in diceRoll['rolls']),
-                                                        sum(r for r in diceRoll['rolls'] if isinstance(r, int))))
+        rollStrings = (str(roll) for roll in self.rolls)
         return rollStrings
 
     tokens = ('NUMBER',
               'PLUS', 'MINUS',
               'TIMES', 'DIVIDE',
               'EXPONENT',
-              'KEEPHIGHEST', 'KEEPLOWEST', 'DROPHIGHEST', 'DROPLOWEST',
+              'KEEPHIGHEST', 'KEEPLOWEST', 'DROPHIGHEST', 'DROPLOWEST', 'EXPLODE',
               'DICE',
               'LPAREN', 'RPAREN',
               'POINT')
@@ -94,6 +121,7 @@ class DiceParser(object):
     t_KEEPLOWEST = r'kl'
     t_DROPHIGHEST = r'dh'
     t_DROPLOWEST = r'dl'
+    t_EXPLODE = r'!'
     t_DICE = r'd'
     t_LPAREN = r'\('
     t_RPAREN = r'\)'
@@ -138,7 +166,7 @@ class DiceParser(object):
     precedence = (('left', 'PLUS', 'MINUS'),
                   ('left', 'TIMES', 'DIVIDE'),
                   ('left', 'EXPONENT'),
-                  ('left', 'KEEPHIGHEST', 'KEEPLOWEST', 'DROPHIGHEST', 'DROPLOWEST'),
+                  ('left', 'KEEPHIGHEST', 'KEEPLOWEST', 'DROPHIGHEST', 'DROPLOWEST', 'EXPLODE'),
                   ('left', 'DICE'),
                   ('right', 'UMINUS'),
                   ('right', 'UDICE'))
@@ -167,7 +195,7 @@ class DiceParser(object):
         elif op == '/':
             p[0] = operator.floordiv(left, right)
         elif op == '^':
-            p[0] = operator.pow(left, right)        
+            p[0] = operator.pow(left, right)
 
     def p_expr_diceexpr(self, p):
         """expression : dice_expr"""
@@ -176,6 +204,27 @@ class DiceParser(object):
     def p_dice_expr(self, p):
         """dice_expr : expression DICE expression"""
         p[0] = self._rollDice(p[1], p[3])
+
+    def p_explode_expr(self, p):
+        """dice_expr : dice_expr EXPLODE expression
+                     | dice_expr EXPLODE"""
+        rollList = p[1]
+        threshold = rollList.numSides
+
+        if len(p) > 3:
+            threshold = p[3]
+
+        debrisDice = []
+        for roll in rollList.rolls:
+            if roll.value >= threshold:
+                index = rollList.rolls.index(roll)
+                rollList.rolls[index].exploded = True
+
+                debrisDice.append(Die(roll.numSides))
+
+        rollList.rolls.extend(debrisDice)
+
+        p[0] = rollList
 
     def p_keepdrop_expr(self, p):
         """dice_expr : dice_expr KEEPHIGHEST expression
@@ -186,7 +235,7 @@ class DiceParser(object):
                      | dice_expr KEEPLOWEST
                      | dice_expr DROPHIGHEST
                      | dice_expr DROPLOWEST"""
-        rolls = p[1]
+        rollList = p[1]
         op = p[2]
         if len(p) > 3:
             keepDrop = self._sumDiceRolls(p[3])
@@ -194,8 +243,8 @@ class DiceParser(object):
             # default to 1 if no right arg was given
             keepDrop = 1
 
-        # filter out previously dropped rolls
-        validRolls = [r for r in rolls['rolls'] if isinstance(r, int)]
+        # filter dice that have already been dropped
+        validRolls = [r for r in rollList.rolls if not r.dropped]
 
         # if it's a drop op, invert the number into a keep count
         if op.startswith('d'):
@@ -204,7 +253,7 @@ class DiceParser(object):
         else:
             opType = 'keep'
 
-        if rolls['numDice'] < keepDrop:
+        if len(validRolls) < keepDrop:
             raise NotEnoughDiceException(u'attempted to {} {} dice when only {} were rolled'.format(opType,
                                                                                                     keepDrop,
                                                                                                     len(validRolls)))
@@ -216,13 +265,13 @@ class DiceParser(object):
         else:
             raise NotImplementedError(u"operator '{}' is not implemented (also, this should be impossible?)")
 
-        # determine which rolls were dropped, and change them to strings
+        # determine which rolls were dropped, and mark them as such
         dropped = list((mset(validRolls) - mset(keptRolls)).elements())
         for drop in dropped:
-            index = rolls['rolls'].index(drop)
-            rolls['rolls'][index] = u'-{}-'.format(drop)
+            index = rollList.rolls.index(drop)
+            rollList.rolls[index].dropped = True
 
-        p[0] = rolls
+        p[0] = rollList
 
     def p_expression_uminus(self, p):
         """expression : MINUS expression %prec UMINUS"""
@@ -262,23 +311,15 @@ class DiceParser(object):
         if numSides < 1:
             raise ZeroSidesException(u'attempted to roll a die with zero sides')
 
-        rolls = []
-        for _ in range(0, numDice):
-            rolls.append(random.randint(1, numSides))
+        return RollList(numDice, numSides)
 
-        return {
-            'numDice': numDice,
-            'numSides': numSides,
-            'rolls': rolls
-        }
-
-    def _sumDiceRolls(self, diceRolls):
+    def _sumDiceRolls(self, rollList):
         """convert from dice roll structure to a single integer result"""
-        if isinstance(diceRolls, collections.Iterable):
-            self.rolls.append(diceRolls)
-            return sum(r for r in diceRolls['rolls'] if isinstance(r, int))
+        if isinstance(rollList, RollList):
+            self.rolls.append(rollList)
+            return rollList.sum()
         else:
-            return diceRolls
+            return rollList
 
 
 def main():
