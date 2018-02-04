@@ -364,6 +364,7 @@ def main():
             UnknownCharacterException,
             SyntaxErrorException,
             InvalidOperandsException,
+            RecursionError,
             NotImplementedError) as e:
         print(u'Error: {}'.format(e))
         return

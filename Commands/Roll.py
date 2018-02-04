@@ -39,6 +39,7 @@ class Roll(CommandInterface):
                 DiceUtils.UnknownCharacterException,
                 DiceUtils.SyntaxErrorException,
                 DiceUtils.InvalidOperandsException,
+                RecursionError,
                 NotImplementedError) as e:
             return IRCResponse(ResponseType.Say,
                                u'Error: {}'.format(e),
