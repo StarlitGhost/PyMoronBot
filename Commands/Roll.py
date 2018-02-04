@@ -17,7 +17,6 @@ class Roll(CommandInterface):
            'example usage: rollv 5d6 + (5d(2d10)dl1 - d10) * (d20 / 5) #unnecessarily complicated roll\n' \
            'output: User rolled: [2d10: 4,3 (7) | 5d7: 7,3,-1-,4,7 (21) | 1d10: 1 (1) | 1d20: 12 (12) | 5d6: 3,6,2,4,6 (21)] 61 unnecessarily complicated roll'
 
-    # noinspection PyUnusedLocal
     def onLoad(self):
         self.roller = DiceUtils.DiceParser()
 
