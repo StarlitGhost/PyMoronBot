@@ -99,6 +99,7 @@ class DiceParser(object):
               'KEEPHIGHEST', 'KEEPLOWEST',
               'DROPHIGHEST', 'DROPLOWEST',
               'EXPLODE',
+              'REROLL',
               'SORT',
               'DICE',
               'LPAREN', 'RPAREN',
@@ -116,7 +117,8 @@ class DiceParser(object):
     t_KEEPLOWEST = r'kl'
     t_DROPHIGHEST = r'dh'
     t_DROPLOWEST = r'dl'
-    t_EXPLODE = r'!'
+    t_EXPLODE = r'!([<>]=?)?'
+    t_REROLL = r'ro?([<>]=?)?'
     t_SORT = r's[ad]?'
     t_DICE = r'd'
     t_LPAREN = r'\('
@@ -164,7 +166,7 @@ class DiceParser(object):
                   ('left', 'EXPONENT'),
                   ('left', 'KEEPHIGHEST', 'KEEPLOWEST',
                            'DROPHIGHEST', 'DROPLOWEST',
-                           'EXPLODE',
+                           'EXPLODE', 'REROLL',
                            'SORT'),
                   ('left', 'DICE'),
                   ('right', 'UMINUS'),
@@ -270,13 +272,16 @@ class DiceParser(object):
         """dice_expr : dice_expr EXPLODE expression
                      | dice_expr EXPLODE"""
         rollList = p[1]
+        op = p[2]
+
         threshold = rollList.numSides
-
         if len(p) > 3:
-            threshold = p[3]
+            threshold = self._sumDiceRolls(p[3])
 
-        if threshold <= 1:
-            raise InvalidOperandsException(u'attempted to explode with a threshold of {}'.format(threshold))
+        comp = self._getComparisonOp('explode', op, threshold, rollList.numSides)
+
+        if comp != operator.eq and len(p) == 3:
+            raise InvalidOperandsException(u'no parameter given to explode comparison')
 
         debrisList = []
 
@@ -285,27 +290,94 @@ class DiceParser(object):
 
             debris = Die(die.numSides)
             debrisList.append(debris)
-            if debris.value >= threshold:
+            if comp(debris.value, threshold):
                 explode(debris)
 
         for roll in rollList.rolls:
-            if roll.value >= threshold:
+            if comp(roll.value, threshold):
                 explode(roll)
 
         rollList.rolls.extend(debrisList)
 
         p[0] = rollList
 
+    def p_reroll_expr(self, p):
+        """dice_expr : dice_expr REROLL expression
+                     | dice_expr REROLL"""
+        rollList = p[1]
+        op = p[2]
+
+        threshold = 1
+        if len(p) > 3:
+            threshold = self._sumDiceRolls(p[3])
+
+        comp = self._getComparisonOp('reroll', op, threshold, rollList.numSides)
+
+        if comp != operator.eq and len(p) == 3:
+            raise InvalidOperandsException(u'no parameter given to reroll comparison')
+
+        rerollList = []
+
+        def reroll(die, recurse=True):
+            die.dropped = True
+            rerollDie = Die(die.numSides)
+            rerollList.append(rerollDie)
+            if recurse and comp(rerollDie.value, threshold):
+                reroll(rerollDie)
+
+        recurse = True
+        if len(op) > 1 and op[1] == 'o':
+            recurse = False
+
+        for roll in rollList.rolls:
+            if comp(roll.value, threshold):
+                reroll(roll, recurse=recurse)
+
+        rollList.rolls.extend(rerollList)
+
+        p[0] = rollList
+
+    def _getComparisonOp(self, opName, op, threshold, numSides):
+        comp = operator.eq
+        if op.endswith('<'):
+            if threshold > numSides:
+                raise InvalidOperandsException(u"{} threshold '<{}' is invalid with {} sided dice"
+                                               .format(opName, threshold, numSides))
+            comp = operator.lt
+        elif op.endswith('>'):
+            if threshold < 1:
+                raise InvalidOperandsException(u"{} threshold '>{}' is invalid"
+                                               .format(opName, threshold))
+            comp = operator.gt
+        elif op.endswith('<='):
+            if threshold >= numSides:
+                raise InvalidOperandsException(u"{} threshold '<={}' is invalid with {} sided dice"
+                                               .format(opName, threshold, numSides))
+            comp = operator.le
+        elif op.endswith('>='):
+            if threshold <= 1:
+                raise InvalidOperandsException(u"{} threshold '>={}' is invalid"
+                                               .format(opName, threshold))
+            comp = operator.ge
+
+        if comp == operator.eq:
+            if not 1 <= threshold <= numSides:
+                raise InvalidOperandsException(u"{} threshold '{}' is invalid with {} sided dice"
+                                               .format(opName, threshold, numSides))
+
+        return comp
+
     def p_sort_expr(self, p):
         """dice_expr : dice_expr SORT"""
+        rollList = p[1]
         op = p[2]
 
         reverse = False
         if op == 'sd':
             reverse = True
 
-        p[1].sort(reverse)
-        p[0] = p[1]
+        rollList.sort(reverse)
+        p[0] = rollList
 
     def p_expression_group(self, p):
         """expression : LPAREN expression RPAREN"""
