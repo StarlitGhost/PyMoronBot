@@ -74,8 +74,13 @@ class RollList(object):
     def sum(self):
         return sum(r.value for r in self.rolls if not r.dropped)
 
+    def sort(self, reverse=False):
+        self.rolls = sorted(self.rolls, reverse=reverse)
+
     def __str__(self):
-        return u'{}d{}: {} ({})'.format(self.numDice, self.numSides, u','.join(str(die) for die in self.rolls), self.sum())
+        return u'{}d{}: {} ({})'.format(self.numDice, self.numSides,
+                                        u','.join(str(die) for die in self.rolls),
+                                        self.sum())
 
 
 class DiceParser(object):
@@ -109,7 +114,10 @@ class DiceParser(object):
               'PLUS', 'MINUS',
               'TIMES', 'DIVIDE',
               'EXPONENT',
-              'KEEPHIGHEST', 'KEEPLOWEST', 'DROPHIGHEST', 'DROPLOWEST', 'EXPLODE',
+              'KEEPHIGHEST', 'KEEPLOWEST',
+              'DROPHIGHEST', 'DROPLOWEST',
+              'EXPLODE',
+              'SORT',
               'DICE',
               'LPAREN', 'RPAREN',
               'POINT')
@@ -126,6 +134,7 @@ class DiceParser(object):
     t_DROPHIGHEST = r'dh'
     t_DROPLOWEST = r'dl'
     t_EXPLODE = r'!'
+    t_SORT = r's[ad]?'
     t_DICE = r'd'
     t_LPAREN = r'\('
     t_RPAREN = r'\)'
@@ -170,7 +179,10 @@ class DiceParser(object):
     precedence = (('left', 'PLUS', 'MINUS'),
                   ('left', 'TIMES', 'DIVIDE'),
                   ('left', 'EXPONENT'),
-                  ('left', 'KEEPHIGHEST', 'KEEPLOWEST', 'DROPHIGHEST', 'DROPLOWEST', 'EXPLODE'),
+                  ('left', 'KEEPHIGHEST', 'KEEPLOWEST',
+                           'DROPHIGHEST', 'DROPLOWEST',
+                           'EXPLODE',
+                           'SORT'),
                   ('left', 'DICE'),
                   ('right', 'UMINUS'),
                   ('right', 'UDICE'))
@@ -205,6 +217,10 @@ class DiceParser(object):
                 raise OperandsTooLargeException(u'operand or exponent is larger than the maximum {}'
                                                 .format(self._MAX_EXPONENT))
 
+    def p_expression_uminus(self, p):
+        """expression : MINUS expression %prec UMINUS"""
+        p[0] = operator.neg(self._sumDiceRolls(p[2]))
+
     def p_expr_diceexpr(self, p):
         """expression : dice_expr"""
         p[0] = p[1]
@@ -213,26 +229,9 @@ class DiceParser(object):
         """dice_expr : expression DICE expression"""
         p[0] = self._rollDice(p[1], p[3])
 
-    def p_explode_expr(self, p):
-        """dice_expr : dice_expr EXPLODE expression
-                     | dice_expr EXPLODE"""
-        rollList = p[1]
-        threshold = rollList.numSides
-
-        if len(p) > 3:
-            threshold = p[3]
-
-        debrisDice = []
-        for roll in rollList.rolls:
-            if roll.value >= threshold:
-                index = rollList.rolls.index(roll)
-                rollList.rolls[index].exploded = True
-
-                debrisDice.append(Die(roll.numSides))
-
-        rollList.rolls.extend(debrisDice)
-
-        p[0] = rollList
+    def p_expression_udice(self, p):
+        """dice_expr : DICE expression %prec UDICE"""
+        p[0] = self._rollDice(1, p[2])
 
     def p_keepdrop_expr(self, p):
         """dice_expr : dice_expr KEEPHIGHEST expression
@@ -281,13 +280,37 @@ class DiceParser(object):
 
         p[0] = rollList
 
-    def p_expression_uminus(self, p):
-        """expression : MINUS expression %prec UMINUS"""
-        p[0] = operator.neg(self._sumDiceRolls(p[2]))
+    def p_explode_expr(self, p):
+        """dice_expr : dice_expr EXPLODE expression
+                     | dice_expr EXPLODE"""
+        rollList = p[1]
+        threshold = rollList.numSides
 
-    def p_expression_udice(self, p):
-        """dice_expr : DICE expression %prec UDICE"""
-        p[0] = self._rollDice(1, p[2])
+        if len(p) > 3:
+            threshold = p[3]
+
+        debrisDice = []
+        for roll in rollList.rolls:
+            if roll.value >= threshold:
+                index = rollList.rolls.index(roll)
+                rollList.rolls[index].exploded = True
+
+                debrisDice.append(Die(roll.numSides))
+
+        rollList.rolls.extend(debrisDice)
+
+        p[0] = rollList
+
+    def p_sort_expr(self, p):
+        """dice_expr : dice_expr SORT"""
+        op = p[2]
+
+        reverse = False
+        if op == 'sd':
+            reverse = True
+
+        p[1].sort(reverse)
+        p[0] = p[1]
 
     def p_expression_group(self, p):
         """expression : LPAREN expression RPAREN"""
