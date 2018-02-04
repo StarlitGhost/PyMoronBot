@@ -38,11 +38,8 @@ class Roll(CommandInterface):
         except (ZeroDivisionError,
                 DiceUtils.UnknownCharacterException,
                 DiceUtils.SyntaxErrorException,
-                DiceUtils.OperandsTooLargeException,
-                DiceUtils.NegativeDiceException,
-                DiceUtils.NegativeSidesException,
-                DiceUtils.ZeroSidesException,
-                DiceUtils.NotEnoughDiceException) as e:
+                DiceUtils.InvalidOperandsException,
+                NotImplementedError) as e:
             return IRCResponse(ResponseType.Say,
                                u'Error: {}'.format(e),
                                message.ReplyTo)

@@ -23,25 +23,7 @@ class UnknownCharacterException(Exception):
 class SyntaxErrorException(Exception):
     pass
 
-class TooManyDiceException(Exception):
-    pass
-
-class TooManySidesException(Exception):
-    pass
-
-class NegativeDiceException(Exception):
-    pass
-
-class NegativeSidesException(Exception):
-    pass
-
-class ZeroSidesException(Exception):
-    pass
-
-class NotEnoughDiceException(Exception):
-    pass
-
-class OperandsTooLargeException(Exception):
+class InvalidOperandsException(Exception):
     pass
 
 
@@ -214,8 +196,8 @@ class DiceParser(object):
             if -self._MAX_EXPONENT <= left <= self._MAX_EXPONENT and -self._MAX_EXPONENT <= right <= self._MAX_EXPONENT:
                 p[0] = operator.pow(left, right)
             else:
-                raise OperandsTooLargeException(u'operand or exponent is larger than the maximum {}'
-                                                .format(self._MAX_EXPONENT))
+                raise InvalidOperandsException(u'operand or exponent is larger than the maximum {}'
+                                               .format(self._MAX_EXPONENT))
 
     def p_expression_uminus(self, p):
         """expression : MINUS expression %prec UMINUS"""
@@ -261,9 +243,9 @@ class DiceParser(object):
             opType = 'keep'
 
         if len(validRolls) < keepDrop:
-            raise NotEnoughDiceException(u'attempted to {} {} dice when only {} were rolled'.format(opType,
-                                                                                                    keepDrop,
-                                                                                                    len(validRolls)))
+            raise InvalidOperandsException(u'attempted to {} {} dice when only {} were rolled'.format(opType,
+                                                                                                      keepDrop,
+                                                                                                      len(validRolls)))
 
         if op == 'kh' or op == 'dl':
             keptRolls = heapq.nlargest(keepDrop, validRolls)
@@ -289,15 +271,24 @@ class DiceParser(object):
         if len(p) > 3:
             threshold = p[3]
 
-        debrisDice = []
+        if threshold <= 1:
+            raise InvalidOperandsException(u'attempted to explode with a threshold of {}'.format(threshold))
+
+        debrisList = []
+
+        def explode(die):
+            die.exploded = True
+
+            debris = Die(die.numSides)
+            debrisList.append(debris)
+            if debris.value >= threshold:
+                explode(debris)
+
         for roll in rollList.rolls:
             if roll.value >= threshold:
-                index = rollList.rolls.index(roll)
-                rollList.rolls[index].exploded = True
+                explode(roll)
 
-                debrisDice.append(Die(roll.numSides))
-
-        rollList.rolls.extend(debrisDice)
+        rollList.rolls.extend(debrisList)
 
         p[0] = rollList
 
@@ -332,17 +323,17 @@ class DiceParser(object):
         numSides = self._sumDiceRolls(numSides)
 
         if numDice > self._MAX_DICE:
-            raise OperandsTooLargeException(u'attempted to roll more than {} dice in a single d expression'
-                                            .format(self._MAX_DICE))
+            raise InvalidOperandsException(u'attempted to roll more than {} dice in a single d expression'
+                                           .format(self._MAX_DICE))
         if numSides > self._MAX_SIDES:
-            raise OperandsTooLargeException(u'attempted to roll a die with more than {} sides'
-                                            .format(self._MAX_SIDES))
+            raise InvalidOperandsException(u'attempted to roll a die with more than {} sides'
+                                           .format(self._MAX_SIDES))
         if numDice < 0:
-            raise NegativeDiceException(u'attempted to roll a negative number of dice')
+            raise InvalidOperandsException(u'attempted to roll a negative number of dice')
         if numSides < 0:
-            raise NegativeSidesException(u'attempted to roll a die with a negative number of sides')
+            raise InvalidOperandsException(u'attempted to roll a die with a negative number of sides')
         if numSides < 1:
-            raise ZeroSidesException(u'attempted to roll a die with zero sides')
+            raise InvalidOperandsException(u'attempted to roll a die with zero sides')
 
         return RollList(numDice, numSides)
 
@@ -372,11 +363,7 @@ def main():
     except (ZeroDivisionError,
             UnknownCharacterException,
             SyntaxErrorException,
-            OperandsTooLargeException,
-            NegativeDiceException,
-            NegativeDiceException,
-            ZeroSidesException,
-            NotEnoughDiceException,
+            InvalidOperandsException,
             NotImplementedError) as e:
         print(u'Error: {}'.format(e))
         return
