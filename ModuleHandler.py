@@ -120,7 +120,7 @@ class ModuleHandler(object):
 
         module = import_module(category + '.' + catListCaseMap[name])
 
-        importlib.reload(module)
+        reload(module)
 
         class_ = getattr(module, catListCaseMap[name])
 
