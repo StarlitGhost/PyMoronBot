@@ -41,6 +41,9 @@ class ZeroSidesException(Exception):
 class NotEnoughDiceException(Exception):
     pass
 
+class OperandsTooLargeException(Exception):
+    pass
+
 
 class Die(object):
     def __init__(self, numSides):
@@ -76,9 +79,10 @@ class RollList(object):
 
 
 class DiceParser(object):
-    def __init__(self, maxDice=10000, maxSides=10000):
+    def __init__(self, maxDice=10000, maxSides=10000, maxExponent=10000):
         self._MAX_DICE = maxDice
         self._MAX_SIDES = maxSides
+        self._MAX_EXPONENT = maxExponent
 
         self.lexer = lex.lex(module=self)
         self.yaccer = yacc.yacc(module=self)
@@ -195,7 +199,12 @@ class DiceParser(object):
         elif op == '/':
             p[0] = operator.floordiv(left, right)
         elif op == '^':
-            p[0] = operator.pow(left, right)
+            if -self._MAX_EXPONENT <= left <= self._MAX_EXPONENT and -self._MAX_EXPONENT <= right <= self._MAX_EXPONENT:
+                p[0] = operator.pow(left, right)
+            else:
+                raise OperandsTooLargeException(u'operand {} or exponent {} is larger than the maximum {}'.format(left,
+                                                                                                                  right,
+                                                                                                                  self._MAX_EXPONENT))
 
     def p_expr_diceexpr(self, p):
         """expression : dice_expr"""
@@ -278,7 +287,7 @@ class DiceParser(object):
         p[0] = operator.neg(self._sumDiceRolls(p[2]))
 
     def p_expression_udice(self, p):
-        """expression : DICE expression %prec UDICE"""
+        """dice_expr : DICE expression %prec UDICE"""
         p[0] = self._rollDice(1, p[2])
 
     def p_expression_group(self, p):
@@ -301,9 +310,11 @@ class DiceParser(object):
         numSides = self._sumDiceRolls(numSides)
 
         if numDice > self._MAX_DICE:
-            raise TooManyDiceException(u'attempted to roll more than {} dice in a single d expression'.format(self._MAX_DICE))
+            raise OperandsTooLargeException(u'attempted to roll more than {} dice in a single d expression'
+                                            .format(self._MAX_DICE))
         if numSides > self._MAX_SIDES:
-            raise TooManySidesException(u'attempted to roll a die with more than {} sides'.format(self._MAX_SIDES))
+            raise OperandsTooLargeException(u'attempted to roll a die with more than {} sides'
+                                            .format(self._MAX_SIDES))
         if numDice < 0:
             raise NegativeDiceException(u'attempted to roll a negative number of dice')
         if numSides < 0:
@@ -339,8 +350,7 @@ def main():
     except (ZeroDivisionError,
             UnknownCharacterException,
             SyntaxErrorException,
-            TooManyDiceException,
-            TooManySidesException,
+            OperandsTooLargeException,
             NegativeDiceException,
             NegativeDiceException,
             ZeroSidesException,
