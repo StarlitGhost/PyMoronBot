@@ -32,34 +32,45 @@ startTime = datetime.datetime.utcnow()
 class MoronBot(irc.IRCClient, object):
 
     def __init__(self):
-        config = Config(cmdArgs.config)
+        self.config = Config(cmdArgs.config)
 
         if cmdArgs.nick:
             self.nickname = cmdArgs.nick
         else:
-            self.nickname = config['nickname']
+            self.nickname = self.config.getWithDefault('nickname', 'PyMoronBot')
 
-        self.commandChar = config['commandChar']
+        self.commandChar = self.config.getWithDefault('commandChar', '!')
 
-        self.realname = config['realname']
-        self.username = config['username']
+        self.realname = self.config.getWithDefault('realname', self.nickname)
+        self.username = self.config.getWithDefault('username', self.nickname)
 
         self.channels = {}
         self.userModes = {}
 
-        self.fingerReply = config['finger']
+        self.fingerReply = self.config.getWithDefault('finger', 'GET YOUR FINGER OUT OF THERE')
 
         self.versionName = self.nickname
         self.versionNum = subprocess.check_output(["git", "describe", "--always"]).strip()
         self.versionEnv = platform.platform()
 
-        self.sourceURL = config['source']
+        self.sourceURL = self.config.getWithDefault('source', 'https://github.com/MatthewCox/PyMoronBot/')
+
+        if cmdArgs.server:
+            self.server = cmdArgs.server
+        else:
+            self.server = self.config.getWithDefault('server', None)
 
         # dataStore has to be before moduleHandler
-        dataStorePath = os.path.join('Data', cmdArgs.server)
+        dataStorePath = os.path.join('Data', self.server)
         if not os.path.exists(dataStorePath):
             os.makedirs(dataStorePath)
         self.dataStore = shelve.open(os.path.join(dataStorePath, 'shelve.db'), protocol=2, writeback=True)
+
+        # set the logging path
+        abspath = os.path.abspath(__file__)
+        dname = os.path.dirname(abspath)
+        os.chdir(dname)
+        self.logPath = os.path.join(dname, 'logs')
 
         self.moduleHandler = ModuleHandler.ModuleHandler(self)
         self.moduleHandler.loadAll()
@@ -69,8 +80,12 @@ class MoronBot(irc.IRCClient, object):
         irc.IRCClient.quit(self, message)
 
     def signedOn(self):
-        for channel in cmdArgs.channels:
-            self.join(channel)
+        if cmdArgs.channels:
+            for channel in cmdArgs.channels:
+                self.join(channel)
+        elif 'channels' in self.config:
+            for channel in self.config['channels']:
+                self.join(channel)
 
         global startTime
         startTime = datetime.datetime.utcnow()
@@ -282,14 +297,24 @@ class MoronBot(irc.IRCClient, object):
 
         super(MoronBot, self).lineReceived(line)
 
+    def checkPermissions(self, message):
+        """
+        @type message: IRCMessage
+        @rtype Boolean
+        """
+        for admin in self.config.getWithDefault('admins', []):
+            if fnmatch(message.User.String, admin):
+                return True
+        return False
+
     def handleMessage(self, message):
         """
         @type message: IRCMessage
         """
-        # restart command, can't restart within 1 minute of starting (avoids chanhistory triggering another restart)
+        # restart command, can't restart within 10 seconds of starting (avoids chanhistory triggering another restart)
         if (message.Command == 'restart' and
                 datetime.datetime.utcnow() > startTime + datetime.timedelta(seconds=10) and
-                message.User.Name in GlobalVars.admins):
+                self.checkPermissions(message)):
             global restarting
             restarting = True
             self.dataStore.close()

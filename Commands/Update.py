@@ -8,7 +8,6 @@ Created on Dec 07, 2013
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-import GlobalVars
 
 import subprocess
 import os
@@ -33,7 +32,7 @@ class Update(CommandInterface):
         """
         @type message: IRCMessage
         """
-        if message.User.Name not in GlobalVars.admins:
+        if not self.checkPermissions(message):
             return IRCResponse(ResponseType.Say, 'Only my admins can update me', message.ReplyTo)
         
         subprocess.check_call(['git', 'fetch'])

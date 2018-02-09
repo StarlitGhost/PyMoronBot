@@ -3,7 +3,6 @@ from CommandInterface import CommandInterface
 from ModuleHandler import ModuleHandler
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-import GlobalVars
 
 import sys
 import traceback
@@ -21,7 +20,7 @@ class ModuleLoader(CommandInterface):
         """
         @type message: IRCMessage
         """
-        if message.User.Name not in GlobalVars.admins:
+        if not self.checkPermissions(message):
             return IRCResponse(ResponseType.Say,
                                "Only my admins can use {0}".format(message.Command),
                                message.ReplyTo)

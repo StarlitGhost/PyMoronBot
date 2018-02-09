@@ -9,11 +9,9 @@ import datetime
 import codecs
 import os
 
-from moronbot import cmdArgs
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-import GlobalVars
 
 
 logFuncs = {
@@ -30,14 +28,14 @@ logFuncs = {
 }
 
 
-def log(text, target):
+def log(path, target, text):
     now = datetime.datetime.utcnow()
     time = now.strftime("[%H:%M]")
     data = u'{0} {1}'.format(time, text)
     print(target, data)
 
     fileName = "{0}{1}.txt".format(target, now.strftime("-%Y%m%d"))
-    fileDirs = os.path.join(GlobalVars.logPath, cmdArgs.server)
+    fileDirs = path
     if not os.path.exists(fileDirs):
         os.makedirs(fileDirs)
     filePath = os.path.join(fileDirs, fileName)
@@ -67,7 +65,9 @@ class Log(CommandInterface):
         """
         if message.Type in logFuncs:
             logString = logFuncs[message.Type](message)
-            log(logString, message.ReplyTo)
+            log(os.path.join(self.bot.logPath, self.bot.server),
+                message.ReplyTo,
+                logString)
 
         if message.Type in self.acceptedTypes and message.Command in self.triggers:
             # log linking things

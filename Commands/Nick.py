@@ -8,7 +8,6 @@ Created on Dec 20, 2011
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-import GlobalVars
 
 
 class Nick(CommandInterface):
@@ -19,7 +18,7 @@ class Nick(CommandInterface):
         """
         @type message: IRCMessage
         """
-        if message.User.Name not in GlobalVars.admins:
+        if not self.checkPermissions(message):
             return IRCResponse(ResponseType.Say, 'Only my admins can change my name', message.ReplyTo)
 
         if len(message.ParameterList) > 0:

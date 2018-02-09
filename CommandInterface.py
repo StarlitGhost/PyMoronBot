@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from fnmatch import fnmatch
+
 from moronbot import MoronBot
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
@@ -24,6 +26,16 @@ class CommandInterface(object):
 
     def onUnload(self):
         pass
+
+    def checkPermissions(self, message):
+        """
+        @type message: IRCMessage
+        @rtype Boolean
+        """
+        for admin in self.bot.config.getWithDefault('admins', []):
+            if fnmatch(message.User.String, admin):
+                return True
+        return False
     
     def shouldExecute(self, message):
         """

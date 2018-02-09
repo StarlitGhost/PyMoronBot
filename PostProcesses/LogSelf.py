@@ -5,6 +5,8 @@ Created on May 11, 2014
 @author: Tyranic-Moron
 """
 
+import os
+
 from PostProcessInterface import PostProcessInterface
 from IRCResponse import IRCResponse, ResponseType
 from Commands.Log import log
@@ -25,6 +27,8 @@ class LogSelf(PostProcessInterface):
         """
         if response.Type in logFuncs:
             logString = logFuncs[response.Type](self.bot.nickname, response)
-            log(logString, response.Target)
+            log(os.path.join(self.bot.logPath, self.bot.server),
+                response.Target,
+                logString)
 
         return response

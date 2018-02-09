@@ -8,7 +8,6 @@ Created on Dec 07, 2014
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-import GlobalVars
 
 from twisted.conch.manhole_tap import makeService
 from twisted.internet.error import CannotListenError
@@ -46,5 +45,5 @@ class Manhole(CommandInterface):
         """
         @type message: IRCMessage
         """
-        if message.User.Name in GlobalVars.admins:
+        if self.checkPermissions(message):
             return IRCResponse(ResponseType.Notice, "Manhole port: {}".format(self.port), message.User.Name)

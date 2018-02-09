@@ -8,7 +8,6 @@ Created on Feb 05, 2014
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-import GlobalVars
 
 
 class CommandChar(CommandInterface):
@@ -19,7 +18,7 @@ class CommandChar(CommandInterface):
         """
         @type message: IRCMessage
         """
-        if message.User.Name not in GlobalVars.admins:
+        if not self.checkPermissions(message):
             return IRCResponse(ResponseType.Say, 'Only my admins can change my command character', message.ReplyTo)
 
         if len(message.ParameterList) > 0:

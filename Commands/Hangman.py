@@ -12,7 +12,6 @@ from unicodedata import category as unicodeCategory
 from builtins import str
 from builtins import range
 
-import GlobalVars
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
@@ -238,7 +237,7 @@ class Hangman(CommandInterface):
     def _stop(self, message, suppressMessage=False):
         """stop - stops the current game. Bot-admin only"""
         if not suppressMessage:
-            if message.User.Name not in GlobalVars.admins:
+            if not self.checkPermissions(message):
                 return IRCResponse(ResponseType.Say,
                                    u'[Hangman] only my admins can stop games!',
                                    message.ReplyTo)
@@ -253,7 +252,7 @@ class Hangman(CommandInterface):
     def _setMaxBadGuesses(self, message):
         """max <num> - sets the maximum number of bad guesses allowed in future games. Must be between 1 and 20. \
         Bot-admin only"""
-        if message.User.Name in GlobalVars.admins:
+        if self.checkPermissions(message):
             try:
                 if len(message.ParameterList[1]) < 3:
                     maxBadGuesses = int(message.ParameterList[1])

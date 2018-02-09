@@ -8,7 +8,6 @@ Created on Dec 20, 2011
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-import GlobalVars
 
 
 class Source(CommandInterface):
@@ -24,4 +23,4 @@ class Source(CommandInterface):
         """
         @type message: IRCMessage
         """
-        return IRCResponse(ResponseType.Say, GlobalVars.source, message.ReplyTo)
+        return IRCResponse(ResponseType.Say, self.bot.source, message.ReplyTo)

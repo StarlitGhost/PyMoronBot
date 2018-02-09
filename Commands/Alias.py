@@ -11,9 +11,7 @@ from six import iteritems
 from CommandInterface import CommandInterface
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
-import GlobalVars
 from Utils import WebUtils
-from moronbot import cmdArgs
 
 from bs4 import UnicodeDammit
 
@@ -47,7 +45,7 @@ class Alias(CommandInterface):
         """add <alias> <command/alias> [<params>] - aliases <alias> to the specified command/alias and parameters.\
         You can specify where parameters given to the alias should be inserted with $1, $2, $n.\
         The whole parameter string is $0. $sender and $channel can also be used"""
-        if message.User.Name not in GlobalVars.admins:
+        if not self.checkPermissions(message):
             return IRCResponse(ResponseType.Say,
                                u"Only my admins may create new aliases!",
                                message.ReplyTo)
@@ -83,7 +81,7 @@ class Alias(CommandInterface):
 
     def _del(self, message):
         """del <alias> - deletes the alias named <alias>. You can list multiple aliases to delete (space separated)"""
-        if message.User.Name not in GlobalVars.admins:
+        if not self.checkPermissions(message):
             return IRCResponse(ResponseType.Say,
                                u"Only my admins may delete aliases!",
                                message.ReplyTo)
@@ -130,7 +128,7 @@ class Alias(CommandInterface):
 
     def _help(self, message):
         """help <alias> <alias help> - defines the help text for the given alias"""
-        if message.User.Name not in GlobalVars.admins:
+        if not self.checkPermissions(message):
             return IRCResponse(ResponseType.Say,
                                u"Only my admins may set alias help text!",
                                message.ReplyTo)
@@ -195,7 +193,7 @@ class Alias(CommandInterface):
                                     u"\n".join(sorted(helpCommands)))
 
         url = WebUtils.pasteEE(export,
-                               u"Exported {} aliases for {}".format(self.bot.nickname, cmdArgs.server),
+                               u"Exported {} aliases for {}".format(self.bot.nickname, self.bot.server),
                                60)
         return IRCResponse(ResponseType.Say,
                            u"Exported {} aliases and {} help texts to {}".format(len(addCommands),
@@ -205,7 +203,7 @@ class Alias(CommandInterface):
 
     def _import(self, message):
         """import <url> [<alias(es)>] - imports all aliases from the given address, or only the listed aliases"""
-        if message.User.Name not in GlobalVars.admins:
+        if not self.checkPermissions(message):
             return IRCResponse(ResponseType.Say,
                                u"Only my admins may import aliases!",
                                message.ReplyTo)

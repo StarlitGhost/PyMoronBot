@@ -8,7 +8,6 @@ Created on Dec 01, 2013
 from IRCMessage import IRCMessage
 from IRCResponse import IRCResponse, ResponseType
 from CommandInterface import CommandInterface
-import GlobalVars
 from Data import ignores
 
 
@@ -30,7 +29,7 @@ class Unignore(CommandInterface):
         """
         @type message: IRCMessage
         """
-        if message.User.Name not in GlobalVars.admins:
+        if not self.checkPermissions(message):
             return IRCResponse(ResponseType.Say, 'Only my admins can edit the ignore list', message.ReplyTo)
 
         if len(message.ParameterList) > 0:
