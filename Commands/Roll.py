@@ -13,7 +13,7 @@ from Utils import DiceUtils
 
 class Roll(CommandInterface):
     triggers = ['roll', 'rollv']
-    help = 'roll(v) - dice roller, \'rollv\' outputs every roll. supported operators are #d#(kh#/kl#/dh#/dl#/!/r/ro/s/sa/sd), + - * / % ^ ( ) #comments\n' \
+    help = 'roll(v) - dice roller, \'rollv\' outputs every roll. supported operators are #d#(kh#/kl#/dh#/dl#/!/r/ro/s/sa/sd), + - * / % ^ ( ) #comments | ' \
            'see https://git.io/PyMoBo-Roll for example usage and a detailed explanation of the dice modifiers'
 
     def onLoad(self):
