@@ -29,8 +29,8 @@ class Config(object):
         if 'import' not in configData:
             return configData
 
-        for fname in configData['include']:
-            includeConfig = self._readConfig('{}.yaml'.format(fname))
+        for fname in configData['import']:
+            includeConfig = self._readConfig('Configs/{}.yaml'.format(fname))
             for key, val in iteritems(includeConfig):
                 # not present in base config, just assign it
                 if key not in configData:

@@ -7,6 +7,7 @@ import platform
 import datetime
 import argparse
 import subprocess
+from fnmatch import fnmatch
 
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
@@ -33,6 +34,7 @@ class MoronBot(irc.IRCClient, object):
 
     def __init__(self):
         self.config = Config(cmdArgs.config)
+        self.config.loadConfig()
 
         if cmdArgs.nick:
             self.nickname = cmdArgs.nick
@@ -50,7 +52,10 @@ class MoronBot(irc.IRCClient, object):
         self.fingerReply = self.config.getWithDefault('finger', 'GET YOUR FINGER OUT OF THERE')
 
         self.versionName = self.nickname
-        self.versionNum = subprocess.check_output(["git", "describe", "--always"]).strip()
+        try:
+            self.versionNum = subprocess.check_output(["git", "describe", "--always"]).strip()
+        except FileNotFoundError:
+            self.versionNum = "1.0"
         self.versionEnv = platform.platform()
 
         self.sourceURL = self.config.getWithDefault('source', 'https://github.com/MatthewCox/PyMoronBot/')
