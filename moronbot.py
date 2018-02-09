@@ -6,21 +6,23 @@ import sys
 import platform
 import datetime
 import argparse
+import subprocess
 
 from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 from IRCMessage import IRCMessage, IRCChannel, IRCUser
 from IRCResponse import IRCResponse
 import ModuleHandler
-import GlobalVars
+from Config import Config
 import ServerInfo
 
 
 parser = argparse.ArgumentParser(description='An IRC bot written in Python.')
-parser.add_argument('-s', '--server', help='the IRC server to connect to (required)', type=str, required=True)
+parser.add_argument('-c', '--config', help='the config file to read from', type=str)
+parser.add_argument('-s', '--server', help='the IRC server to connect to (required)', type=str)
 parser.add_argument('-p', '--port', help='the port on the server to connect to (default 6667)', type=int, default=6667)
-parser.add_argument('-c', '--channels', help='channels to join after connecting (default none)', type=str, nargs='+', default=[])
-parser.add_argument('-n', '--nick', help='the nick the bot should use (default PyMoronBot)', type=str, default='PyMoronBot')
+parser.add_argument('--channels', help='channels to join after connecting (default none)', type=str, nargs='+', default=[])
+parser.add_argument('-n', '--nick', help='the nick the bot should use', type=str)
 cmdArgs = parser.parse_args()
 
 restarting = False
@@ -30,22 +32,28 @@ startTime = datetime.datetime.utcnow()
 class MoronBot(irc.IRCClient, object):
 
     def __init__(self):
-        self.nickname = cmdArgs.nick
-        self.commandChar = '.'
+        config = Config(cmdArgs.config)
 
-        self.realname = self.nickname
-        self.username = self.nickname
+        if cmdArgs.nick:
+            self.nickname = cmdArgs.nick
+        else:
+            self.nickname = config['nickname']
+
+        self.commandChar = config['commandChar']
+
+        self.realname = config['realname']
+        self.username = config['username']
 
         self.channels = {}
         self.userModes = {}
 
-        self.fingerReply = GlobalVars.finger
+        self.fingerReply = config['finger']
 
         self.versionName = self.nickname
-        self.versionNum = GlobalVars.version
+        self.versionNum = subprocess.check_output(["git", "describe", "--always"]).strip()
         self.versionEnv = platform.platform()
 
-        self.sourceURL = GlobalVars.source
+        self.sourceURL = config['source']
 
         # dataStore has to be before moduleHandler
         dataStorePath = os.path.join('Data', cmdArgs.server)

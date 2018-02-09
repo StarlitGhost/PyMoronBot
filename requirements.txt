@@ -19,3 +19,4 @@ parsedatetime==2.4
 cryptography==2.1.4
 future==0.16.0
 six==1.11.0
+PyYAML==3.12
