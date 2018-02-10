@@ -32,6 +32,9 @@ class CommandInterface(object):
         @type message: IRCMessage
         @rtype Boolean
         """
+        for owner in self.bot.config.getWithDefault('owners', []):
+            if fnmatch(message.User.String, owner):
+                return True
         for admin in self.bot.config.getWithDefault('admins', []):
             if fnmatch(message.User.String, admin):
                 return True

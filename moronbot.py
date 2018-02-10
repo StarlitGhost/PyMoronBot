@@ -307,6 +307,9 @@ class MoronBot(irc.IRCClient, object):
         @type message: IRCMessage
         @rtype Boolean
         """
+        for owner in self.config.getWithDefault('owners', []):
+            if fnmatch(message.User.String, owner):
+                return True
         for admin in self.config.getWithDefault('admins', []):
             if fnmatch(message.User.String, admin):
                 return True
