@@ -1,12 +1,18 @@
+# the bot's name
 nickname: "PyMoronBot"
 username: "PyMoronBot"
 realname: "PyMoronBot"
 
+# prefix for commands
 commandChar: "."
 
+# where to find the bot's source
 source: "https://github.com/MatthewCox/PyMoronBot/"
+
+# CTCP FINGER response
 finger: "GET YOUR FINGER OUT OF THERE"
 
+# slightly more privileged than admins; can add/remove admins
 owners:
 - "*!~TM@tyranicmoron.uk"
 - "*!TM@tyranicmoron.uk"

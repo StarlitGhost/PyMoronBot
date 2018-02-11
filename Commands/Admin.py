@@ -81,6 +81,7 @@ class Admin(CommandInterface):
             deleted.append(admin)
 
         self.bot.config['admins'] = admins
+        self.bot.config.writeConfig()
 
         return IRCResponse(ResponseType.Say,
                            u"Removed '{}' as admin(s), {} skipped"
