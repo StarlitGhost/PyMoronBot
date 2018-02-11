@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import yaml
+import copy
+from ruamel.yaml import YAML
 from six import iteritems
 
 
@@ -11,6 +12,8 @@ class Config(object):
     def __init__(self, configFile):
         self.configFile = configFile
         self._configData = {}
+        self.yaml = YAML()
+        self._inBaseConfig = []
 
     def loadConfig(self):
         configData = self._readConfig(self.configFile)
@@ -20,9 +23,12 @@ class Config(object):
     def _readConfig(self, fileName):
         try:
             with open(fileName, mode='r') as config:
-                configData = yaml.safe_load(config)
+                configData = self.yaml.load(config)
                 if not configData:
                     configData = {}
+                # if this is the base server config, store what keys we loaded
+                if fileName == self.configFile:
+                    self._inBaseConfig = list(configData.keys())
         except Exception as e:
             raise ConfigError(fileName, e)
 
@@ -68,12 +74,20 @@ class Config(object):
         return configData
 
     def writeConfig(self):
+        # filter the configData to only those keys
+        # that were present in the base server config,
+        # or have been modified at runtime
+        configData = copy.deepcopy(self._configData)
+        to_delete = set(configData.keys()).difference(self._inBaseConfig)
+        for key in to_delete:
+            del configData[key]
+
+        # write the filtered configData
         try:
             with open(self.configFile, mode='w') as config:
-                yaml.safe_dump(self._configData, config)
+                self.yaml.dump(configData, config)
         except Exception as e:
             raise ConfigError(self.configFile, e)
-
 
     def getWithDefault(self, key, default=None):
         if key in self._configData:
@@ -95,6 +109,10 @@ class Config(object):
         return self._configData[key]
 
     def __setitem__(self, key, value):
+        # mark this key to be saved in the server config
+        if key not in self._inBaseConfig:
+            self._inBaseConfig.append(key)
+
         self._configData[key] = value
 
     def __contains__(self, key):
