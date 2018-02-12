@@ -23,6 +23,8 @@ class CommandChar(CommandInterface):
 
         if len(message.ParameterList) > 0:
             self.bot.commandChar = message.ParameterList[0]
+            self.bot.config['commandChar'] = self.bot.commandChar
+            self.bot.config.writeConfig()
             return IRCResponse(ResponseType.Say,
                                'Command prefix char changed to \'{0}\'!'.format(self.bot.commandChar),
                                message.ReplyTo)

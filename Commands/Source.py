@@ -23,4 +23,4 @@ class Source(CommandInterface):
         """
         @type message: IRCMessage
         """
-        return IRCResponse(ResponseType.Say, self.bot.source, message.ReplyTo)
+        return IRCResponse(ResponseType.Say, self.bot.sourceURL, message.ReplyTo)
