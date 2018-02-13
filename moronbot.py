@@ -18,28 +18,16 @@ from Config import Config
 import ServerInfo
 
 
-parser = argparse.ArgumentParser(description='An IRC bot written in Python.')
-parser.add_argument('-c', '--config', help='the config file to read from', type=str)
-parser.add_argument('-s', '--server', help='the IRC server to connect to (required)', type=str)
-parser.add_argument('-p', '--port', help='the port on the server to connect to (default 6667)', type=int, default=6667)
-parser.add_argument('--channels', help='channels to join after connecting (default none)', type=str, nargs='+', default=[])
-parser.add_argument('-n', '--nick', help='the nick the bot should use', type=str)
-cmdArgs = parser.parse_args()
-
-restarting = False
-startTime = datetime.datetime.utcnow()
-
-
 class MoronBot(irc.IRCClient, object):
+    def __init__(self, factory, config):
+        """
+        @type factory: MoronBotFactory
+        @type config: Config
+        """
+        self.factory = factory
+        self.config = config
 
-    def __init__(self):
-        self.config = Config(cmdArgs.config)
-        self.config.loadConfig()
-
-        if cmdArgs.nick:
-            self.nickname = cmdArgs.nick
-        else:
-            self.nickname = self.config.getWithDefault('nickname', 'PyMoronBot')
+        self.nickname = self.config.getWithDefault('nickname', 'PyMoronBot')
 
         self.commandChar = self.config.getWithDefault('commandChar', '!')
 
@@ -60,10 +48,7 @@ class MoronBot(irc.IRCClient, object):
 
         self.sourceURL = self.config.getWithDefault('source', 'https://github.com/MatthewCox/PyMoronBot/')
 
-        if cmdArgs.server:
-            self.server = cmdArgs.server
-        else:
-            self.server = self.config.getWithDefault('server', None)
+        self.server = self.config['server']
 
         # dataStore has to be before moduleHandler
         dataStorePath = os.path.join('Data', self.server)
@@ -77,23 +62,25 @@ class MoronBot(irc.IRCClient, object):
         os.chdir(dname)
         self.logPath = os.path.join(dname, 'logs')
 
+        self.quitting = False
+        self.startTime = datetime.datetime.utcnow()
+        reactor.addSystemEventTrigger('before', 'shutdown', self.cleanup)
+
         self.moduleHandler = ModuleHandler.ModuleHandler(self)
         self.moduleHandler.loadAll()
 
-    def quit(self, message=''):
+    def cleanup(self):
         self.dataStore.close()
-        irc.IRCClient.quit(self, message)
+        self.config.writeConfig()
+        print('-#- Saved config and data')
+
+    def quit(self, message=''):
+        self.cleanup()
+        super(MoronBot, self).quit(message)
 
     def signedOn(self):
-        if cmdArgs.channels:
-            for channel in cmdArgs.channels:
-                self.join(channel)
-        elif 'channels' in self.config:
-            for channel in self.config['channels']:
-                self.join(channel)
-
-        global startTime
-        startTime = datetime.datetime.utcnow()
+        for channel in self.config['channels']:
+            self.join(channel)
 
     def privmsg(self, user, channel, msg):
         chan = self.getChannel(channel)
@@ -302,33 +289,10 @@ class MoronBot(irc.IRCClient, object):
 
         super(MoronBot, self).lineReceived(line)
 
-    def checkPermissions(self, message):
-        """
-        @type message: IRCMessage
-        @rtype Boolean
-        """
-        for owner in self.config.getWithDefault('owners', []):
-            if fnmatch(message.User.String, owner):
-                return True
-        for admin in self.config.getWithDefault('admins', []):
-            if fnmatch(message.User.String, admin):
-                return True
-        return False
-
     def handleMessage(self, message):
         """
         @type message: IRCMessage
         """
-        # restart command, can't restart within 10 seconds of starting (avoids chanhistory triggering another restart)
-        if (message.Command == 'restart' and
-                datetime.datetime.utcnow() > startTime + datetime.timedelta(seconds=10) and
-                self.checkPermissions(message)):
-            global restarting
-            restarting = True
-            self.dataStore.close()
-            self.quit(message='restarting')
-            return
-
         self.moduleHandler.handleMessage(message)
 
     def sendResponse(self, response):
@@ -339,9 +303,18 @@ class MoronBot(irc.IRCClient, object):
 
 
 class MoronBotFactory(protocol.ReconnectingClientFactory):
+    def __init__(self, config):
+        """
+        @type config: Config
+        """
+        self.bot = MoronBot(self, config)
+        self.protocol = self.bot
 
-    def __init__(self):
-        self.protocol = MoronBot
+        self.server = config['server']
+        self.port = config.getWithDefault('port', 6667)
+
+        reactor.connectTCP(self.server, self.port, self)
+        reactor.run()
 
     def startedConnecting(self, connector):
         print('-#- Started to connect.')
@@ -350,16 +323,12 @@ class MoronBotFactory(protocol.ReconnectingClientFactory):
         print('-#- Connected.')
         print('-#- Resetting reconnection delay')
         self.resetDelay()
-        return MoronBot()
+        return self.bot
 
     def clientConnectionLost(self, connector, reason):
-        print('-!- Lost connection.  Reason:', reason)
-        if restarting:
-            python = sys.executable
-            os.execl(python, python, *sys.argv)
-            # nothing beyond here will be executed if the bot is restarting, as the process itself is replaced
-
-        protocol.ReconnectingClientFactory.clientConnectionLost(self, connector, reason)
+        if not self.bot.quitting:
+            print('-!- Lost connection.  Reason:', reason)
+            protocol.ReconnectingClientFactory.clientConnectionLost(self, connector, reason)
 
     def clientConnectionFailed(self, connector, reason):
         print('-!- Connection failed. Reason:', reason)
@@ -367,6 +336,14 @@ class MoronBotFactory(protocol.ReconnectingClientFactory):
 
 
 if __name__ == '__main__':
-    moronbot = MoronBotFactory()
-    reactor.connectTCP(cmdArgs.server, cmdArgs.port, moronbot)
-    reactor.run()
+    parser = argparse.ArgumentParser(description='An IRC bot written in Python.')
+    parser.add_argument('-c', '--config', help='the config file to read from', type=str)
+    cmdArgs = parser.parse_args()
+
+    config = Config(cmdArgs.config)
+    try:
+        config.loadConfig()
+    except ConfigError as e:
+        print(e)
+    else:
+        factory = MoronBotFactory(config)

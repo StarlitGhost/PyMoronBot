@@ -39,7 +39,7 @@ class Time(CommandInterface):
         """
         @type message: IRCMessage
         """
-        return self._commands[message.Command].__doc__
+        return self._commands[message.ParameterList[0].lower()].__doc__
 
     def execute(self, message):
         """
