@@ -15,7 +15,7 @@ Features
   * with specialised follows to get extra relevant information from Imgur, KickStarter, Steam, Twitch, Twitter, and YouTube links
 * Recognizes [sed-like](pymoronbot/modules/Sed.py) patterns in chat and replaces the most recent match in the last 20 messages
 * Also recognizes [`*correction`](pymoronbot/modules/AsterFix.py) style corrections and replaces the most likely candidate word in that user's previous message
-* [AutoPasteEE](pymoronbot/postprocesses/AutoPasteEE.py) detects when single responses are longer than ~2 IRC messages, and submit them to paste.ee instead, replacing the response with a link
+* [AutoPasteEE](pymoronbot/postprocesses/AutoPasteEE.py) detects when single responses are longer than ~2 IRC messages, and submits them to paste.ee instead, replacing the response with a link
 * Consistent help for any module via the [Help](pymoronbot/modules/Help.py) module
 * And many more (take a look in [modules](pymoronbot/modules) and [postprocesses](pymoronbot/postprocesses))
 
