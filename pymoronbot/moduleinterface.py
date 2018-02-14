@@ -46,8 +46,8 @@ class ModuleInterface(object):
         """
         for ignore in self.bot.config.getWithDefault('ignored', []):
             if fnmatch(message.User.String, ignore):
-                return False
-        return True
+                return True
+        return False
     
     def shouldExecute(self, message):
         """
