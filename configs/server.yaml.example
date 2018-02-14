@@ -1,0 +1,14 @@
+# import default config values
+import: [_defaults]
+
+# the server to connect to
+server: irc.server.org
+# the port to connect on
+port: 6667
+# the channels to join
+channels:
+- '#channel'
+
+# who can issue admin commands
+admins:
+ - '*!~You@host.mask'

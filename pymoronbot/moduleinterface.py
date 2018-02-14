@@ -48,7 +48,7 @@ class ModuleInterface(object):
             if fnmatch(message.User.String, ignore):
                 return True
         return False
-    
+
     def shouldExecute(self, message):
         """
         @type message: IRCMessage
