@@ -11,7 +11,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--config', help='the config file to read from', type=str, required=True)
     cmdArgs = parser.parse_args()
 
-    os.chdir(os.path.dirname(__file__))
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
     config = Config(cmdArgs.config)
     try:

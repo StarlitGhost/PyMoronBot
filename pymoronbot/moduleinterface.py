@@ -44,9 +44,10 @@ class ModuleInterface(object):
         @type message: IRCMessage
         @rtype Boolean
         """
-        for ignore in self.bot.config.getWithDefault('ignoredUsers', []):
+        for ignore in self.bot.config.getWithDefault('ignored', []):
             if fnmatch(message.User.String, ignore):
                 return False
+        return True
     
     def shouldExecute(self, message):
         """
