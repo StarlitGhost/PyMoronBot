@@ -20,3 +20,4 @@ cryptography==2.1.4
 future==0.16.0
 six==1.11.0
 ruamel.yaml==0.15.35
+croniter==0.3.20
