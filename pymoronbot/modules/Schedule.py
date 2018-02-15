@@ -11,6 +11,7 @@ from croniter import croniter
 from twisted.internet import task
 from twisted.internet import reactor
 from pytimeparse.timeparse import timeparse
+from six import iteritems
 
 from pymoronbot.moduleinterface import ModuleInterface
 from pymoronbot.message import IRCMessage
@@ -18,18 +19,43 @@ from pymoronbot.response import IRCResponse, ResponseType
 from pymoronbot.utils import string
 
 
-class Event(object):
-    def __init__(self, cronStr, command, params):
+class Task(object):
+    def __init__(self, cronStr, command, params, user, channel, bot):
         self.cronStr = cronStr
-        self.command = command
+        self.commandStr = command
+        self.command = bot.moduleHandler.mappedTriggers[command].execute
         self.params = params
+        self.user = user
+        self.channel = channel
+        self.bot = bot
+        self.task = None
 
-        cron = croniter(cronStr, datetime.datetime.utcnow())
-        nextTime = cron.get_next(datetime.datetime)
-        delta = nextTime - datetime.datetime.utcnow()
+        self.cron = croniter(self.cronStr, datetime.datetime.utcnow())
+        self.nextTime = self.cron.get_next(datetime.datetime)
+
+    def start(self):
+        delta = self.nextTime - datetime.datetime.utcnow()
         seconds = delta.total_seconds()
+        self.task = task.deferLater(reactor, seconds, self.activate)
+        self.task.addCallback(self.cycle)
 
+    def activate(self):
+        commandStr = u'{}{} {}'.format(self.bot.commandChar, self.commandStr,
+                                       u' '.join(self.params))
+        message = IRCMessage('PRIVMSG', self.user, self.channel,
+                             commandStr,
+                             self.bot)
 
+        return self.command(message)
+
+    def cycle(self, response):
+        self.bot.sendResponse(response)
+        self.nextTime = self.cron.get_next(datetime.datetime)
+        self.start()
+
+    def stop(self):
+        if self.task:
+            self.task.cancel()
 
 
 class Schedule(ModuleInterface):
@@ -44,7 +70,8 @@ class Schedule(ModuleInterface):
 
     def onUnload(self):
         # cancel everything
-        pass
+        for _, t in iteritems(self.schedule):
+            t.stop()
 
     def execute(self, message):
         """
@@ -54,14 +81,13 @@ class Schedule(ModuleInterface):
             return IRCResponse(ResponseType.Say, self.help, message.ReplyTo)
 
         cronStr = u' '.join(message.ParameterList[0:5])
-        title = message.ParameterList[6]
-        command = message.ParameterList[7].lower()
-        params = message.ParameterList[8:]
-        self.schedule[title] = Event(cronStr, command, params)
-
-        #commandString = u'{}{} {}'.format(self.bot.commandChar, command, u' '.join(params))
-
-        #newMessage = IRCMessage(message.Type, message.User.String, message.Channel, commandString, self.bot)
+        title = message.ParameterList[5]
+        command = message.ParameterList[6].lower()
+        params = message.ParameterList[7:]
+        self.schedule[title] = Task(cronStr, command, params,
+                                    message.User.String, message.Channel,
+                                    self.bot)
+        self.schedule[title].start()
 
         #moduleHandler = self.bot.moduleHandler
         #if command in moduleHandler.mappedTriggers:
