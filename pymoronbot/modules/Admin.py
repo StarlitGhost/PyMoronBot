@@ -16,11 +16,6 @@ from pymoronbot.moduleinterface import ModuleInterface
 class Admin(ModuleInterface):
     triggers = ['admin']
 
-    def onLoad(self):
-        self._helpText = u"{1}admin ({0}) - manages users with bot admin permissions. " \
-                         u"Use '{1}help admin <subcommand> for subcommand help.".format(
-            u'/'.join(self.subCommands.keys()), self.bot.commandChar)
-
     def _add(self, message):
         """add <nick/full hostmask> - adds the specified user to the bot admins list.
         You can list multiple users to add them all at once.
@@ -114,7 +109,12 @@ class Admin(ModuleInterface):
             else:
                 return self._unrecognizedSubcommand(subCommand)
         else:
-            return self._helpText
+            return self._helpText()
+
+    def _helpText(self):
+        return u"{1}admin ({0}) - manages users with bot admin permissions. " \
+               u"Use '{1}help admin <subcommand> for subcommand help.".format(u'/'.join(self.subCommands.keys()),
+                                                                              self.bot.commandChar)
 
     def _unrecognizedSubcommand(self, subCommand):
         return u"unrecognized subcommand '{}', " \
@@ -130,5 +130,5 @@ class Admin(ModuleInterface):
             return self.subCommands[subCommand](self, message)
         else:
             return IRCResponse(ResponseType.Say,
-                               self._helpText,
+                               self._helpText(),
                                message.ReplyTo)
