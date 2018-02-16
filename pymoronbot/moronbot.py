@@ -34,7 +34,7 @@ class MoronBot(irc.IRCClient, object):
 
         self.versionName = self.nickname
         try:
-            self.versionNum = subprocess.check_output(["git", "describe", "--always"]).strip()
+            self.versionNum = u'{}'.format(subprocess.check_output(["git", "describe", "--always"]).strip())
         except FileNotFoundError:
             self.versionNum = "1.0"
         self.versionEnv = platform.platform()
