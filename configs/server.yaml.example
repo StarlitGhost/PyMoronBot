@@ -11,4 +11,8 @@ channels:
 
 # who can issue admin commands
 admins:
- - '*!~You@host.mask'
+- '*!~You@host.mask'
+
+# modules to load (or not)
+#modules:
+#- -Responses
