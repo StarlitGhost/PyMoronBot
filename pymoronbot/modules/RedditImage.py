@@ -58,8 +58,14 @@ class RedditImage(ModuleInterface):
 
         url = "https://api.imgur.com/3/gallery/r/{}/time/all/{}"
         url = url.format(subreddit, random.randint(0, topRange))
-        response = web.fetchURL(url, self.headers)
-        jsonResponse = json.loads(response.body)
+        try:
+            response = web.fetchURL(url, self.headers)
+            jsonResponse = json.loads(response.body)
+        except JSONDecodeError:
+            return IRCResponse(ResponseType.Say,
+                               "[The imgur API doesn't appear to be responding correctly]",
+                               message.ReplyTo)
+
         images = jsonResponse['data']
 
         if not images:
