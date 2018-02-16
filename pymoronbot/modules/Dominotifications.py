@@ -22,15 +22,15 @@ class Dominotifications(ModuleInterface):
 
         self.regex = r'www\.dominos\.(co\.uk|ie)/pizzatracker/?\?id=(?P<orderID>[a-zA-Z0-9=]+)'
 
-        commands = self.bot.moduleHandler.commands
-        if 'URLFollow' in commands:
-            commands['URLFollow'].handledExternally['Dominotifications'] = [self.regex]
+        modules = self.bot.moduleHandler.modules
+        if 'URLFollow' in modules:
+            modules['URLFollow'].handledExternally['Dominotifications'] = [self.regex]
 
     def onUnload(self):
         self._stopAllPizzaTrackers()
-        commands = self.bot.moduleHandler.commands
-        if 'URLFollow' in commands and 'Dominotifications' in commands['URLFollow'].handledExternally:
-            del commands['URLFollow'].handledExternally['Dominotifications']
+        modules = self.bot.moduleHandler.modules
+        if 'URLFollow' in modules and 'Dominotifications' in modules['URLFollow'].handledExternally:
+            del modules['URLFollow'].handledExternally['Dominotifications']
 
     def shouldExecute(self, message):
         """
