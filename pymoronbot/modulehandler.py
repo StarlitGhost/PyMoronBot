@@ -126,12 +126,12 @@ class ModuleHandler(object):
 
         class_ = getattr(module, catListCaseMap[name])
 
+        constructedModule = class_(self.bot)
+
         if alreadyExisted:
             print('-- {0} reloaded'.format(module.__name__))
         else:
             print('-- {0} loaded'.format(module.__name__))
-
-        constructedModule = class_(self.bot)
 
         categoryDict.update({catListCaseMap[name]: constructedModule})
         categoryCaseMap.update({name: catListCaseMap[name]})
@@ -180,8 +180,8 @@ class ModuleHandler(object):
         for module in modulesToLoad:
             try:
                 self.loadModule(module)
-            except Exception as x:
-                print(x.args)
+            except Exception as e:
+                print(u'[{}]'.format(module), e)
 
         postProcessesToLoad = []
         if 'all' in self.postProcessesToLoad:
@@ -198,8 +198,8 @@ class ModuleHandler(object):
         for post in postProcessesToLoad:
             try:
                 self.loadPostProcess(post)
-            except Exception as x:
-                print(x.args)
+            except Exception as e:
+                print(u'[{}]'.format(post), e)
 
     @classmethod
     def getDirList(cls, category):
