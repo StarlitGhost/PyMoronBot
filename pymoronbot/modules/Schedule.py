@@ -7,31 +7,48 @@ Created on Feb 15, 2018
 
 import datetime
 import re
+import os
 from collections import OrderedDict
 
 from croniter import croniter
 from twisted.internet import task
 from twisted.internet import reactor
 from pytimeparse.timeparse import timeparse
+from ruamel.yaml import YAML, yaml_object
 from six import iteritems
 
 from pymoronbot.moduleinterface import ModuleInterface
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
+from pymoronbot.channel import IRCChannel
 from pymoronbot.utils import string
 
+yaml = YAML()
 
+
+@yaml_object(yaml)
 class Task(object):
+    yaml_tag = u'!Task'
+
     def __init__(self, cronStr, command, params, user, channel, bot):
         self.cronStr = cronStr
         self.commandStr = command
-        self.command = bot.moduleHandler.mappedTriggers[command].execute
         self.params = params
         self.user = user
         self.channel = channel
-        self.bot = bot
         self.task = None
 
+        # these will be set by self.reInit()
+        self.bot = None
+        self.command = None
+        self.cron = None
+        self.nextTime = None
+
+        self.reInit(bot)
+
+    def reInit(self, bot):
+        self.bot = bot
+        self.command = bot.moduleHandler.mappedTriggers[self.commandStr].execute
         self.cron = croniter(self.cronStr, datetime.datetime.utcnow())
         self.nextTime = self.cron.get_next(datetime.datetime)
 
@@ -44,7 +61,7 @@ class Task(object):
     def activate(self):
         commandStr = u'{}{} {}'.format(self.bot.commandChar, self.commandStr,
                                        u' '.join(self.params))
-        message = IRCMessage('PRIVMSG', self.user, self.channel,
+        message = IRCMessage('PRIVMSG', self.user, IRCChannel(self.channel),
                              commandStr,
                              self.bot)
 
@@ -59,11 +76,16 @@ class Task(object):
         if self.task:
             self.task.cancel()
 
+    @classmethod
+    def to_yaml(cls, representer, node):
+        # trim out complex objects and things we can recreate
+        skip = ['bot', 'task', 'command', 'cron', 'nextTime']
+        cleanedTask = dict((k, v) for (k, v) in node.__dict__.items() if k not in skip)
+        return representer.represent_mapping(cls.yaml_tag, cleanedTask)
+
 
 class Schedule(ModuleInterface):
     triggers = ['schedule']
-
-    schedule = {}
 
     def _cron(self, message):
         """cron <min> <hour> <day> <month> <day of week> <task name> <command> (<params>) -
@@ -90,9 +112,11 @@ class Schedule(ModuleInterface):
         cronStr = u' '.join(message.ParameterList[1:6])
 
         self.schedule[taskName] = Task(cronStr, command, params,
-                                       message.User.String, message.Channel,
+                                       message.User.String, message.Channel.Name,
                                        self.bot)
         self.schedule[taskName].start()
+
+        self._saveSchedule()
 
         return IRCResponse(ResponseType.Say,
                            u'Task {!r} created! Next execution: {}'.format(taskName, self.schedule[taskName].nextTime),
@@ -137,6 +161,8 @@ class Schedule(ModuleInterface):
         self.schedule[taskName].stop()
         del self.schedule[taskName]
 
+        self._saveSchedule()
+
         return IRCResponse(ResponseType.Say,
                            u'Task {!r} stopped'.format(taskName),
                            message.ReplyTo)
@@ -163,15 +189,6 @@ class Schedule(ModuleInterface):
         else:
             return self._helpText()
 
-    def onLoad(self):
-        # load schedule from data file, start them all going
-        pass
-
-    def onUnload(self):
-        # cancel everything
-        for _, t in iteritems(self.schedule):
-            t.stop()
-
     def _unrecognizedSubCommand(self, subCommand):
         return u"unrecognized sub-command '{}', " \
                u"available sub-commands for schedule are: {}".format(subCommand, u', '.join(self.subCommands.keys()))
@@ -180,6 +197,31 @@ class Schedule(ModuleInterface):
         return u"{1}schedule ({0}) - manages scheduled tasks. " \
                u"Use '{1}help schedule <sub-command> for sub-command help.".format(u'/'.join(self.subCommands.keys()),
                                                                                    self.bot.commandChar)
+
+    def _saveSchedule(self):
+        with open(os.path.join(self.bot.dataPath, 'schedule.yaml'), 'w') as file:
+            yaml.dump(self.schedule, file)
+
+    def onLoad(self):
+        # load schedule from data file
+        try:
+            with open(os.path.join(self.bot.dataPath, 'schedule.yaml'), 'r') as file:
+                self.schedule = yaml.load(file)
+
+            if not self.schedule:
+                self.schedule = {}
+
+            # start them all going
+            for _, t in iteritems(self.schedule):
+                t.reInit(self.bot)
+                t.start()
+        except FileNotFoundError:
+            self.schedule = {}
+
+    def onUnload(self):
+        # cancel everything
+        for _, t in iteritems(self.schedule):
+            t.stop()
 
     def execute(self, message):
         """

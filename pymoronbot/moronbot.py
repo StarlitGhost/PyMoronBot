@@ -43,16 +43,16 @@ class MoronBot(irc.IRCClient, object):
 
         self.server = self.config['server']
 
-        rootDir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
+        self.rootDir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
 
         # dataStore has to be before moduleHandler
-        dataStorePath = os.path.join(rootDir, 'data', self.server)
-        if not os.path.exists(dataStorePath):
-            os.makedirs(dataStorePath)
-        self.dataStore = shelve.open(os.path.join(dataStorePath, 'shelve.db'), protocol=2, writeback=True)
+        self.dataPath = os.path.join(self.rootDir, 'data', self.server)
+        if not os.path.exists(self.dataPath):
+            os.makedirs(self.dataPath)
+        self.dataStore = shelve.open(os.path.join(self.dataPath, 'shelve.db'), protocol=2, writeback=True)
 
         # set the logging path
-        self.logPath = os.path.join(rootDir, 'logs')
+        self.logPath = os.path.join(self.rootDir, 'logs')
 
         self.quitting = False
         self.startTime = datetime.datetime.utcnow()
