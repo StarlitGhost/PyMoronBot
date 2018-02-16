@@ -29,7 +29,7 @@ class Manhole(ModuleInterface):
                     "namespace": {"bot": self.bot},
                     "passwd": os.path.join("data", "manhole.passwd"),
                     "telnetPort": None,
-                    "sshPort": str(self.port),
+                    "sshPort": "tcp:{}:interface=127.0.0.1".format(self.port),
                     "sshKeyDir": os.path.join("data"),
                     "sshKeyName": "manhole.sshkey",
                     "sshKeySize": 4096
