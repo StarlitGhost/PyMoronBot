@@ -34,9 +34,9 @@ class MoronBot(irc.IRCClient, object):
 
         self.versionName = self.nickname
         try:
-            self.versionNum = u'{}'.format(subprocess.check_output(["git", "describe", "--always"]).strip())
+            self.versionNum = subprocess.check_output(["git", "describe", "--always"]).decode('utf-8').strip()
         except FileNotFoundError:
-            self.versionNum = "1.0"
+            self.versionNum = u'1.0'
         self.versionEnv = platform.platform()
 
         self.sourceURL = self.config.getWithDefault('source', 'https://github.com/MatthewCox/PyMoronBot/')
