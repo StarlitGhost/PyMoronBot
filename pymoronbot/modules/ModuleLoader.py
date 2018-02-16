@@ -12,8 +12,8 @@ from six import iteritems
 class ModuleLoader(ModuleInterface):
     triggers = ['load', 'reload', 'unload',
                 'loadp', 'reloadp', 'unloadp']
-    help = "load/reload <command>, unload <command> - handles loading/unloading/reloading of commands. " \
-           "Use 'all' with load/reload to reload all active commands"
+    help = "load/reload <module>, unload <module> - handles loading/unloading/reloading of modules. " \
+           "Use 'all' with load/reload to reload all active modules"
 
     def execute(self, message):
         """
@@ -26,7 +26,7 @@ class ModuleLoader(ModuleInterface):
 
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
-                               "You didn't specify a command name! Usage: {0}".format(self.help),
+                               "You didn't specify a module name! Usage: {0}".format(self.help),
                                message.ReplyTo)
 
         command = {'load': self.load, 'reload': self.load, 'unload': self.unload,
@@ -54,43 +54,43 @@ class ModuleLoader(ModuleInterface):
         return responses
 
     @staticmethod
-    def load(commandNames, moduleHandler):
+    def load(moduleNames, moduleHandler):
         """
-        @type commandNames: list[str]
+        @type moduleNames: list[str]
         @type moduleHandler: ModuleHandler
         @return: (list[str], list[str], list[str])
         """
-        commandNameCaseMap = {c.lower(): c for c in commandNames}
+        moduleNameCaseMap = {m.lower(): m for m in moduleNames}
 
         successes = []
         failures = []
         exceptions = []
 
-        if len(commandNames) == 1 and 'all' in commandNameCaseMap:
-            for name, _ in iteritems(moduleHandler.commands):
+        if len(moduleNames) == 1 and 'all' in moduleNameCaseMap:
+            for name, _ in iteritems(moduleHandler.modules):
                 if name == 'ModuleLoader':
                     continue
 
-                moduleHandler.loadCommand(name)
+                moduleHandler.loadModule(name)
 
             return ['all commands'], [], []
 
-        for commandName in commandNameCaseMap.keys():
+        for moduleName in moduleNameCaseMap.keys():
 
-            if commandName == 'moduleloader':
+            if moduleName == 'moduleloader':
                 failures.append("ModuleLoader (I can't reload myself)")
             
             else:
                 try:
-                    success = moduleHandler.loadCommand(commandName)
+                    success = moduleHandler.loadModule(moduleName)
                     if success:
-                        successes.append(moduleHandler.commandCaseMapping[commandName])
+                        successes.append(moduleHandler.moduleCaseMapping[moduleName])
                     else:
-                        failures.append(commandNameCaseMap[commandName])
+                        failures.append(moduleNameCaseMap[moduleName])
 
                 except Exception as x:
                     xName = x.__class__.__name__
-                    exceptions.append(u"{} ({})".format(commandNameCaseMap[commandName], xName))
+                    exceptions.append(u"{} ({})".format(moduleNameCaseMap[moduleName], xName))
                     print(xName, x.args)
                     traceback.print_tb(sys.exc_info()[2])
 
@@ -132,29 +132,29 @@ class ModuleLoader(ModuleInterface):
         return successes, failures, exceptions
 
     @staticmethod
-    def unload(commandNames, moduleHandler):
+    def unload(moduleNames, moduleHandler):
         """
-        @type commandNames: list[str]
+        @type moduleNames: list[str]
         @type moduleHandler: ModuleHandler
         @return: (list[str], list[str], list[str])
         """
 
-        commandNameCaseMap = {c.lower(): c for c in commandNames}
+        moduleNameCaseMap = {m.lower(): m for m in moduleNames}
 
         successes = []
         failures = []
         exceptions = []
         
-        for commandName in commandNameCaseMap.keys():
+        for moduleName in moduleNameCaseMap.keys():
             try:
-                success = moduleHandler.unloadCommand(commandName)
+                success = moduleHandler.unloadModule(moduleName)
                 if success:
-                    successes.append(commandNameCaseMap[commandName])
+                    successes.append(moduleNameCaseMap[moduleName])
                 else:
-                    failures.append(commandNameCaseMap[commandName])
+                    failures.append(moduleNameCaseMap[moduleName])
             except Exception as x:
                 xName = x.__class__.__name__
-                exceptions.append(u"{} ({})".format(commandNameCaseMap[commandName], xName))
+                exceptions.append(u"{} ({})".format(moduleNameCaseMap[moduleName], xName))
                 print(xName, x.args)
                 traceback.print_tb(sys.exc_info()[2])
 

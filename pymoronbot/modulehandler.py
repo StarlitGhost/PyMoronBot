@@ -19,22 +19,25 @@ class ModuleHandler(object):
         """
         self.bot = bot
 
-        self.commands = {}
-        self.commandCaseMapping = {}
+        self.modules = {}
+        self.moduleCaseMapping = {}
 
         self.mappedTriggers = {}
 
         self.postProcesses = {}
         self.postProcessCaseMapping = {}
 
-    def loadCommand(self, name):
-        return self._load(name, 'modules', self.commands, self.commandCaseMapping)
+        self.modulesToLoad = bot.config.getWithDefault('modules', ['all'])
+        self.postProcessesToLoad = bot.config.getWithDefault('postprocesses', ['all'])
+
+    def loadModule(self, name):
+        return self._load(name, 'modules', self.modules, self.moduleCaseMapping)
 
     def loadPostProcess(self, name):
         return self._load(name, 'postprocesses', self.postProcesses, self.postProcessCaseMapping)
 
-    def unloadCommand(self, name):
-        return self._unload(name, 'modules', self.commands, self.commandCaseMapping)
+    def unloadModule(self, name):
+        return self._unload(name, 'modules', self.modules, self.moduleCaseMapping)
 
     def unloadPostProcess(self, name):
         return self._unload(name, 'postprocesses', self.postProcesses, self.postProcessCaseMapping)
@@ -63,7 +66,7 @@ class ModuleHandler(object):
                 elif response.Type == ResponseType.Raw:
                     self.bot.sendLine(response.Response)
             except Exception:
-                # ^ dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
+                # ^ dirty, but I don't want any modules to kill the bot, especially if I'm working on it live
                 print("Python Execution Error sending responses '{0}': {1}".format(responses, str(sys.exc_info())))
                 traceback.print_tb(sys.exc_info()[2])
 
@@ -87,19 +90,19 @@ class ModuleHandler(object):
         print(str(failure))
 
     def handleMessage(self, message):
-        for command in sorted(self.commands.values(), key=operator.attrgetter('priority')):
+        for module in sorted(self.modules.values(), key=operator.attrgetter('priority')):
             try:
-                if command.shouldExecute(message):
-                    if not command.runInThread:
-                        response = command.execute(message)
+                if module.shouldExecute(message):
+                    if not module.runInThread:
+                        response = module.execute(message)
                         self.sendResponse(response)
                     else:
-                        d = threads.deferToThread(command.execute, message)
+                        d = threads.deferToThread(module.execute, message)
                         d.addCallback(self.sendResponse)
                         d.addErrback(self._deferredError)
             except Exception:
-                # ^ dirty, but I don't want any commands to kill the bot, especially if I'm working on it live
-                print("Python Execution Error in '{0}': {1}".format(command.__class__.__name__, str(sys.exc_info())))
+                # ^ dirty, but I don't want any modules to kill the bot, especially if I'm working on it live
+                print("Python Execution Error in '{0}': {1}".format(module.__class__.__name__, str(sys.exc_info())))
                 traceback.print_tb(sys.exc_info()[2])
 
     def _load(self, name, category, categoryDict, categoryCaseMap):
@@ -133,7 +136,7 @@ class ModuleHandler(object):
         categoryDict.update({catListCaseMap[name]: constructedModule})
         categoryCaseMap.update({name: catListCaseMap[name]})
 
-        # map triggers to commands so we can call them via dict lookup
+        # map triggers to modules so we can call them via dict lookup
         if hasattr(constructedModule, 'triggers'):
             for trigger in constructedModule.triggers:
                 self.mappedTriggers[trigger] = constructedModule
@@ -162,13 +165,37 @@ class ModuleHandler(object):
         return True
 
     def loadAll(self):
-        for command in self.getDirList('modules'):
+        modulesToLoad = []
+        if 'all' in self.modulesToLoad:
+            modulesToLoad.extend(ModuleHandler.getDirList('modules'))
+
+        for module in self.modulesToLoad:
+            if module == 'all':
+                continue
+            elif module.startswith('-'):
+                modulesToLoad.remove(module[1:])
+            else:
+                modulesToLoad.append(module)
+
+        for module in modulesToLoad:
             try:
-                self.loadCommand(command)
+                self.loadModule(module)
             except Exception as x:
                 print(x.args)
 
-        for post in self.getDirList('postprocesses'):
+        postProcessesToLoad = []
+        if 'all' in self.postProcessesToLoad:
+            postProcessesToLoad.extend(ModuleHandler.getDirList('postprocesses'))
+
+        for post in self.postProcessesToLoad:
+            if post == 'all':
+                continue
+            elif post.startswith('-'):
+                postProcessesToLoad.remove(post[1:])
+            else:
+                postProcessesToLoad.append(post)
+
+        for post in postProcessesToLoad:
             try:
                 self.loadPostProcess(post)
             except Exception as x:
