@@ -242,7 +242,7 @@ class URLFollow(ModuleInterface):
     def FollowTwitter(self, tweeter, tweetID, message):
         webPage = web.fetchURL('https://twitter.com/{0}/status/{1}'.format(tweeter, tweetID))
 
-        soup = BeautifulSoup(webPage.body)
+        soup = BeautifulSoup(webPage.body, 'lxml')
 
         tweet = soup.find(class_='permalink-tweet')
         
@@ -396,7 +396,7 @@ class URLFollow(ModuleInterface):
     def FollowKickstarter(self, ksID, message):
         webPage = web.fetchURL('https://www.kickstarter.com/projects/{}/description'.format(ksID))
 
-        soup = BeautifulSoup(webPage.body)
+        soup = BeautifulSoup(webPage.body, 'lxml')
 
         data = []
 
@@ -564,7 +564,7 @@ class URLFollow(ModuleInterface):
         return
 
     def GetTitle(self, webpage):
-        soup = BeautifulSoup(webpage)
+        soup = BeautifulSoup(webpage, 'lxml')
         title = soup.title
         if title:
             title = title.text

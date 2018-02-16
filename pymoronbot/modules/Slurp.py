@@ -44,7 +44,7 @@ class Slurp(ModuleInterface):
             page = web.fetchURL(url)
             if page is None:
                 return IRCResponse(ResponseType.Say, u"Problem fetching {}".format(url), message.ReplyTo)
-            soup = BeautifulSoup(page.body)
+            soup = BeautifulSoup(page.body, 'lxml')
 
         tag = soup.select_one(selector)
 

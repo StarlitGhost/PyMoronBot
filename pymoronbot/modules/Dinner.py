@@ -34,7 +34,7 @@ class Dinner(ModuleInterface):
         if option in options:
             webPage = web.fetchURL(wtfsimfd.format(options[option]))
 
-            soup = BeautifulSoup(webPage.body)
+            soup = BeautifulSoup(webPage.body, 'lxml')
 
             phrase = soup.find('dl').text
             item = soup.find('a')
