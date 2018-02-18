@@ -7,8 +7,8 @@ from six import string_types
 
 
 class Help(ModuleInterface):
-    triggers = ['help', 'command', 'commands']
-    help = 'help/command(s) (<module>) - returns a list of loaded command modules, ' \
+    triggers = ['help', 'module', 'modules']
+    help = 'help/module(s) (<module>) - returns a list of loaded modules, ' \
            'or the help text of a particular module if one is specified'
 
     def execute(self, message):
@@ -25,8 +25,8 @@ class Help(ModuleInterface):
                 else:
                     return IRCResponse(ResponseType.Say, funcHelp(message), message.ReplyTo)
 
-            elif message.ParameterList[0].lower() in moduleHandler.commandCaseMapping:
-                func = moduleHandler.commands[moduleHandler.commandCaseMapping[message.ParameterList[0].lower()]]
+            elif message.ParameterList[0].lower() in moduleHandler.moduleCaseMapping:
+                func = moduleHandler.modules[moduleHandler.moduleCaseMapping[message.ParameterList[0].lower()]]
                 if isinstance(func.help, string_types):
                     return IRCResponse(ResponseType.Say, func.help, message.ReplyTo)
                 else:
@@ -39,7 +39,7 @@ class Help(ModuleInterface):
                                                                                  message.Command),
                                    message.ReplyTo)
         else:
-            funcs = ', '.join(sorted(moduleHandler.commands, key=lambda s: s.lower()))
+            funcs = ', '.join(sorted(moduleHandler.modules, key=lambda s: s.lower()))
             return [IRCResponse(ResponseType.Say,
                                 "Command modules loaded are (use 'help <module>' to get help for that module):",
                                 message.ReplyTo),
