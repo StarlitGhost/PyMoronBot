@@ -3,7 +3,7 @@ beautifulsoup4==4.6.0
 lxml==4.1.1
 psutil==5.4.3
 python-dateutil==2.6.1
-ply==3.10
+ply==3.11
 enum34==1.1.6
 twitter==1.18.0
 requests==2.18.4
