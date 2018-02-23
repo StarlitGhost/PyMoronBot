@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.moduleinterface import ModuleInterface, admin
 from pymoronbot.modulehandler import ModuleHandler
 from pymoronbot.response import IRCResponse, ResponseType
 
@@ -15,15 +15,11 @@ class ModuleLoader(ModuleInterface):
     help = "load/reload <module>, unload <module> - handles loading/unloading/reloading of modules. " \
            "Use 'all' with load/reload to reload all active modules"
 
+    @admin
     def execute(self, message):
         """
         @type message: IRCMessage
         """
-        if not self.checkPermissions(message):
-            return IRCResponse(ResponseType.Say,
-                               "Only my admins can use {0}".format(message.Command),
-                               message.ReplyTo)
-
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say,
                                "You didn't specify a module name! Usage: {0}".format(self.help),

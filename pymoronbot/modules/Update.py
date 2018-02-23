@@ -7,7 +7,7 @@ Created on Dec 07, 2013
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.moduleinterface import ModuleInterface, admin
 
 import subprocess
 import os
@@ -28,13 +28,11 @@ class Update(ModuleInterface):
         if command in helpDict:
             return helpDict[command]
 
+    @admin
     def execute(self, message):
         """
         @type message: IRCMessage
         """
-        if not self.checkPermissions(message):
-            return IRCResponse(ResponseType.Say, 'Only my admins can update me', message.ReplyTo)
-        
         subprocess.check_call(['git', 'fetch'])
 
         output = subprocess.check_output(['git', 'log', '--no-merges',

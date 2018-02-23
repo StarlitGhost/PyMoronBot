@@ -10,20 +10,17 @@ from collections import OrderedDict
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.moduleinterface import ModuleInterface, admin
 
 
 class Admin(ModuleInterface):
     triggers = ['admin']
 
+    @admin("Only my admins may add new admins!")
     def _add(self, message):
         """add <nick/full hostmask> - adds the specified user to the bot admins list.
         You can list multiple users to add them all at once.
         Nick alone will be converted to a glob hostmask, eg: *!user@host"""
-        if not self.checkPermissions(message):
-            return IRCResponse(ResponseType.Say,
-                               u'Only my admins may add new admins!',
-                               message.ReplyTo)
 
         if len(message.ParameterList) < 2:
             return IRCResponse(ResponseType.Say,
@@ -45,14 +42,10 @@ class Admin(ModuleInterface):
                            u"Added specified users as bot admins!",
                            message.ReplyTo)
 
+    @admin("Only my admins may remove admins!")
     def _del(self, message):
         """del <full hostmask> - removes the specified user from the bot admins list.
         You can list multiple users to remove them all at once."""
-        if not self.checkPermissions(message):
-            return IRCResponse(ResponseType.Say,
-                               u'Only my admins may remove admins!',
-                               message.ReplyTo)
-
         if len(message.ParameterList) < 2:
             return IRCResponse(ResponseType.Say,
                                u"You didn't give me a user to remove!",

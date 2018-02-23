@@ -16,7 +16,7 @@ from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.moduleinterface import ModuleInterface, admin
 
 
 class AlreadyGuessedException(Exception):
@@ -246,29 +246,25 @@ class Hangman(ModuleInterface):
                                    u'[Hangman] game stopped!',
                                    message.ReplyTo)
 
+    @admin("[Hangman] only my admins can set the maximum bad guesses!")
     def _setMaxBadGuesses(self, message):
         """max <num> - sets the maximum number of bad guesses allowed in future games. Must be between 1 and 20. \
         Bot-admin only"""
-        if self.checkPermissions(message):
-            try:
-                if len(message.ParameterList[1]) < 3:
-                    maxBadGuesses = int(message.ParameterList[1])
-                else:
-                    raise ValueError
-                if 0 < maxBadGuesses < 21:
-                    response = u'[Hangman] maximum bad guesses changed from {} to {}'.format(self.maxBadGuesses,
+        try:
+            if len(message.ParameterList[1]) < 3:
+                maxBadGuesses = int(message.ParameterList[1])
+            else:
+                raise ValueError
+            if 0 < maxBadGuesses < 21:
+                response = u'[Hangman] maximum bad guesses changed from {} to {}'.format(self.maxBadGuesses,
                                                                                              maxBadGuesses)
-                    self.maxBadGuesses = maxBadGuesses
-                    return IRCResponse(ResponseType.Say, response, message.ReplyTo)
-                else:
-                    raise ValueError
-            except ValueError:
-                return IRCResponse(ResponseType.Say,
-                                   u'[Hangman] maximum bad guesses should be an integer between 1 and 20',
-                                   message.ReplyTo)
-        else:
+                self.maxBadGuesses = maxBadGuesses
+                return IRCResponse(ResponseType.Say, response, message.ReplyTo)
+            else:
+                raise ValueError
+        except ValueError:
             return IRCResponse(ResponseType.Say,
-                               u'[Hangman] only my admins can set the maximum bad guesses!',
+                               u'[Hangman] maximum bad guesses should be an integer between 1 and 20',
                                message.ReplyTo)
 
     def _guess(self, message):

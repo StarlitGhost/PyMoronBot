@@ -5,7 +5,7 @@ Created on Feb 05, 2014
 @author: Tyranic-Moron
 """
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.moduleinterface import ModuleInterface, admin
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
@@ -14,13 +14,11 @@ class CommandChar(ModuleInterface):
     triggers = ['commandchar']
     help = "commandchar <char> - changes the prefix character for bot commands (admin-only)"
 
+    @admin("Only my admins can change my command character")
     def execute(self, message):
         """
         @type message: IRCMessage
         """
-        if not self.checkPermissions(message):
-            return IRCResponse(ResponseType.Say, 'Only my admins can change my command character', message.ReplyTo)
-
         if len(message.ParameterList) > 0:
             self.bot.commandChar = message.ParameterList[0]
             self.bot.config['commandChar'] = self.bot.commandChar

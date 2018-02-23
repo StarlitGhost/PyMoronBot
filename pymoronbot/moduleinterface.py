@@ -1,8 +1,38 @@
 # -*- coding: utf-8 -*-
 from fnmatch import fnmatch
+from functools import wraps, partial
 
 from pymoronbot.moronbot import MoronBot
 from pymoronbot.response import IRCResponse, ResponseType
+
+
+def admin(func=None, msg=''):
+    if callable(func):
+        @wraps(func)
+        def wrapped_func(inst, message):
+            print(func)
+            print(msg)
+
+            if not inst.checkPermissions(message):
+                if msg:
+                    return IRCResponse(ResponseType.Say, msg, message.ReplyTo)
+                else:
+                    return IRCResponse(ResponseType.Say,
+                                       "Only my admins may use {!r}".format(message.Command),
+                                       message.ReplyTo)
+            return func(inst, message)
+        return wrapped_func
+    else:
+        return partial(admin, msg=func) # this seems wrong, should be msg=msg
+
+
+def ignore(command):
+    @wraps(command)
+    def wrapped(inst, message):
+        if not inst.checkIgnoreList(message):
+            return
+        return command(inst, message)
+    return wrapped
 
 
 class ModuleInterface(object):

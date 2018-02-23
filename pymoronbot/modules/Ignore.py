@@ -10,21 +10,17 @@ from collections import OrderedDict
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.moduleinterface import ModuleInterface, admin
 
 
 class Ignore(ModuleInterface):
     triggers = ['ignore']
 
+    @admin("Only my admins may add new ignores!")
     def _add(self, message):
         """add <nick/full hostmask> - adds the specified user to the ignored list.
         You can list multiple users to add them all at once.
         Nick alone will be converted to a glob hostmask, eg: *!user@host"""
-        if not self.checkPermissions(message):
-            return IRCResponse(ResponseType.Say,
-                               u'Only my admins may add new ignores!',
-                               message.ReplyTo)
-
         if len(message.ParameterList) < 2:
             return IRCResponse(ResponseType.Say,
                                u"You didn't give me a user to ignore!",
@@ -45,14 +41,10 @@ class Ignore(ModuleInterface):
                            u"Now ignoring specified users!",
                            message.ReplyTo)
 
+    @admin("Only my admins may remove ignores!")
     def _del(self, message):
         """del <full hostmask> - removes the specified user from the ignored list.
         You can list multiple users to remove them all at once."""
-        if not self.checkPermissions(message):
-            return IRCResponse(ResponseType.Say,
-                               u'Only my admins may remove ignores!',
-                               message.ReplyTo)
-
         if len(message.ParameterList) < 2:
             return IRCResponse(ResponseType.Say,
                                u"You didn't give me a user to unignore!",

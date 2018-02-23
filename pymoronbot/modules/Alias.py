@@ -10,7 +10,7 @@ from six import iteritems
 
 from bs4 import UnicodeDammit
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.moduleinterface import ModuleInterface, admin
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 from pymoronbot.utils import web
@@ -41,15 +41,11 @@ class Alias(ModuleInterface):
         for alias in self.aliases:
             del self.bot.moduleHandler.mappedTriggers[alias]
 
+    @admin("Only my admins may create new aliases!")
     def _add(self, message):
         """add <alias> <command/alias> [<params>] - aliases <alias> to the specified command/alias and parameters.\
         You can specify where parameters given to the alias should be inserted with $1, $2, $n.\
         The whole parameter string is $0. $sender and $channel can also be used"""
-        if not self.checkPermissions(message):
-            return IRCResponse(ResponseType.Say,
-                               u"Only my admins may create new aliases!",
-                               message.ReplyTo)
-
         if len(message.ParameterList) <= 2:
             return IRCResponse(ResponseType.Say, u"Alias what?", message.ReplyTo)
 
@@ -79,13 +75,9 @@ class Alias(ModuleInterface):
                                                                         u" ".join(newAlias)),
                            message.ReplyTo)
 
+    @admin("Only my admins may delete aliases!")
     def _del(self, message):
         """del <alias> - deletes the alias named <alias>. You can list multiple aliases to delete (space separated)"""
-        if not self.checkPermissions(message):
-            return IRCResponse(ResponseType.Say,
-                               u"Only my admins may delete aliases!",
-                               message.ReplyTo)
-
         if len(message.ParameterList) == 1:
             return IRCResponse(ResponseType.Say, u"Delete which alias?", message.ReplyTo)
 
@@ -126,13 +118,9 @@ class Alias(ModuleInterface):
                                u"'{}' is not a recognized alias".format(alias),
                                message.ReplyTo)
 
+    @admin("Only my admins may set alias help text!")
     def _help(self, message):
         """help <alias> <alias help> - defines the help text for the given alias"""
-        if not self.checkPermissions(message):
-            return IRCResponse(ResponseType.Say,
-                               u"Only my admins may set alias help text!",
-                               message.ReplyTo)
-
         if len(message.ParameterList) == 1:
             return IRCResponse(ResponseType.Say,
                                u"Set the help text for what alias to what?",
@@ -201,12 +189,9 @@ class Alias(ModuleInterface):
                                                                                  url),
                            message.ReplyTo)
 
+    @admin("Only my admins may import aliases!")
     def _import(self, message):
         """import <url> [<alias(es)>] - imports all aliases from the given address, or only the listed aliases"""
-        if not self.checkPermissions(message):
-            return IRCResponse(ResponseType.Say,
-                               u"Only my admins may import aliases!",
-                               message.ReplyTo)
         if len(message.ParameterList) < 2:
             return IRCResponse(ResponseType.Say,
                                u"You didn't give a url to import from!",

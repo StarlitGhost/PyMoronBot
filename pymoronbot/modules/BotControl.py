@@ -12,7 +12,7 @@ from collections import OrderedDict
 
 from twisted.internet import reactor
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.moduleinterface import ModuleInterface, admin
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
@@ -20,6 +20,7 @@ from pymoronbot.response import IRCResponse, ResponseType
 class BotControl(ModuleInterface):
     triggers = ['restart', 'shutdown']
 
+    @admin
     def _restart(self, message):
         """restart - restarts the bot"""
         # can't restart within 10 seconds of starting (avoids chanhistory triggering another restart)
@@ -34,6 +35,7 @@ class BotControl(ModuleInterface):
                 self.bot.quit(message=self.bot.config.getWithDefault('restartMessage', 'restarting'))
             reactor.callLater(2.0, reactor.stop)
 
+    @admin
     def _shutdown(self, message):
         """shutdown - shuts down the bot"""
         # can't shutdown within 10 seconds of starting (avoids chanhistory triggering another shutdown)
@@ -65,11 +67,5 @@ class BotControl(ModuleInterface):
         """
         @type message: IRCMessage
         """
-        if not self.checkPermissions(message):
-            return IRCResponse(ResponseType.Say,
-                               'Only my admins can use {}'
-                               .format(message.Command),
-                               message.ReplyTo)
-
         return self._commands[message.Command.lower()](self, message)
 

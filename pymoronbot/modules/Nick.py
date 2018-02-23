@@ -7,20 +7,18 @@ Created on Dec 20, 2011
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.moduleinterface import ModuleInterface, admin
 
 
 class Nick(ModuleInterface):
     triggers = ['nick', 'name']
     help = "nick <nick> - changes the bot's nick to the one specified"
 
+    @admin
     def execute(self, message):
         """
         @type message: IRCMessage
         """
-        if not self.checkPermissions(message):
-            return IRCResponse(ResponseType.Say, 'Only my admins can change my name', message.ReplyTo)
-
         if len(message.ParameterList) > 0:
             return IRCResponse(ResponseType.Raw, 'NICK %s' % (message.ParameterList[0]), '')
         else:
