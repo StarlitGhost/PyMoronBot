@@ -1,99 +1,54 @@
 # -*- coding: utf-8 -*-
-from fnmatch import fnmatch
-from functools import wraps, partial
 
-from pymoronbot.moronbot import MoronBot
-from pymoronbot.response import IRCResponse, ResponseType
+from zope.interface import Interface
 
 
-def admin(func=None, msg=''):
-    if callable(func):
-        @wraps(func)
-        def wrapped_func(inst, message):
-            print(func)
-            print(msg)
-
-            if not inst.checkPermissions(message):
-                if msg:
-                    return IRCResponse(ResponseType.Say, msg, message.ReplyTo)
-                else:
-                    return IRCResponse(ResponseType.Say,
-                                       "Only my admins may use {!r}".format(message.Command),
-                                       message.ReplyTo)
-            return func(inst, message)
-        return wrapped_func
-    else:
-        return partial(admin, msg=func) # this seems wrong, should be msg=msg
-
-
-def ignore(command):
-    @wraps(command)
-    def wrapped(inst, message):
-        if not inst.checkIgnoreList(message):
-            return
-        return command(inst, message)
-    return wrapped
-
-
-class ModuleInterface(object):
-    triggers = []
-    acceptedTypes = ['PRIVMSG']
-    help = '<no help defined (yet)>'
-    runInThread = False
-
-    priority = 0
-    
-    def __init__(self, bot):
+class IModule(Interface):
+    def actions():
         """
-        @type bot: MoronBot
+        Returns the list of actions this module hooks into.
+        Actions are defined as a tuple with the following values:
+        (action_name, priority, function)
+        action_name (string): The name of the action.
+        priority (int):       Actions are handled in order of priority.
+                              Leave it at 1 unless you want to override another handler.
+        function (reference): A reference to the function in the module that handles this action.
         """
-        self.bot = bot
-        self.onLoad()
+
+    def onLoad():
+        """
+        Called when the module is loaded. Typically loading data, API keys, etc.
+        """
+
+    def hookBot(bot):
+        """
+        Called when the bot is loaded to pass a reference to the bot for later use.
+        """
+
+    def help(arg):
+        """
+        Returns help text describing what the module does.
+        Takes an arg as input so you can override with more complex help lookup.
+        """
+
+    def onUnload():
+        """
+        Called when the module is unloaded. Cleanup, if any.
+        """
+
+
+class BotModule(object):
+    def actions(self):
+        return [('help', 1, self.help)]
 
     def onLoad(self):
         pass
 
+    def hookBot(self, bot):
+        self.bot = bot
+
+    def help(self, arg):
+        return "This module has no help text"
+
     def onUnload(self):
         pass
-
-    def checkPermissions(self, message):
-        """
-        @type message: IRCMessage
-        @rtype Boolean
-        """
-        for owner in self.bot.config.getWithDefault('owners', []):
-            if fnmatch(message.User.String, owner):
-                return True
-        for admin in self.bot.config.getWithDefault('admins', []):
-            if fnmatch(message.User.String, admin):
-                return True
-        return False
-
-    def checkIgnoreList(self, message):
-        """
-        @type message: IRCMessage
-        @rtype Boolean
-        """
-        for ignore in self.bot.config.getWithDefault('ignored', []):
-            if fnmatch(message.User.String, ignore):
-                return True
-        return False
-
-    def shouldExecute(self, message):
-        """
-        @type message: IRCMessage
-        @rtype Boolean
-        """
-        if message.Type not in self.acceptedTypes:
-            return False
-        if message.Command.lower() not in self.triggers:
-            return False
-        
-        return True
-
-    def execute(self, message):
-        """
-        @type message: IRCMessage
-        @rtype IRCResponse | list[IRCResponse]
-        """
-        return IRCResponse(ResponseType.Say, '<command not yet implemented>', message.ReplyTo)

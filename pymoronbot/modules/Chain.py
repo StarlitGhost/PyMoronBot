@@ -9,14 +9,14 @@ import re
 from builtins import str
 from six import iteritems
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 from pymoronbot.utils import string
 
 
-class Chain(ModuleInterface):
+class Chain(BotCommand):
     triggers = ['chain']
     help = 'chain <command 1> | <command 2> [| <command n>] - chains multiple commands together, feeding the output of each command into the next\n' \
            'syntax: command1 params | command2 $output | command3 $var\n' \

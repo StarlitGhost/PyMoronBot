@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.moduleinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 
-class Apples(ModuleInterface):
+class Apples(BotCommand):
     help = 'playapples, stopapples - For when you need a 4th for Apples to Apples (will always pick 0)'
 
     playApples = 0

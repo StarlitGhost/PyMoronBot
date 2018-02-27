@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 from pymoronbot.utils import web
 
 
-class Googl(ModuleInterface):
+class Googl(BotCommand):
     triggers = ['googl', 'shorten', 'goo.gl']
     help = "googl/shorten <url> - Gives you a shortened version of a url, via Goo.gl"
     

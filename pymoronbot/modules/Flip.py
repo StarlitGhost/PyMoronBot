@@ -8,10 +8,10 @@ from future.utils import iteritems
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 
-class Flip(ModuleInterface):
+class Flip(BotCommand):
     triggers = ['flip']
     help = 'flip <text> - flips the text given to it'
 

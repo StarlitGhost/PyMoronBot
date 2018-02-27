@@ -7,14 +7,14 @@ Created on Jul 31, 2013
 
 from bs4 import BeautifulSoup
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 from pymoronbot.utils import web
 
 
-class Dinner(ModuleInterface):
+class Dinner(BotCommand):
     triggers = ['dinner']
     help = 'dinner (meat/veg/drink) - asks WhatTheFuckShouldIMakeForDinner.com' \
            ' what you should make for dinner'

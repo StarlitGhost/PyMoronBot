@@ -8,7 +8,7 @@ Created on Dec 13, 2011
 import re
 import datetime
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 from pymoronbot.utils import string
@@ -20,7 +20,7 @@ class Data(object):
     lastUser = None
 
 
-class HangoutTracker(ModuleInterface):
+class HangoutTracker(BotCommand):
     triggers = ['hangout', 'hangoot']
     help = 'hangout - gives you the last posted G+ hangout link'
     acceptedTypes = ['PRIVMSG','ACTION','JOIN']

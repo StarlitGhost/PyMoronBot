@@ -9,12 +9,12 @@ from collections import OrderedDict
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 import parsedatetime
 
 
-class Time(ModuleInterface):
+class Time(BotCommand):
     triggers = ['time', 'date']
     
     def onLoad(self):

@@ -7,11 +7,11 @@ Created on May 10, 2014
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.utils import dice
 
 
-class Roll(ModuleInterface):
+class Roll(BotCommand):
     triggers = ['roll', 'rollv']
     help = 'roll(v) - dice roller, \'rollv\' outputs every roll. supported operators are #d#(kh#/kl#/dh#/dl#/!/r/ro/s/sa/sd), + - * / % ^ ( ) #comments | ' \
            'see https://git.io/PyMoBo-Roll for example usage and a detailed explanation of the dice modifiers'

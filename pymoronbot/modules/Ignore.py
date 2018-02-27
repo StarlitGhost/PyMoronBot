@@ -10,10 +10,10 @@ from collections import OrderedDict
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface, admin
+from pymoronbot.modules.commandinterface import BotCommand, admin
 
 
-class Ignore(ModuleInterface):
+class Ignore(BotCommand):
     triggers = ['ignore']
 
     @admin("Only my admins may add new ignores!")

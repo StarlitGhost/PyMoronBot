@@ -7,14 +7,14 @@ Created on Dec 18, 2011
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 import datetime
 
 import psutil
 
 
-class Uptime(ModuleInterface):
+class Uptime(BotCommand):
     triggers = ['uptime']
     help = "uptime - tells you the bot's uptime " \
            "(actually that's a lie right now, it gives you the bot's server's uptime)"

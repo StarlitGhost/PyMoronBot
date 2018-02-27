@@ -8,7 +8,7 @@ Created on Oct 09, 2013
 import json
 import urllib
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
@@ -16,7 +16,7 @@ from pymoronbot.utils.api_keys import load_key
 from pymoronbot.utils import web
 
 
-class GPSLookup(ModuleInterface):
+class GPSLookup(BotCommand):
     triggers = ['gps', 'gpslookup']
     help = "gps(lookup) <address> - Uses Microsoft's Bing Maps geocoding API to " \
            "lookup GPS coordinates for the given address"

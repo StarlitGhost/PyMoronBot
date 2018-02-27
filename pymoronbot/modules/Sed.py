@@ -15,10 +15,10 @@ import sre_constants
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 
-class Sed(ModuleInterface):
+class Sed(BotCommand):
     triggers = ['sed']
     acceptedTypes = ['PRIVMSG', 'ACTION']
     

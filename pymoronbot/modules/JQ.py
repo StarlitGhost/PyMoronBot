@@ -9,14 +9,14 @@ import re
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 from pymoronbot.utils import web
 
 from jq import jq
 
 
-class JQ(ModuleInterface):
+class JQ(BotCommand):
     triggers = ['jq']
     help = "jq <url> <filter> - filters json returned by the given url, returning values. \
 filter syntax here: https://stedolan.github.io/jq/manual/#Basicfilters"

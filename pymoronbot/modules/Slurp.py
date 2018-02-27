@@ -10,14 +10,14 @@ from six import string_types
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 from pymoronbot.utils import web
 
 from bs4 import BeautifulSoup
 
 
-class Slurp(ModuleInterface):
+class Slurp(BotCommand):
     triggers = ['slurp']
     help = "slurp <attribute> <url> <css selector> - scrapes the given attribute from the tag selected at the given url"
     runInThread = True

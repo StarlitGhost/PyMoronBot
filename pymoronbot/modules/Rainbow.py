@@ -5,14 +5,14 @@ Created on May 04, 2014
 @author: Tyranic-Moron
 """
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
-class Rainbow(ModuleInterface):
+class Rainbow(BotCommand):
     triggers = ['rainbow', 'rrainbow']
     help = 'rainbow <text> - outputs the specified text with rainbow colours; rrainbow uses background colours'
 

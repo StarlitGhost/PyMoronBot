@@ -5,12 +5,12 @@ Created on Dec 20, 2011
 @author: Tyranic-Moron
 """
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 
-class Join(ModuleInterface):
+class Join(BotCommand):
     triggers = ['join']
     help = 'join <channel> - makes the bot join the specified channel(s)'
 

@@ -16,7 +16,7 @@ from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface, admin
+from pymoronbot.modules.commandinterface import BotCommand, admin
 
 
 class AlreadyGuessedException(Exception):
@@ -196,7 +196,7 @@ class PhraseList(object):
             f.writelines(sorted(self.phraseList))
 
 
-class Hangman(ModuleInterface):
+class Hangman(BotCommand):
     triggers = ['hangman', 'hm']
 
     def onLoad(self):

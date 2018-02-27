@@ -12,7 +12,7 @@ from six import iteritems
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 from pymoronbot.utils.api_keys import load_key
 from pymoronbot.utils import string, web
@@ -24,7 +24,7 @@ import dateutil.tz
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
-class URLFollow(ModuleInterface):
+class URLFollow(BotCommand):
     triggers = ['urlfollow', 'follow']
     acceptedTypes = ['PRIVMSG', 'ACTION']
     help = 'automatic module that follows urls and grabs information about the resultant webpage'

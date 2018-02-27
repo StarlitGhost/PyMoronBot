@@ -20,27 +20,72 @@ class ModuleHandler(object):
         self.bot = bot
 
         self.modules = {}
-        self.moduleCaseMapping = {}
-
+        self.caseMap = {}
         self.mappedTriggers = {}
 
-        self.postProcesses = {}
-        self.postProcessCaseMapping = {}
-
-        self.modulesToLoad = bot.config.getWithDefault('modules', ['all'])
-        self.postProcessesToLoad = bot.config.getWithDefault('postprocesses', ['all'])
+        self.modulesToLoad = self.bot.config.getWithDefault('modules', ['all'])
 
     def loadModule(self, name):
-        return self._load(name, 'modules', self.modules, self.moduleCaseMapping)
+        name = name.lower()
 
-    def loadPostProcess(self, name):
-        return self._load(name, 'postprocesses', self.postProcesses, self.postProcessCaseMapping)
+        moduleCaseMap = {key.lower(): key for key in ModuleHandler.getDirList('modules')}
+
+        if name not in moduleCaseMap:
+            return False
+
+        alreadyExisted = False
+
+        # unload first if the module is already loaded, we're doing a reload
+        if name in self.caseMap:
+            self._unload(name)
+            alreadyExisted = True
+
+        module = import_module('pymoronbot.modules.' + moduleCaseMap[name])
+
+        reload(module)
+
+        class_ = getattr(module, moduleCaseMap[name])
+
+        constructedModule = class_(self.bot)
+
+        if alreadyExisted:
+            print('-- {0} reloaded'.format(module.__name__))
+        else:
+            print('-- {0} loaded'.format(module.__name__))
+
+        self.modules.update({moduleCaseMap[name]: constructedModule})
+        self.caseMap.update({name: moduleCaseMap[name]})
+
+        # map triggers to modules so we can call them via dict lookup
+        if hasattr(constructedModule, 'triggers'):
+            for trigger in constructedModule.triggers():
+                self.mappedTriggers[trigger] = constructedModule
+
+        return True
 
     def unloadModule(self, name):
-        return self._unload(name, 'modules', self.modules, self.moduleCaseMapping)
+        if name.lower() in self.caseMap.keys():
+            properName = self.caseMap[name.lower()]
 
-    def unloadPostProcess(self, name):
-        return self._unload(name, 'postprocesses', self.postProcesses, self.postProcessCaseMapping)
+            # unmap module triggers
+            if hasattr(self.modules[properName], 'triggers'):
+                for trigger in self.modules[properName].triggers:
+                    del self.mappedTriggers[trigger]
+
+            self.modules[properName].onUnload()
+
+            del self.modules[properName]
+            del self.caseMap[name.lower()]
+            del sys.modules['pymoronbot.modules.{}'.format(properName)]
+            for f in glob('pymoronbot/modules/{}.pyc'.format(properName)):
+                os.remove(f)
+        else:
+            return False
+
+        return True
+
+    def sendPRIVMSG(self, message, destination):
+        self.bot.msg(destination, message)
 
     def sendResponse(self, response):
         responses = []
@@ -55,8 +100,6 @@ class ModuleHandler(object):
 
         for response in responses:
             try:
-                response = self.postProcess(response)
-
                 if response.Type == ResponseType.Say:
                     self.bot.msg(response.Target, response.Response)
                 elif response.Type == ResponseType.Do:
@@ -69,22 +112,6 @@ class ModuleHandler(object):
                 # ^ dirty, but I don't want any modules to kill the bot, especially if I'm working on it live
                 print("Python Execution Error sending responses '{0}': {1}".format(responses, str(sys.exc_info())))
                 traceback.print_tb(sys.exc_info()[2])
-
-    def postProcess(self, response):
-        """
-        @type response: IRCResponse
-        """
-        newResponse = response
-        for post in sorted(self.postProcesses.values(), key=operator.attrgetter('priority'), reverse=True):
-            try:
-                if post.shouldExecute(newResponse):
-                    newResponse = post.execute(newResponse)
-            except Exception:
-                # ^ dirty, but I don't want any responses to kill the bot, especially if I'm working on it live
-                print("Python Execution Error in '{0}': {1}".format(post.__class__.__name__, str(sys.exc_info())))
-                traceback.print_tb(sys.exc_info()[2])
-
-        return newResponse
     
     def _deferredError(self, failure):
         print(str(failure))
@@ -105,65 +132,6 @@ class ModuleHandler(object):
                 print("Python Execution Error in '{0}': {1}".format(module.__class__.__name__, str(sys.exc_info())))
                 traceback.print_tb(sys.exc_info()[2])
 
-    def _load(self, name, category, categoryDict, categoryCaseMap):
-        name = name.lower()
-
-        catListCaseMap = {key.lower(): key for key in ModuleHandler.getDirList(category)}
-
-        if name not in catListCaseMap:
-            return False
-
-        alreadyExisted = False
-
-        # unload first if the module is already loaded, we're doing a reload
-        if name in categoryCaseMap:
-            self._unload(name, category, categoryDict, categoryCaseMap)
-            alreadyExisted = True
-
-        module = import_module('pymoronbot.' + category + '.' + catListCaseMap[name])
-
-        reload(module)
-
-        class_ = getattr(module, catListCaseMap[name])
-
-        constructedModule = class_(self.bot)
-
-        if alreadyExisted:
-            print('-- {0} reloaded'.format(module.__name__))
-        else:
-            print('-- {0} loaded'.format(module.__name__))
-
-        categoryDict.update({catListCaseMap[name]: constructedModule})
-        categoryCaseMap.update({name: catListCaseMap[name]})
-
-        # map triggers to modules so we can call them via dict lookup
-        if hasattr(constructedModule, 'triggers'):
-            for trigger in constructedModule.triggers:
-                self.mappedTriggers[trigger] = constructedModule
-
-        return True
-
-    def _unload(self, name, category, categoryDict, categoryCaseMap):
-        if name.lower() in categoryCaseMap.keys():
-            properName = categoryCaseMap[name.lower()]
-
-            # unmap module triggers
-            if hasattr(categoryDict[properName], 'triggers'):
-                for trigger in categoryDict[properName].triggers:
-                    del self.mappedTriggers[trigger]
-
-            categoryDict[properName].onUnload()
-
-            del categoryDict[properName]
-            del categoryCaseMap[name.lower()]
-            del sys.modules['pymoronbot.{0}.{1}'.format(category, properName)]
-            for f in glob('pymoronbot/{0}/{1}.pyc'.format(category, properName)):
-                os.remove(f)
-        else:
-            return False
-
-        return True
-
     def loadAll(self):
         modulesToLoad = []
         if 'all' in self.modulesToLoad:
@@ -183,24 +151,6 @@ class ModuleHandler(object):
             except Exception as e:
                 print(u'[{}]'.format(module), e)
 
-        postProcessesToLoad = []
-        if 'all' in self.postProcessesToLoad:
-            postProcessesToLoad.extend(ModuleHandler.getDirList('postprocesses'))
-
-        for post in self.postProcessesToLoad:
-            if post == 'all':
-                continue
-            elif post.startswith('-'):
-                postProcessesToLoad.remove(post[1:])
-            else:
-                postProcessesToLoad.append(post)
-
-        for post in postProcessesToLoad:
-            try:
-                self.loadPostProcess(post)
-            except Exception as e:
-                print(u'[{}]'.format(post), e)
-
     @classmethod
     def getDirList(cls, category):
         root = os.path.join('pymoronbot', category)
@@ -214,3 +164,47 @@ class ModuleHandler(object):
                 continue
 
             yield item[:-3]
+
+    def runGenericAction(self, actionName, *params, **kw):
+        actionList = []
+        if actionName in self.actions:
+            actionList = self.actions[actionName]
+        for action in actionList:
+            action[0](*params, **kw)
+
+    def runProcessingAction(self, actionName, data, *params, **kw):
+        actionList = []
+        if actionName in self.actions:
+            actionList = self.actions[actionName]
+        for action in actionList:
+            action[0](data, *params, **kw)
+            if not data:
+                return
+
+    def runActionUntilTrue(self, actionName, *params, **kw):
+        actionList = []
+        if actionName in self.actions:
+            actionList = self.actions[actionName]
+        for action in actionList:
+            if action[0](*params, **kw):
+                return True
+        return False
+
+    def runActionUntilFalse(self, actionName, *params, **kw):
+        actionList = []
+        if actionName in self.actions:
+            actionList = self.actions[actionName]
+        for action in actionList:
+            if not action[0](*params, **kw):
+                return True
+        return False
+
+    def runActionUntilValue(self, actionName, *params, **kw):
+        actionList = []
+        if actionName in self.actions:
+            actionList = self.actions[actionName]
+        for action in actionList:
+            value = action[0](*params, **kw)
+            if value:
+                return value
+        return None

@@ -5,7 +5,7 @@ Created on Dec 07, 2014
 @author: Tyranic-Moron
 """
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
@@ -14,7 +14,7 @@ from twisted.internet.error import CannotListenError
 import os
 
 
-class Manhole(ModuleInterface):
+class Manhole(BotCommand):
     triggers = ['manhole']
     help = "A debug module that uses Twisted's Manhole to poke at the bot's innards"
     runInThread = True

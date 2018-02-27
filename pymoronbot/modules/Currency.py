@@ -11,12 +11,12 @@ from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 from pymoronbot.utils import web
 
 
-class Currency(ModuleInterface):
+class Currency(BotCommand):
     triggers = ['currency']
     help = "currency [<amount>] <from> in <to> - converts <amount> in <from> currency to <to> currency"
     runInThread = True

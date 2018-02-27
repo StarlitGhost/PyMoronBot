@@ -9,7 +9,7 @@ import random
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 from pymoronbot.utils.api_keys import load_key
 from pymoronbot.utils import web
@@ -21,7 +21,7 @@ from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 # https://github.com/Heufneutje/RE_HeufyBot/blob/f45219d1a61f0ed0fd60a89dcaeb2e962962356e/modules/Aww/src/heufybot/modules/Aww.java
 # Future plans:
 # - multiple fetch types beyond the current random, eg reddit sort types (top rated, hot, best, etc)
-class RedditImage(ModuleInterface):
+class RedditImage(BotCommand):
     triggers = ['redditimage']
     help = "redditimage <subreddit> [<range>] - fetches a random image from the top 100 (or given range) of the specified subreddit"
     runInThread = True

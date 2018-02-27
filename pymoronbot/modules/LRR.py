@@ -2,14 +2,14 @@
 import datetime
 from six import iteritems
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 import pymoronbot.utils.LRRChecker as DataStore
 
 
-class LRR(ModuleInterface):
+class LRR(BotCommand):
 
     triggers = ['lrr', 'llr']
 

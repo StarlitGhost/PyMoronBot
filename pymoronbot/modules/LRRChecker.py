@@ -5,7 +5,7 @@ from six import iteritems
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 import pymoronbot.utils.LRRChecker as DataStore
 from pymoronbot.utils import web
@@ -13,7 +13,7 @@ from pymoronbot.utils import web
 import dateutil.parser as dparser
 
 
-class LRRChecker(ModuleInterface):
+class LRRChecker(BotCommand):
     help = "Automatic function, scans LRR video RSS feeds and reports new items in the channel."
     runInThread = True
 

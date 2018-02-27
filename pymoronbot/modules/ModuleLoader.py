@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pymoronbot.moduleinterface import ModuleInterface, admin
+from pymoronbot.modules.commandinterface import BotCommand, admin
 from pymoronbot.modulehandler import ModuleHandler
 from pymoronbot.response import IRCResponse, ResponseType
 
@@ -9,7 +9,7 @@ import traceback
 from six import iteritems
 
 
-class ModuleLoader(ModuleInterface):
+class ModuleLoader(BotCommand):
     triggers = ['load', 'reload', 'unload',
                 'loadp', 'reloadp', 'unloadp']
     help = "load/reload <module>, unload <module> - handles loading/unloading/reloading of modules. " \
@@ -80,7 +80,7 @@ class ModuleLoader(ModuleInterface):
                 try:
                     success = moduleHandler.loadModule(moduleName)
                     if success:
-                        successes.append(moduleHandler.moduleCaseMapping[moduleName])
+                        successes.append(moduleHandler.caseMap[moduleName])
                     else:
                         failures.append(moduleNameCaseMap[moduleName])
 

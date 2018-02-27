@@ -7,10 +7,10 @@ Created on Oct 16, 2014
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 
-class Notice(ModuleInterface):
+class Notice(BotCommand):
     triggers = ['notice']
     help = 'notice <target> <text> - makes the bot send the specified text as a notice to the specified target'
 

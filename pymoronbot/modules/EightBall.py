@@ -7,12 +7,12 @@ Created on Aug 14, 2013
 
 import random
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 
-class EightBall(ModuleInterface):
+class EightBall(BotCommand):
     triggers = ['8ball', 'eightball']
     help = '8ball (question) - swirls a magic 8-ball to give you the answer to your questions'
 

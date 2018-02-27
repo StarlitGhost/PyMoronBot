@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 from pymoronbot.utils import web
 
@@ -11,7 +11,7 @@ from builtins import str
 from bs4 import BeautifulSoup
 
 
-class Mtg(ModuleInterface):
+class Mtg(BotCommand):
     triggers = ['mtg', 'mtgf']
     help = 'mtg(f) <card name> - fetches details of the Magic: The Gathering card you specify ' \
            'from gatherer.wizards.com. mtgf includes the flavour text, if it has any'

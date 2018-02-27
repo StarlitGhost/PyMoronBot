@@ -6,10 +6,10 @@ Created on Mar 09, 2016
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 
-class Var(ModuleInterface):
+class Var(BotCommand):
     triggers = ['var']
     help = "var <varname> <value> - sets <varname> to <value>, which can be accessed later using $<varname>. " \
            "the variables don't persist between messages, so it is only useful as a support function for aliases using sub and/or chain"

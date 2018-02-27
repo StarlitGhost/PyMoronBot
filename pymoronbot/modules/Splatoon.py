@@ -10,14 +10,14 @@ import datetime
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 from pymoronbot.utils import string, web
 
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
-class Splatoon(ModuleInterface):
+class Splatoon(BotCommand):
     triggers = ['splat']
     help = "splat [regular/ranked/league/fest]"
     runInThread = True

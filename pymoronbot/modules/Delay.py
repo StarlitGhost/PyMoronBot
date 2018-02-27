@@ -11,13 +11,13 @@ from twisted.internet import task
 from twisted.internet import reactor
 from pytimeparse.timeparse import timeparse
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 from pymoronbot.utils import string
 
 
-class Delay(ModuleInterface):
+class Delay(BotCommand):
     triggers = ['delay', 'later']
     help = 'delay <duration> <command> (<parameters>) - executes the given command after the specified delay'
 

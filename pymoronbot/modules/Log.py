@@ -10,8 +10,7 @@ import codecs
 import os
 
 from pymoronbot.message import IRCMessage
-from pymoronbot.moduleinterface import ModuleInterface
-
+from pymoronbot.modules.commandinterface import BotCommand
 
 logFuncs = {
     'PRIVMSG': lambda m: u'<{0}> {1}'.format(m.User.Name, m.MessageString),
@@ -43,7 +42,7 @@ def log(path, target, text):
         f.write(data + '\n')
 
 
-class Log(ModuleInterface):
+class Log(BotCommand):
     triggers = []#['log']
     help = "Logs {} messages.".format("/".join(logFuncs.keys()))#"log (-n / yyyy-mm-dd) - " \
            #"without parameters, links to today's log. " \

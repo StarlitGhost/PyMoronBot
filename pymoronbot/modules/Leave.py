@@ -7,10 +7,10 @@ Created on Dec 20, 2011
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 
-class Leave(ModuleInterface):
+class Leave(BotCommand):
     triggers = ['leave', 'gtfo']
     help = "leave/gtfo - makes the bot leave the current channel"
 

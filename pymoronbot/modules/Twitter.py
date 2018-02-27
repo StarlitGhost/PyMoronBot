@@ -16,13 +16,13 @@ from twisted.internet import task, threads
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 from twitter import Twitter as tw, OAuth2, TwitterHTTPError
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 from pymoronbot.utils import string, web, api_keys
 
 
-class Twitter(ModuleInterface):
+class Twitter(BotCommand):
     triggers = ['twitter']
     help = 'twitter <user>/<hashtag>, twitter follow <user>, twitter unfollow <user>\n' \
            '<user>/<hashtag> - returns the latest tweet from the specified twitter user, ' \

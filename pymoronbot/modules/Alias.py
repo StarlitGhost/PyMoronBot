@@ -10,13 +10,13 @@ from six import iteritems
 
 from bs4 import UnicodeDammit
 
-from pymoronbot.moduleinterface import ModuleInterface, admin
+from pymoronbot.modules.commandinterface import BotCommand, admin
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 from pymoronbot.utils import web
 
 
-class Alias(ModuleInterface):
+class Alias(BotCommand):
     triggers = ['alias']
     runInThread = True
 

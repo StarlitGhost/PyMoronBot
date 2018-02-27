@@ -6,14 +6,14 @@ Created on Dec 05, 2013
 """
 import random
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 from pymoronbot.utils import web
 
 
-class Gif(ModuleInterface):
+class Gif(BotCommand):
     triggers = ['gif']
     help = 'gif [<year>] - fetches a random gif posted during Desert Bus'
     

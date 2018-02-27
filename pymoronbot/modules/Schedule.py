@@ -17,7 +17,7 @@ from pytimeparse.timeparse import timeparse
 from ruamel.yaml import YAML, yaml_object
 from six import iteritems
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 from pymoronbot.channel import IRCChannel
@@ -84,7 +84,7 @@ class Task(object):
         return representer.represent_mapping(cls.yaml_tag, cleanedTask)
 
 
-class Schedule(ModuleInterface):
+class Schedule(BotCommand):
     triggers = ['schedule']
 
     def _cron(self, message):

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import math
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 
-class DBCalc(ModuleInterface):
+class DBCalc(BotCommand):
     triggers = ['dbcalc']
     help = 'dbcalc (hours <hours> / money <money>) - tells you how much money is required for a given number of hours, ' \
            'or how many hours will be bussed for a given amount of money'

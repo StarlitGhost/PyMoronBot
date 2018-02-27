@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 
-class Actions(ModuleInterface):
+class Actions(BotCommand):
     acceptedTypes = ['ACTION']
     help = 'Responds to various actions'
 

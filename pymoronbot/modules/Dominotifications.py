@@ -6,11 +6,11 @@ from twisted.internet import task, threads
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.utils import web
 
 
-class Dominotifications(ModuleInterface):
+class Dominotifications(BotCommand):
     help = "Automatic module that tracks Domino's pizza tracker links, " \
            "informing you of the progress of your pizza until delivery"
 

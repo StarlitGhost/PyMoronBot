@@ -11,10 +11,10 @@ from pyxdameraulevenshtein import normalized_damerau_levenshtein_distance as ndl
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 
-class AsterFix(ModuleInterface):
+class AsterFix(BotCommand):
     triggers = ['asterfix']
     acceptedTypes = ['PRIVMSG', 'ACTION']
 

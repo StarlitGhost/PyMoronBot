@@ -10,7 +10,7 @@ from six import iteritems
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
@@ -27,7 +27,7 @@ class DictMergeError(Exception):
     pass
 
 
-class Sub(ModuleInterface):
+class Sub(BotCommand):
     triggers = ['sub']
     help = "sub <text> - executes nested commands in <text> and replaces the commands with their output\n" \
            "syntax: text {command params} more text {command {command params} {command params}}\n" \

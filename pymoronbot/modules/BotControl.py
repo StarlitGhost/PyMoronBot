@@ -12,12 +12,13 @@ from collections import OrderedDict
 
 from twisted.internet import reactor
 
-from pymoronbot.moduleinterface import ModuleInterface, admin
+from pymoronbot.moduleinterface import BotCommand
+from pymoronbot.modules.commandinterface import admin
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 
-class BotControl(ModuleInterface):
+class BotControl(BotCommand):
     triggers = ['restart', 'shutdown']
 
     @admin

@@ -7,13 +7,13 @@ Created on Dec 07, 2013
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface, admin
+from pymoronbot.modules.commandinterface import BotCommand, admin
 
 import subprocess
 import os
 import sys
 
-class Update(ModuleInterface):
+class Update(BotCommand):
     triggers = ['update', 'updatelibs']
     
     def help(self, message):

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 from six import string_types
 
 
-class Help(ModuleInterface):
+class Help(BotCommand):
     triggers = ['help', 'module', 'modules']
     help = 'help/module(s) (<module>) - returns a list of loaded modules, ' \
            'or the help text of a particular module if one is specified'

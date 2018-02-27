@@ -5,12 +5,12 @@ Created on Feb 05, 2014
 @author: Tyranic-Moron
 """
 
-from pymoronbot.moduleinterface import ModuleInterface, admin
+from pymoronbot.modules.commandinterface import BotCommand, admin
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 
-class CommandChar(ModuleInterface):
+class CommandChar(BotCommand):
     triggers = ['commandchar']
     help = "commandchar <char> - changes the prefix character for bot commands (admin-only)"
 

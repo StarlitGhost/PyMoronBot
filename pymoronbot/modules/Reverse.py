@@ -7,10 +7,10 @@ Created on Nov 07, 2014
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 
-class Reverse(ModuleInterface):
+class Reverse(BotCommand):
     triggers = ['reverse', 'backwards']
     help = 'reverse <text> - reverses the text given to it'
 

@@ -5,12 +5,12 @@ import re
 
 from six import iteritems
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import ResponseType, IRCResponse
 
 
-class Responses(ModuleInterface):
+class Responses(BotCommand):
     acceptedTypes = ['PRIVMSG', 'ACTION']
     help = 'Talkwords from the mouth place - response <name> to enable/disable a particular response ' \
            '(might need to check the source for names)'

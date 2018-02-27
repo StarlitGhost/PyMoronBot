@@ -11,14 +11,14 @@ from builtins import str
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 from pymoronbot.utils import web
 
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
-class Urban(ModuleInterface):
+class Urban(BotCommand):
     triggers = ['urban', 'ud']
     help = "urban <search term> - returns the definition of the given search term from UrbanDictionary.com"
     

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 
-class Conversation(ModuleInterface):
+class Conversation(BotCommand):
     help = 'Responds to greetings and such'
 
     def shouldExecute(self, message):

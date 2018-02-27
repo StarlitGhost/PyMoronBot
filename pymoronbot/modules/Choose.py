@@ -7,12 +7,12 @@ Created on May 04, 2014
 
 import random
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 
-class Choose(ModuleInterface):
+class Choose(BotCommand):
     triggers = ['choose']
     help = 'choose <option1>, <option2>[, <optionN>] - randomly chooses one of the given options for you'
 

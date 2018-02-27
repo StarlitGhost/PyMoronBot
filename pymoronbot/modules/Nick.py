@@ -7,10 +7,10 @@ Created on Dec 20, 2011
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface, admin
+from pymoronbot.modules.commandinterface import BotCommand, admin
 
 
-class Nick(ModuleInterface):
+class Nick(BotCommand):
     triggers = ['nick', 'name']
     help = "nick <nick> - changes the bot's nick to the one specified"
 

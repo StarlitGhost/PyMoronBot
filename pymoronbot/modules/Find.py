@@ -6,14 +6,14 @@ Created on May 20, 2014
 """
 import re
 
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 from pymoronbot.utils import string, web
 
 
-class Find(ModuleInterface):
+class Find(BotCommand):
     triggers = ['find', 'google', 'g']
     help = 'find/google/g <searchterm> - returns the first google result for the given search term'
     runInThread = True

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.moduleinterface import ModuleInterface
+from pymoronbot.modules.commandinterface import BotCommand
 
 tang = {'A': 'ALPHA',
         'B': 'BRAVO',
@@ -42,7 +42,7 @@ tang = {'A': 'ALPHA',
         '-': 'DASH'}
 
 
-class Tango(ModuleInterface):
+class Tango(BotCommand):
     triggers = ['tango']
     help = 'tango <words> - reproduces <words> with the NATO phonetic alphabet, because reasons.'
 
