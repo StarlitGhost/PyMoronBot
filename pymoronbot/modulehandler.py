@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from imp import reload
 from importlib import import_module
 import sys
 import traceback
@@ -7,8 +6,12 @@ import operator
 import os
 from glob import glob
 
+from twisted.plugin import getPlugins
+from twisted.python.rebuild import rebuild
 from twisted.internet import threads
 
+from pymoronbot.moduleinterface import IModule
+import pymoronbot.modules
 from pymoronbot.response import IRCResponse, ResponseType
 
 
@@ -21,68 +24,81 @@ class ModuleHandler(object):
 
         self.modules = {}
         self.caseMap = {}
+        self.actions = {}
         self.mappedTriggers = {}
 
-        self.modulesToLoad = self.bot.config.getWithDefault('modules', ['all'])
-
     def loadModule(self, name):
-        name = name.lower()
+        for module in getPlugins(IModule, pymoronbot.modules):
+            if module.__name__ and module.__name__.lower() == name.lower():
+                rebuild(importlib.import_module(module.__module__))
+                self._loadModuleData(module)
 
-        moduleCaseMap = {key.lower(): key for key in ModuleHandler.getDirList('modules')}
+        return module.__name__
 
-        if name not in moduleCaseMap:
-            return False
+    def _loadModuleData(self, module):
+        if not IModule.providedBy(module):
+            raise ModuleLoaderError(module.__name__,
+                                    "Module doesn't implement the module interface.",
+                                    ModuleLoadType.LOAD)
+        if module.__name__ in self.modules:
+            raise ModuleLoaderError(module.__name__,
+                                    "Module is already loaded.",
+                                    ModuleLoadType.LOAD)
 
-        alreadyExisted = False
+        module.hookBot(self.bot)
 
-        # unload first if the module is already loaded, we're doing a reload
-        if name in self.caseMap:
-            self._unload(name)
-            alreadyExisted = True
+        actions = {}
+        for action in module.actions():
+            if action[0] not in actions:
+                actions[action[0]] = [ (action[2], action[1]) ]
+            else:
+                actions[action[0]].append(([action[2], action[1]))
 
-        module = import_module('pymoronbot.modules.' + moduleCaseMap[name])
-
-        reload(module)
-
-        class_ = getattr(module, moduleCaseMap[name])
-
-        constructedModule = class_(self.bot)
-
-        if alreadyExisted:
-            print('-- {0} reloaded'.format(module.__name__))
-        else:
-            print('-- {0} loaded'.format(module.__name__))
-
-        self.modules.update({moduleCaseMap[name]: constructedModule})
-        self.caseMap.update({name: moduleCaseMap[name]})
+        for action, actionList in iteritems(actions):
+            if action not in self.actions:
+                self.actions[action] = []
+            for actionData in actionList:
+                for index, handlerData in enumerate(self.actions[action]):
+                    if handlerData[1] < actionData[1]:
+                        self.actions[action].insert(index, actionData)
+                        break
+                else:
+                    self.actions[action].append(actionData)
 
         # map triggers to modules so we can call them via dict lookup
-        if hasattr(constructedModule, 'triggers'):
-            for trigger in constructedModule.triggers():
-                self.mappedTriggers[trigger] = constructedModule
+        if hasattr(module, 'triggers'):
+            for trigger in module.triggers():
+                self.mappedTriggers[trigger] = module
 
-        return True
+        self.modules.update({module.__name__: module})
+        self.caseMap.update({module.__name__.lower(): module.__name__})
+
+        module.onLoad()
 
     def unloadModule(self, name):
-        if name.lower() in self.caseMap.keys():
-            properName = self.caseMap[name.lower()]
+        if name.lower() not in self.caseMap:
+            raise ModuleLoaderError(name, "The module is not loaded.", ModuleLoadType.UNLOAD)
 
-            # unmap module triggers
-            if hasattr(self.modules[properName], 'triggers'):
-                for trigger in self.modules[properName].triggers:
-                    del self.mappedTriggers[trigger]
+        name = self.caseMap[name.lower()]
 
-            self.modules[properName].onUnload()
+        self.modules[name].onUnload()
 
-            del self.modules[properName]
-            del self.caseMap[name.lower()]
-            del sys.modules['pymoronbot.modules.{}'.format(properName)]
-            for f in glob('pymoronbot/modules/{}.pyc'.format(properName)):
-                os.remove(f)
-        else:
-            return False
+        for action in self.modules[name]:
+            self.actions[action[0]].remove((action[2], action[1]))
 
-        return True
+        # unmap module triggers
+        if hasattr(self.modules[name], 'triggers'):
+            for trigger in self.modules[name].triggers():
+                del self.mappedTriggers[trigger]
+
+        del self.modules[name]
+        del self.caseMap[name.lower()]
+
+        return name
+
+    def reloadModule(self, name):
+        self.unloadModule(name)
+        return self.loadModule(name)
 
     def sendPRIVMSG(self, message, destination):
         self.bot.msg(destination, message)
@@ -117,6 +133,14 @@ class ModuleHandler(object):
         print(str(failure))
 
     def handleMessage(self, message):
+        isChannel = message.TargetType == TargetTypes.CHANNEL
+        typeActionMap = {
+            "PRIVMSG": lambda: "message-channel" if isChannel else "message-user",
+        }
+        action = typeActionMap[message.Type]
+        responses = self.runGatheringAction(action, message)
+        self.sendResponses(responses)
+        ###
         for module in sorted(self.modules.values(), key=operator.attrgetter('priority')):
             try:
                 if module.shouldExecute(message):
@@ -133,11 +157,11 @@ class ModuleHandler(object):
                 traceback.print_tb(sys.exc_info()[2])
 
     def loadAll(self):
-        modulesToLoad = []
-        if 'all' in self.modulesToLoad:
-            modulesToLoad.extend(ModuleHandler.getDirList('modules'))
+        modulesToLoad = self.bot.config.getWithDefault('modules', ['all'])
+        if 'all' in modulesToLoad:
+            modulesToLoad.extend([module.__name__ for module in getPlugins(IModule, pymoronbot.modules)])
 
-        for module in self.modulesToLoad:
+        for module in modulesToLoad:
             if module == 'all':
                 continue
             elif module.startswith('-'):
@@ -145,25 +169,11 @@ class ModuleHandler(object):
             else:
                 modulesToLoad.append(module)
 
-        for module in modulesToLoad:
+        for module in set(modulesToLoad):
             try:
                 self.loadModule(module)
             except Exception as e:
                 print(u'[{}]'.format(module), e)
-
-    @classmethod
-    def getDirList(cls, category):
-        root = os.path.join('pymoronbot', category)
-
-        for item in os.listdir(root):
-            if not os.path.isfile(os.path.join(root, item)):
-                continue
-            if not item.endswith('.py'):
-                continue
-            if item.startswith('__init__'):
-                continue
-
-            yield item[:-3]
 
     def runGenericAction(self, actionName, *params, **kw):
         actionList = []
@@ -180,6 +190,26 @@ class ModuleHandler(object):
             action[0](data, *params, **kw)
             if not data:
                 return
+
+    def runGatheringAction(self, actionName, *params, **kw):
+        actionList = []
+        if actionName in self.actions:
+            actionList = self.actions[actionName]
+        responses = []
+        for action in actionList:
+            responses.append(action[0](*params, **kw))
+        return responses
+
+    def runGatheringProcessingAction(self, actionName, data, *params, **kw):
+        actionList = []
+        if actionName in self.actions:
+            actionList = self.actions[actionName]
+        responses = []
+        for action in actionList:
+            responses.append(action[0](data, *params, **kw))
+            if not data:
+                return responses
+        return responses
 
     def runActionUntilTrue(self, actionName, *params, **kw):
         actionList = []
