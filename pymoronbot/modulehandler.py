@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
-from importlib import import_module
+import importlib
 import sys
 import traceback
-import operator
-import os
-from glob import glob
 
 from twisted.plugin import getPlugins
 from twisted.python.rebuild import rebuild
 from twisted.internet import threads
+from enum import Enum
+from six import iteritems
 
 from pymoronbot.moduleinterface import IModule
 import pymoronbot.modules
-from pymoronbot.response import IRCResponse, ResponseType
+from pymoronbot.message import TargetTypes
+from pymoronbot.response import ResponseType
 
 
 class ModuleHandler(object):
@@ -33,7 +33,7 @@ class ModuleHandler(object):
                 rebuild(importlib.import_module(module.__module__))
                 self._loadModuleData(module)
 
-        return module.__name__
+                return module.__name__
 
     def _loadModuleData(self, module):
         if not IModule.providedBy(module):
@@ -52,7 +52,7 @@ class ModuleHandler(object):
             if action[0] not in actions:
                 actions[action[0]] = [ (action[2], action[1]) ]
             else:
-                actions[action[0]].append(([action[2], action[1]))
+                actions[action[0]].append((action[2], action[1]))
 
         for action, actionList in iteritems(actions):
             if action not in self.actions:
@@ -103,18 +103,41 @@ class ModuleHandler(object):
     def sendPRIVMSG(self, message, destination):
         self.bot.msg(destination, message)
 
-    def sendResponse(self, response):
-        responses = []
+    def handleMessage(self, message):
+        isChannel = message.TargetType == TargetTypes.CHANNEL
+        typeActionMap = {
+            "PRIVMSG": lambda: "message-channel" if isChannel else "message-user",
+            "ACTION": lambda: "action-channel" if isChannel else "action-user",
+            "NOTICE": lambda: "notice-channel" if isChannel else "notice-user",
+            "JOIN": lambda: "channeljoin",
+            "INVITE": lambda: "channelinvite",
+            "PART": lambda: "channelpart",
+            "KICK": lambda: "channelkick",
+            "QUIT": lambda: "userquit",
+            "NICK": lambda: "usernick",
+            "MODE": lambda: "modeschanged-channel" if isChannel else "modeschanged-user",
+            "TOPIC": lambda: "channeltopic",
+        }
+        action = typeActionMap[message.Type]
+        responses = self.runGatheringAction(action, message)
+        self.sendResponses(responses)
 
-        if hasattr(response, '__iter__'):
-            for r in response:
-                if r is None or r.Response is None or r.Response == '':
-                    continue
-                responses.append(r)
-        elif response is not None and response.Response is not None and response.Response != '':
-            responses.append(response)
-
+    def sendResponses(self, responses):
+        typeActionMap = {
+            ResponseType.Say: lambda: "response-message",
+            ResponseType.Do: lambda: "response-action",
+            ResponseType.Notice: lambda: "response-notice",
+            ResponseType.Raw: lambda: "response-",
+        }
         for response in responses:
+            if not response or not response.Response:
+                continue
+
+            action = typeActionMap[response.Type]()
+            if response.Type == ResponseType.Raw:
+                action += response.Response.split()[0].lower()
+            self.runProcessingAction(action, response)
+
             try:
                 if response.Type == ResponseType.Say:
                     self.bot.msg(response.Target, response.Response)
@@ -127,33 +150,6 @@ class ModuleHandler(object):
             except Exception:
                 # ^ dirty, but I don't want any modules to kill the bot, especially if I'm working on it live
                 print("Python Execution Error sending responses '{0}': {1}".format(responses, str(sys.exc_info())))
-                traceback.print_tb(sys.exc_info()[2])
-    
-    def _deferredError(self, failure):
-        print(str(failure))
-
-    def handleMessage(self, message):
-        isChannel = message.TargetType == TargetTypes.CHANNEL
-        typeActionMap = {
-            "PRIVMSG": lambda: "message-channel" if isChannel else "message-user",
-        }
-        action = typeActionMap[message.Type]
-        responses = self.runGatheringAction(action, message)
-        self.sendResponses(responses)
-        ###
-        for module in sorted(self.modules.values(), key=operator.attrgetter('priority')):
-            try:
-                if module.shouldExecute(message):
-                    if not module.runInThread:
-                        response = module.execute(message)
-                        self.sendResponse(response)
-                    else:
-                        d = threads.deferToThread(module.execute, message)
-                        d.addCallback(self.sendResponse)
-                        d.addErrback(self._deferredError)
-            except Exception:
-                # ^ dirty, but I don't want any modules to kill the bot, especially if I'm working on it live
-                print("Python Execution Error in '{0}': {1}".format(module.__class__.__name__, str(sys.exc_info())))
                 traceback.print_tb(sys.exc_info()[2])
 
     def loadAll(self):
@@ -200,17 +196,6 @@ class ModuleHandler(object):
             responses.append(action[0](*params, **kw))
         return responses
 
-    def runGatheringProcessingAction(self, actionName, data, *params, **kw):
-        actionList = []
-        if actionName in self.actions:
-            actionList = self.actions[actionName]
-        responses = []
-        for action in actionList:
-            responses.append(action[0](data, *params, **kw))
-            if not data:
-                return responses
-        return responses
-
     def runActionUntilTrue(self, actionName, *params, **kw):
         actionList = []
         if actionName in self.actions:
@@ -238,3 +223,26 @@ class ModuleHandler(object):
             if value:
                 return value
         return None
+
+
+class ModuleLoadType(Enum):
+    LOAD = 0
+    UNLOAD = 1
+
+
+class ModuleLoaderError(Exception):
+    def __init__(self, module, message, loadType):
+        self.module = module
+        self.message = message
+        self.loadType = loadType
+
+    def __str__(self):
+        if self.loadType == ModuleLoadType.LOAD:
+            return "Module {} could not be loaded: {}".format(self.module, self.message)
+        elif self.loadType == ModuleLoadType.UNLOAD:
+            return "Module {} could not be unloaded: {}".format(self.module, self.message)
+        elif self.loadType == ModuleLoadType.ENABLE:
+            return "Module {} could not be enabled: {}".format(self.module, self.message)
+        elif self.loadType == ModuleLoadType.DISABLE:
+            return "Module {} could not be disabled: {}".format(self.module, self.message)
+        return "Error: {}".format(self.message)

@@ -127,6 +127,17 @@ class MoronBot(irc.IRCClient, object):
 
         self.handleMessage(message)
 
+    def irc_INVITE(self, prefix, params):
+        if params[0] in self.channels:
+            channel = self.channels[params[0]]
+        else:
+            channel = IRCChannel(params[0])
+        message = IRCMessage('INVITE', prefix, channel, u'', self)
+
+        self.join(channel.Name)
+
+        self.handleMessage(message)
+
     def irc_PART(self, prefix, params):
         partMessage = u''
         if len(params) > 1:
