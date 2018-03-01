@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Feb 28, 2018
+
+@author: Tyranic-Moron
+"""
+
 from fnmatch import fnmatch
 from functools import wraps, partial
 
@@ -9,9 +16,6 @@ def admin(func=None, msg=''):
     if callable(func):
         @wraps(func)
         def wrapped_func(inst, message):
-            print(func)
-            print(msg)
-
             if not inst.checkPermissions(message):
                 if msg:
                     return IRCResponse(ResponseType.Say, msg, message.ReplyTo)
@@ -80,7 +84,7 @@ class BotCommand(BotModule):
             return
 
         try:
-            self.execute(message)
+            return self.execute(message)
         except Exception as e:
             error = u"Python execution error while running command {!r}: {}: {}".format(message.Command,
                                                                                         type(e).__name__,

@@ -104,7 +104,7 @@ class ModuleLoader(BotCommand):
 
             return ['all commands'], [], []
 
-        for moduleName in moduleNameCaseMap.keys():
+        for moduleName in moduleNameCaseMap:
 
             if moduleName == 'moduleloader':
                 failures.append("ModuleLoader (I can't reload myself)")

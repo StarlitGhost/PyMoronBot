@@ -61,7 +61,7 @@ class ModuleHandler(object):
                 self.actions[action] = []
             for actionData in actionList:
                 for index, handlerData in enumerate(self.actions[action]):
-                    if handlerData[1] < actionData[1]:
+                    if actionData[1] > handlerData[1]:
                         self.actions[action].insert(index, actionData)
                         break
                 else:
@@ -85,7 +85,7 @@ class ModuleHandler(object):
 
         self.modules[name].onUnload()
 
-        for action in self.modules[name]:
+        for action in self.modules[name].actions():
             self.actions[action[0]].remove((action[2], action[1]))
 
         # unmap module triggers
@@ -200,6 +200,8 @@ class ModuleHandler(object):
         responses = []
         for action in actionList:
             response = action[0](*params, **kw)
+            if not response:
+                continue
             if isinstance(response, list):
                 responses.extend(response)
             else:
