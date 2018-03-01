@@ -19,6 +19,10 @@ class StripColour(BotModule):
                                                      ('response-action', 99, self.execute),
                                                      ('response-notice', 99, self.execute)]
 
+    def help(self, query):
+        return "Automatic module that strips colours from responses " \
+               "if colours are blocked by channel mode"
+
     def execute(self, response):
         """
         @type response: IRCResponse

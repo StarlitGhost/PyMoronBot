@@ -39,8 +39,8 @@ class URLFollow(BotCommand):
     def triggers(self):
         return ['urlfollow', 'follow']
 
-    def help(self, arg):
-        return 'automatic module that follows urls and grabs information about the resultant webpage'
+    def help(self, query):
+        return 'Automatic module that follows urls and grabs information about the resultant webpage'
 
     runInThread = True
 

@@ -52,9 +52,14 @@ class BotCommand(BotModule):
     def onLoad(self):
         self.triggerHelp = {}
 
-    def help(self, arg):
-        if arg.lower() in self.triggerHelp:
-            return self.triggerHelp[arg]
+    def displayHelp(self, query):
+        if query[0].lower() in self.triggers() or query[0].lower() == self.__class__.__name__.lower():
+            return self.help(query)
+
+    def help(self, query):
+        if query[0].lower() in self.triggerHelp:
+            return self.triggerHelp[query[0].lower()]
+        return super(BotCommand, self).help(query)
 
     def checkPermissions(self, message):
         """
@@ -88,9 +93,10 @@ class BotCommand(BotModule):
         except Exception as e:
             error = u"Python execution error while running command {!r}: {}: {}".format(message.Command,
                                                                                         type(e).__name__,
-                                                                                        e.message)
+                                                                                        e)#e.message)
             self.bot.moduleHandler.sendPRIVMSG(error, message.ReplyTo)
-            self.bot.log.failure(error)
+            #self.bot.log.failure(error)
+            print(error)
 
     def shouldExecute(self, message):
         """

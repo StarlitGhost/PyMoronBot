@@ -67,7 +67,7 @@ class ModuleLoader(BotCommand):
         failures = []
         exceptions = []
 
-        for moduleName in moduleNameCaseMap.keys():
+        for moduleName in moduleNameCaseMap:
             try:
                 success = moduleHandler.loadModule(moduleName)
                 if success:
@@ -105,10 +105,8 @@ class ModuleLoader(BotCommand):
             return ['all commands'], [], []
 
         for moduleName in moduleNameCaseMap:
-
             if moduleName == 'moduleloader':
                 failures.append("ModuleLoader (I can't reload myself)")
-            
             else:
                 try:
                     success = moduleHandler.reloadModule(moduleName)

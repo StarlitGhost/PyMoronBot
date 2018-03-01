@@ -47,3 +47,4 @@ parsetab.py
 PTVS/*
 *.db
 manhole.passwd
+dropin.cache

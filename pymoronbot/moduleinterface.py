@@ -25,10 +25,15 @@ class IModule(Interface):
         Called when the bot is loaded to pass a reference to the bot for later use.
         """
 
-    def help(arg):
+    def displayHelp(query, params):
+        """
+        Catches help actions, checks if they are for this module, then calls help(query, params)
+        """
+
+    def help(query, params):
         """
         Returns help text describing what the module does.
-        Takes an arg as input so you can override with more complex help lookup.
+        Takes params as input so you can override with more complex help lookup.
         """
 
     def onUnload():
@@ -39,7 +44,7 @@ class IModule(Interface):
 
 class BotModule(object):
     def actions(self):
-        return [('help', 1, self.help)]
+        return [('help', 1, self.displayHelp)]
 
     def onLoad(self):
         pass
@@ -47,7 +52,11 @@ class BotModule(object):
     def hookBot(self, bot):
         self.bot = bot
 
-    def help(self, arg):
+    def displayHelp(self, query):
+        if query[0].lower() == self.__class__.__name__.lower():
+            return self.help(query)
+
+    def help(self, query):
         return "This module has no help text"
 
     def onUnload(self):

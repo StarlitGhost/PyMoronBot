@@ -4,42 +4,41 @@ Created on May 21, 2014
 
 @author: HubbeKing, Tyranic-Moron
 """
+
+from twisted.plugin import IPlugin
+from pymoronbot.moduleinterface import IModule
+from pymoronbot.modules.commandinterface import BotCommand, admin
+from zope.interface import implementer
+
 import re
 from collections import OrderedDict
 from six import iteritems
 
 from bs4 import UnicodeDammit
 
-from pymoronbot.modules.commandinterface import BotCommand, admin
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 from pymoronbot.utils import web
 
 
+@implementer(IPlugin, IModule)
 class Alias(BotCommand):
-    triggers = ['alias']
+    def triggers(self):
+        return self.ownTriggers + list(self.aliases.keys())
+
     runInThread = True
 
     def onLoad(self):
-        if 'Alias' not in self.bot.dataStore:
-            self.bot.dataStore['Alias'] = {
-                'Aliases': {},
-                'Help': {}
-            }
+        self.ownTriggers = ['alias']
 
-        self.aliases = self.bot.dataStore['Alias']['Aliases']
-        for alias in self.aliases:
-            self.bot.moduleHandler.mappedTriggers[alias] = self
-
-        self.aliasHelpDict = self.bot.dataStore['Alias']['Help']
+        self.data = self.bot.config.getWithDefault('module-alias', { 'aliases': {},
+                                                                     'help': {} })
+        self.aliases = self.data['aliases']
+        self.aliasHelp = self.data['help']
 
         self._helpText = u"{1}alias ({0}) - does alias things. "\
                          u"Use '{1}help alias <subcommand>' for subcommand help. ".format(
             u'/'.join(self.subCommands.keys()), self.bot.commandChar)
-
-    def onUnload(self):
-        for alias in self.aliases:
-            del self.bot.moduleHandler.mappedTriggers[alias]
 
     @admin("Only my admins may create new aliases!")
     def _add(self, message):
@@ -138,7 +137,7 @@ class Alias(BotCommand):
                                message.ReplyTo)
 
         aliasHelp = u" ".join(message.ParameterList[2:])
-        self.aliasHelpDict[alias] = aliasHelp
+        self.aliasHelp[alias] = aliasHelp
         return IRCResponse(ResponseType.Say,
                            u"'{}' help text set to '{}'"
                            .format(alias, aliasHelp),
@@ -153,8 +152,8 @@ class Alias(BotCommand):
             aliases = {alias: self.aliases[alias]
                        for alias in self.aliases
                        if alias in params}
-            aliasHelp = {alias: self.aliasHelpDict[alias]
-                         for alias in self.aliasHelpDict
+            aliasHelp = {alias: self.aliasHelp[alias]
+                         for alias in self.aliasHelp
                          if alias in params}
 
             if len(aliases) == 0:
@@ -163,7 +162,7 @@ class Alias(BotCommand):
                                    message.ReplyTo)
         else:
             aliases = self.aliases
-            aliasHelp = self.aliasHelpDict
+            aliasHelp = self.aliasHelp
 
             if len(aliases) == 0:
                 return IRCResponse(ResponseType.Say,
@@ -250,7 +249,7 @@ class Alias(BotCommand):
                 numAliases += 1
             elif subCommand == u"help":
                 aliasHelp = u" ".join(splitLine[3:])
-                self.aliasHelpDict[aliasName] = aliasHelp
+                self.aliasHelp[aliasName] = aliasHelp
                 numHelpTexts += 1
 
         return IRCResponse(ResponseType.Say,
@@ -268,14 +267,11 @@ class Alias(BotCommand):
         (u'export', _export),
         (u'import', _import)])
 
-    def help(self, message):
-        """
-        @type message: IRCMessage
-        """
-        command = message.ParameterList[0].lower()
-        if command in self.triggers:
-            if len(message.ParameterList) > 1:
-                subCommand = message.ParameterList[1].lower()
+    def help(self, query):
+        command = query[0].lower()
+        if command in self.ownTriggers:
+            if len(query) > 1:
+                subCommand = query[1].lower()
                 if subCommand in self.subCommands:
                     return u'{1}alias {0}'.format(re.sub(r"\s+", u" ", self.subCommands[subCommand].__doc__),
                                                   self.bot.commandChar)
@@ -284,8 +280,8 @@ class Alias(BotCommand):
             else:
                 return self._helpText
         elif command in self.aliases:
-            if command in self.aliasHelpDict:
-                return self.aliasHelpDict[command]
+            if command in self.aliasHelp:
+                return self.aliasHelp[command]
             else:
                 return u"'{}' is an alias for: {}".format(command, u" ".join(self.aliases[command]))
 
@@ -293,16 +289,11 @@ class Alias(BotCommand):
         return u"unrecognized subcommand '{0}', " \
                u"available subcommands for alias are: {1}".format(subCommand, u', '.join(self.subCommands.keys()))
 
-    def shouldExecute(self, message):
-        if message.Command.lower() in self.triggers or message.Command.lower() in self.aliases:
-            return True
-        return False
-
     def execute(self, message):
         """
         @type message: IRCMessage
         """
-        if message.Command.lower() in self.triggers:
+        if message.Command.lower() in self.ownTriggers:
             if len(message.ParameterList) > 0:
                 subCommand = message.ParameterList[0].lower()
                 if subCommand not in self.subCommands:
@@ -331,18 +322,17 @@ class Alias(BotCommand):
     def _delAlias(self, alias):
         del self.aliases[alias]
         del self.bot.moduleHandler.mappedTriggers[alias]
-        if alias in self.aliasHelpDict:
-            del self.aliasHelpDict[alias]
+        if alias in self.aliasHelp:
+            del self.aliasHelp[alias]
         self._syncAliases()
 
     def _setAliasHelp(self, alias, aliasHelp):
-        self.aliasHelpDict[alias] = aliasHelp
+        self.aliasHelp[alias] = aliasHelp
         self._syncAliases()
 
     def _syncAliases(self):
-        self.bot.dataStore['Alias']['Aliases'] = self.aliases
-        self.bot.dataStore['Alias']['Help'] = self.aliasHelpDict
-        self.bot.dataStore.sync()
+        self.bot.config['module-alias'] = self.data
+        self.bot.config.writeConfig()
 
     def _aliasedMessage(self, message):
         if message.Command.lower() not in self.aliases:
@@ -387,3 +377,7 @@ class Alias(BotCommand):
         # Replace the mangled replacement points with unmangled ones
         string = re.sub(r'@D([\w]+)@', r'$\1', string)
         return string
+
+
+alias = Alias()
+

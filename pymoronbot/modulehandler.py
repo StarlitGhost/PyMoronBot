@@ -49,6 +49,10 @@ class ModuleHandler(object):
 
         module.hookBot(self.bot)
 
+        # do this before loading actions or triggers, in case the
+        # module wants to do anything to them
+        module.onLoad()
+
         actions = {}
         for action in module.actions():
             if action[0] not in actions:
@@ -75,15 +79,11 @@ class ModuleHandler(object):
         self.modules.update({module.__class__.__name__: module})
         self.caseMap.update({module.__class__.__name__.lower(): module.__class__.__name__})
 
-        module.onLoad()
-
     def unloadModule(self, name):
         if name.lower() not in self.caseMap:
             raise ModuleLoaderError(name, "The module is not loaded.", ModuleLoadType.UNLOAD)
 
         name = self.caseMap[name.lower()]
-
-        self.modules[name].onUnload()
 
         for action in self.modules[name].actions():
             self.actions[action[0]].remove((action[2], action[1]))
@@ -92,6 +92,10 @@ class ModuleHandler(object):
         if hasattr(self.modules[name], 'triggers'):
             for trigger in self.modules[name].triggers():
                 del self.mappedTriggers[trigger]
+
+        # do this after removing actions and triggers,
+        # so the module can't leave some dangling
+        self.modules[name].onUnload()
 
         del self.modules[name]
         del self.caseMap[name.lower()]

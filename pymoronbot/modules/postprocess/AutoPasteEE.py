@@ -19,6 +19,10 @@ class AutoPasteEE(BotModule):
                                                      ('response-action', 100, self.execute),
                                                      ('response-notice', 100, self.execute)]
 
+    def help(self, query):
+        return "Automatic module that uploads overly " \
+               "long reponses to paste.ee and gives you a link instead"
+
     def execute(self, response):
         """
         @type response: IRCResponse
