@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+from twisted.plugin import IPlugin
+from pymoronbot.moduleinterface import IModule
 from pymoronbot.modules.commandinterface import BotCommand, admin
+from zope.interface import implementer
+
 from pymoronbot.modulehandler import ModuleHandler
 from pymoronbot.response import IRCResponse, ResponseType
 
@@ -9,11 +13,13 @@ import traceback
 from six import iteritems
 
 
+@implementer(IPlugin, IModule)
 class ModuleLoader(BotCommand):
-    triggers = ['load', 'reload', 'unload',
-                'loadp', 'reloadp', 'unloadp']
-    help = "load/reload <module>, unload <module> - handles loading/unloading/reloading of modules. " \
-           "Use 'all' with load/reload to reload all active modules"
+    def triggers(self):
+        return ['load', 'reload', 'unload']
+
+    def help(self, arg):
+        return "load/reload/unload <module> - handles loading/reloading/unloading of modules."
 
     @admin
     def execute(self, message):
@@ -25,9 +31,7 @@ class ModuleLoader(BotCommand):
                                "You didn't specify a module name! Usage: {0}".format(self.help),
                                message.ReplyTo)
 
-        command = {'load': self.load, 'reload': self.load, 'unload': self.unload,
-                   'loadp': self.loadp, 'reloadp': self.loadp, 'unloadp': self.unloadp,
-        }[message.Command.lower()]
+        command = {'load': self.load, 'reload': self.reload, 'unload': self.unload}[message.Command.lower()]
 
         successes, failures, exceptions = command(message.ParameterList, self.bot.moduleHandler)
 
@@ -56,6 +60,35 @@ class ModuleLoader(BotCommand):
         @type moduleHandler: ModuleHandler
         @return: (list[str], list[str], list[str])
         """
+
+        moduleNameCaseMap = {m.lower(): m for m in moduleNames}
+
+        successes = []
+        failures = []
+        exceptions = []
+
+        for moduleName in moduleNameCaseMap.keys():
+            try:
+                success = moduleHandler.loadModule(moduleName)
+                if success:
+                    successes.append(moduleNameCaseMap[moduleName])
+                else:
+                    failures.append(moduleNameCaseMap[moduleName])
+            except Exception as x:
+                xName = x.__class__.__name__
+                exceptions.append(u"{} ({})".format(moduleNameCaseMap[moduleName], xName))
+                print(xName, x.args)
+                traceback.print_tb(sys.exc_info()[2])
+
+        return successes, failures, exceptions
+
+    @staticmethod
+    def reload(moduleNames, moduleHandler):
+        """
+        @type moduleNames: list[str]
+        @type moduleHandler: ModuleHandler
+        @return: (list[str], list[str], list[str])
+        """
         moduleNameCaseMap = {m.lower(): m for m in moduleNames}
 
         successes = []
@@ -67,7 +100,7 @@ class ModuleLoader(BotCommand):
                 if name == 'ModuleLoader':
                     continue
 
-                moduleHandler.loadModule(name)
+                moduleHandler.reloadModule(name)
 
             return ['all commands'], [], []
 
@@ -78,7 +111,7 @@ class ModuleLoader(BotCommand):
             
             else:
                 try:
-                    success = moduleHandler.loadModule(moduleName)
+                    success = moduleHandler.reloadModule(moduleName)
                     if success:
                         successes.append(moduleHandler.caseMap[moduleName])
                     else:
@@ -89,41 +122,6 @@ class ModuleLoader(BotCommand):
                     exceptions.append(u"{} ({})".format(moduleNameCaseMap[moduleName], xName))
                     print(xName, x.args)
                     traceback.print_tb(sys.exc_info()[2])
-
-        return successes, failures, exceptions
-
-    @staticmethod
-    def loadp(postProcessNames, moduleHandler):
-        """
-        @type postProcessNames: list[str]
-        @type moduleHandler: ModuleHandler
-        @return: (list[str], list[str], list[str])
-        """
-        postProcessNameCaseMap = {p.lower(): p for p in postProcessNames}
-
-        successes = []
-        failures = []
-        exceptions = []
-
-        if len(postProcessNames) == 1 and 'all' in postProcessNameCaseMap:
-            for name, _ in iteritems(moduleHandler.postProcesses):
-                moduleHandler.loadPostProcess(name)
-
-            return ['all post processes'], [], []
-
-        for postProcessName in postProcessNameCaseMap.keys():
-            try:
-                success = moduleHandler.loadPostProcess(postProcessName)
-                if success:
-                    successes.append(moduleHandler.postProcessCaseMapping[postProcessName])
-                else:
-                    failures.append(postProcessNameCaseMap[postProcessName])
-
-            except Exception as x:
-                xName = x.__class__.__name__
-                exceptions.append(u"{} ({})".format(postProcessNameCaseMap[postProcessName], xName))
-                print(xName, x.args)
-                traceback.print_tb(sys.exc_info()[2])
 
         return successes, failures, exceptions
 
@@ -156,31 +154,5 @@ class ModuleLoader(BotCommand):
 
         return successes, failures, exceptions
 
-    @staticmethod
-    def unloadp(postProcessNames, moduleHandler):
-        """
-        @type postProcessNames: list[str]
-        @type moduleHandler: ModuleHandler
-        @return: (list[str], list[str], list[str])
-        """
 
-        postProcessNameCaseMap = {p.lower(): p for p in postProcessNames}
-
-        successes = []
-        failures = []
-        exceptions = []
-
-        for postProcessName in postProcessNameCaseMap.keys():
-            try:
-                success = moduleHandler.unloadPostProcess(postProcessName)
-                if success:
-                    successes.append(postProcessNameCaseMap[postProcessName])
-                else:
-                    failures.append(postProcessNameCaseMap[postProcessName])
-            except Exception as x:
-                xName = x.__class__.__name__
-                exceptions.append(u"{} ({})".format(postProcessNameCaseMap[postProcessName], xName))
-                print(xName, x.args)
-                traceback.print_tb(sys.exc_info()[2])
-
-        return successes, failures, exceptions
+moduleloader = ModuleLoader()

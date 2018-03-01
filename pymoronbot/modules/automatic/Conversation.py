@@ -1,22 +1,24 @@
 # -*- coding: utf-8 -*-
+from twisted.plugin import IPlugin
+from pymoronbot.moduleinterface import IModule, BotModule
+from zope.interface import implementer
+
 import re
 
-from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 
-class Conversation(BotCommand):
-    help = 'Responds to greetings and such'
+@implementer(IPlugin, IModule)
+class Conversation(BotModule):
+    def actions(self):
+        return super(Conversation, self).actions() + [('message-channel', 1, self.handleConversation),
+                                                      ('message-user', 1, self.handleConversation)]
 
-    def shouldExecute(self, message):
-        """
-        @type message: IRCMessage
-        """
-        if message.Type in self.acceptedTypes:
-            return True
+    def help(self, arg):
+        return 'Responds to greetings and such'
 
-    def execute(self, message):
+    def handleConversation(self, message):
         """
         @type message: IRCMessage
         """
@@ -50,3 +52,6 @@ class Conversation(BotCommand):
             return IRCResponse(ResponseType.Say,
                                '{0} {1}'.format(match.group('greeting'), message.User.Name),
                                message.ReplyTo)
+
+
+conversation = Conversation()

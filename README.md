@@ -7,15 +7,15 @@ Initially a language port/rewrite of [MoronBot](https://github.com/MatthewCox/Mo
 
 Features
 --------
-* [Alias](pymoronbot/modules/Alias.py) any of the following to create new commands on-the-fly, and then alias *those* aliases to create even more
-* Use [Slurp](pymoronbot/modules/Slurp.py) and [JQ](pymoronbot/modules/JQ.py) to extract data from HTML/XML or JSON
-* Use [Sub](pymoronbot/modules/Sub.py) or [Chain](pymoronbot/modules/Chain.py) to link multiple modules together
+* [Alias](pymoronbot/modules-todo/Alias.py) any of the following to create new commands on-the-fly, and then alias *those* aliases to create even more
+* Use [Slurp](pymoronbot/modules/Slurp.py) to extract data from HTML/XML
+* Use [Sub](pymoronbot/modules/Sub.py) or [Chain](pymoronbot/modules-todo/Chain.py) to link multiple modules together
   * and use [Var](pymoronbot/modules/Var.py) to store data for use within the same command (eg, a URL you want to slurp multiple times)
-* [Follows URLs](pymoronbot/modules/URLFollow.py) posted in chat to see where they lead (following all redirects), responding with the page title and final hostname
+* [Follows URLs](pymoronbot/modules/automatic/URLFollow.py) posted in chat to see where they lead (following all redirects), responding with the page title and final hostname
   * with specialised follows to get extra relevant information from Imgur, KickStarter, Steam, Twitch, Twitter, and YouTube links
 * Recognizes [sed-like](pymoronbot/modules/Sed.py) patterns in chat and replaces the most recent match in the last 20 messages
-* Also recognizes [`*correction`](pymoronbot/modules/AsterFix.py) style corrections and replaces the most likely candidate word in that user's previous message
-* [AutoPasteEE](pymoronbot/postprocesses/AutoPasteEE.py) detects when single responses are longer than ~2 IRC messages, and submits them to paste.ee instead, replacing the response with a link
+* Also recognizes [`*correction`](pymoronbot/modules-todo/AsterFix.py) style corrections and replaces the most likely candidate word in that user's previous message
+* [AutoPasteEE](pymoronbot/modules/postprocess/AutoPasteEE.py) detects when single responses are longer than ~2 IRC messages, and submits them to paste.ee instead, replacing the response with a link
 * Consistent help for any module via the [Help](pymoronbot/modules/Help.py) module
 * And many more (take a look in [modules](pymoronbot/modules) and [postprocesses](pymoronbot/postprocesses))
 

@@ -29,19 +29,21 @@ class ModuleHandler(object):
 
     def loadModule(self, name):
         for module in getPlugins(IModule, pymoronbot.modules):
-            if module.__name__ and module.__name__.lower() == name.lower():
+            if module.__class__.__name__ and module.__class__.__name__.lower() == name.lower():
                 rebuild(importlib.import_module(module.__module__))
                 self._loadModuleData(module)
 
-                return module.__name__
+                print('-- {} loaded'.format(module.__class__.__name__))
+
+                return module.__class__.__name__
 
     def _loadModuleData(self, module):
         if not IModule.providedBy(module):
-            raise ModuleLoaderError(module.__name__,
+            raise ModuleLoaderError(module.__class__.__name__,
                                     "Module doesn't implement the module interface.",
                                     ModuleLoadType.LOAD)
-        if module.__name__ in self.modules:
-            raise ModuleLoaderError(module.__name__,
+        if module.__class__.__name__ in self.modules:
+            raise ModuleLoaderError(module.__class__.__name__,
                                     "Module is already loaded.",
                                     ModuleLoadType.LOAD)
 
@@ -70,8 +72,8 @@ class ModuleHandler(object):
             for trigger in module.triggers():
                 self.mappedTriggers[trigger] = module
 
-        self.modules.update({module.__name__: module})
-        self.caseMap.update({module.__name__.lower(): module.__name__})
+        self.modules.update({module.__class__.__name__: module})
+        self.caseMap.update({module.__class__.__name__.lower(): module.__class__.__name__})
 
         module.onLoad()
 
@@ -93,6 +95,8 @@ class ModuleHandler(object):
 
         del self.modules[name]
         del self.caseMap[name.lower()]
+
+        print('-- {} unloaded'.format(name))
 
         return name
 
@@ -118,22 +122,23 @@ class ModuleHandler(object):
             "MODE": lambda: "modeschanged-channel" if isChannel else "modeschanged-user",
             "TOPIC": lambda: "channeltopic",
         }
-        action = typeActionMap[message.Type]
+        action = typeActionMap[message.Type]()
         responses = self.runGatheringAction(action, message)
-        self.sendResponses(responses)
+        if responses:
+            self.sendResponses(responses)
 
     def sendResponses(self, responses):
         typeActionMap = {
-            ResponseType.Say: lambda: "response-message",
-            ResponseType.Do: lambda: "response-action",
-            ResponseType.Notice: lambda: "response-notice",
-            ResponseType.Raw: lambda: "response-",
+            ResponseType.Say: "response-message",
+            ResponseType.Do: "response-action",
+            ResponseType.Notice: "response-notice",
+            ResponseType.Raw: "response-",
         }
         for response in responses:
             if not response or not response.Response:
                 continue
 
-            action = typeActionMap[response.Type]()
+            action = typeActionMap[response.Type]
             if response.Type == ResponseType.Raw:
                 action += response.Response.split()[0].lower()
             self.runProcessingAction(action, response)
@@ -153,19 +158,20 @@ class ModuleHandler(object):
                 traceback.print_tb(sys.exc_info()[2])
 
     def loadAll(self):
-        modulesToLoad = self.bot.config.getWithDefault('modules', ['all'])
-        if 'all' in modulesToLoad:
-            modulesToLoad.extend([module.__name__ for module in getPlugins(IModule, pymoronbot.modules)])
+        configModulesToLoad = self.bot.config.getWithDefault('modules', ['all'])
+        modulesToLoad = set()
+        if 'all' in configModulesToLoad:
+            modulesToLoad.update(set([module.__class__.__name__ for module in getPlugins(IModule, pymoronbot.modules)]))
 
-        for module in modulesToLoad:
+        for module in configModulesToLoad:
             if module == 'all':
                 continue
             elif module.startswith('-'):
                 modulesToLoad.remove(module[1:])
             else:
-                modulesToLoad.append(module)
+                modulesToLoad.add(module)
 
-        for module in set(modulesToLoad):
+        for module in modulesToLoad:
             try:
                 self.loadModule(module)
             except Exception as e:
@@ -193,7 +199,12 @@ class ModuleHandler(object):
             actionList = self.actions[actionName]
         responses = []
         for action in actionList:
-            responses.append(action[0](*params, **kw))
+            response = action[0](*params, **kw)
+            if isinstance(response, list):
+                responses.extend(response)
+            else:
+                responses.append(response)
+
         return responses
 
     def runActionUntilTrue(self, actionName, *params, **kw):

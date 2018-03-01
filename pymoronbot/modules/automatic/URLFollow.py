@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+from twisted.plugin import IPlugin
+from pymoronbot.moduleinterface import IModule
+from pymoronbot.modules.commandinterface import BotCommand
+from zope.interface import implementer
 
 from html.parser import HTMLParser
 import json
@@ -12,7 +16,6 @@ from six import iteritems
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.modules.commandinterface import BotCommand
 
 from pymoronbot.utils.api_keys import load_key
 from pymoronbot.utils import string, web
@@ -24,10 +27,21 @@ import dateutil.tz
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
+@implementer(IPlugin, IModule)
 class URLFollow(BotCommand):
-    triggers = ['urlfollow', 'follow']
-    acceptedTypes = ['PRIVMSG', 'ACTION']
-    help = 'automatic module that follows urls and grabs information about the resultant webpage'
+    def actions(self):
+        return super(URLFollow, self).actions() + [('action-channel', 1, self.handleURL),
+                                                   ('action-user', 1, self.handleURL),
+                                                   ('message-channel', 1, self.handleURL),
+                                                   ('message-user', 1, self.handleURL),
+                                                   ('urlfollow', 1, self.dispatchToFollows)]
+
+    def triggers(self):
+        return ['urlfollow', 'follow']
+
+    def help(self, arg):
+        return 'automatic module that follows urls and grabs information about the resultant webpage'
+
     runInThread = True
 
     htmlParser = HTMLParser()
@@ -35,53 +49,48 @@ class URLFollow(BotCommand):
     graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
     def onLoad(self):
-        self.handledExternally = {}
-        """@type : dict[str, list[str]]"""
-        # dict of regex patterns not to follow. populated by other modules so they can handle them themselves
-
         self.youtubeKey = load_key(u'YouTube')
         self.imgurClientID = load_key(u'imgur Client ID')
         self.twitchClientID = load_key(u'Twitch Client ID')
         
         self.autoFollow = True
-
-    def shouldExecute(self, message):
-        """
-        @type message: IRCMessage
-        """
-        if message.Type not in self.acceptedTypes:
-            return False
-        if self.checkIgnoreList(message):
-            return False
-        return True
     
     def execute(self, message):
         """
         @type message: IRCMessage
         """
-        match = None
-        if message.Command.lower() in self.triggers:
-            if message.ParameterList[0].lower() == 'on':
-                self.autoFollow = True
-                return IRCResponse(ResponseType.Say, 'Auto-follow on', message.ReplyTo)
-            elif message.ParameterList[0].lower() == 'off': 
-                self.autoFollow = False
-                return IRCResponse(ResponseType.Say, 'Auto-follow off', message.ReplyTo)
-            else:
-                match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.Parameters, re.IGNORECASE)
-        elif self.autoFollow:
-            match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.MessageString, re.IGNORECASE)
+        if message.ParameterList[0].lower() == 'on':
+            self.autoFollow = True
+            return IRCResponse(ResponseType.Say, 'Auto-follow on', message.ReplyTo)
+        if message.ParameterList[0].lower() == 'off':
+            self.autoFollow = False
+            return IRCResponse(ResponseType.Say, 'Auto-follow off', message.ReplyTo)
+
+        return self.handleURL(message, auto=False)
+
+    def handleURL(self, message, auto=True):
+        if auto and not self.autoFollow:
+            return
+        if auto and self.checkIgnoreList(message):
+            return
+
+        match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.MessageString, re.IGNORECASE)
         if not match:
             return
 
-        for module, patterns in iteritems(self.handledExternally):
-            for pattern in patterns:
-                if re.search(pattern, message.MessageString):
-                    return  # url will be handled by another module
+        follows = self.bot.moduleHandler.runActionUntilValue('urlfollow', match.group('url'))
+        if not follows:
+            return
+        if not isinstance(follows, list):
+            follows = [follows]
 
-        return self.DispatchToFollows(match.group('url'), message)
+        responses = []
+        for follow in follows:
+            responses.append(IRCResponse(ResponseType.Say, follow, message.ReplyTo))
 
-    def DispatchToFollows(self, url, message):
+        return responses
+
+    def dispatchToFollows(self, url):
         """
         @type url: unicode
         @type message: IRCMessage
@@ -94,23 +103,23 @@ class URLFollow(BotCommand):
         twitchMatch  = re.search(r'twitch\.tv/(?P<twitchChannel>[^/]+)/?(\s|$)', url)
         
         if youtubeMatch:
-            return self.FollowYouTube(youtubeMatch.group('videoID'), message)
+            return self.FollowYouTube(youtubeMatch.group('videoID'))
         elif imgurMatch:
-            return self.FollowImgur(imgurMatch.group('imgurID'), message)
+            return self.FollowImgur(imgurMatch.group('imgurID'))
         elif twitterMatch:
-            return self.FollowTwitter(twitterMatch.group('tweeter'), twitterMatch.group('tweetID'), message)
+            return self.FollowTwitter(twitterMatch.group('tweeter'), twitterMatch.group('tweetID'))
         elif steamMatch:
-            return self.FollowSteam(steamMatch.group('steamType'), steamMatch.group('steamID'), message)
+            return self.FollowSteam(steamMatch.group('steamType'), steamMatch.group('steamID'))
         elif ksMatch:
-            return self.FollowKickstarter(ksMatch.group('ksID'), message)
+            return self.FollowKickstarter(ksMatch.group('ksID'))
         elif twitchMatch:
-            return self.FollowTwitch(twitchMatch.group('twitchChannel'), message)
+            return self.FollowTwitch(twitchMatch.group('twitchChannel'))
         elif not re.search('\.(jpe?g|gif|png|bmp)$', url):
-            return self.FollowStandard(url, message)
+            return self.FollowStandard(url)
         
-    def FollowYouTube(self, videoID, message):
+    def FollowYouTube(self, videoID):
         if self.youtubeKey is None:
-            return IRCResponse(ResponseType.Say, '[YouTube API key not found]', message.ReplyTo)
+            return '[YouTube API key not found]'
 
         fields = 'items(id,snippet(title,description,channelTitle,liveBroadcastContent),contentDetails(duration),statistics(viewCount),liveStreamingDetails(scheduledStartTime))'
         parts = 'snippet,contentDetails,statistics,liveStreamingDetails'
@@ -168,14 +177,11 @@ class URLFollow(BotCommand):
             description = u'{} ...'.format(description[:limit].rsplit(' ', 1)[0])
         data.append(description)
 
-        return IRCResponse(ResponseType.Say,
-                           self.graySplitter.join(data),
-                           message.ReplyTo,
-                           {'urlfollowURL': 'http://youtu.be/{}'.format(videoID)})
+        return self.graySplitter.join(data)
     
-    def FollowImgur(self, imgurID, message):
+    def FollowImgur(self, imgurID):
         if self.imgurClientID is None:
-            return IRCResponse(ResponseType.Say, '[imgur Client ID not found]', message.ReplyTo)
+            return '[imgur Client ID not found]'
 
         if imgurID.startswith('gallery/'):
             imgurID = imgurID.replace('gallery/', '')
@@ -234,12 +240,9 @@ class URLFollow(BotCommand):
                 data.append(u'Size: {0:,d}kb'.format(int(imageData['size']/1024)))
         data.append(u'Views: {0:,d}'.format(imageData['views']))
         
-        return IRCResponse(ResponseType.Say,
-                           self.graySplitter.join(data),
-                           message.ReplyTo,
-                           {'urlfollowURL': '[nope, imgur is too hard. also, pointless?]'})
+        return self.graySplitter.join(data)
 
-    def FollowTwitter(self, tweeter, tweetID, message):
+    def FollowTwitter(self, tweeter, tweetID):
         webPage = web.fetchURL('https://twitter.com/{0}/status/{1}'.format(tweeter, tweetID))
 
         soup = BeautifulSoup(webPage.body, 'lxml')
@@ -270,12 +273,9 @@ class URLFollow(BotCommand):
 
         formatString = str(assembleFormattedText(A.normal[A.fg.gray['[{0}]'], A.bold[' {1}:'], ' {2}']))
 
-        return IRCResponse(ResponseType.Say,
-                           formatString.format(tweetTimeText, user, text),
-                           message.ReplyTo,
-                           {'urlfollowURL': 'https://twitter.com/{}/status/{}'.format(tweeter, tweetID)})
+        return formatString.format(tweetTimeText, user, text)
 
-    def FollowSteam(self, steamType, steamId, message):
+    def FollowSteam(self, steamType, steamId):
         steamType = {'app': 'app', 'sub': 'package'}[steamType]
         webPage = web.fetchURL('http://store.steampowered.com/api/{0}details/?{0}ids={1}&cc=US&l=english&v=1'.format(steamType, steamId))
 
@@ -375,10 +375,7 @@ class URLFollow(BotCommand):
                 description = u'{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
             data.append(description)
 
-        return IRCResponse(ResponseType.Say,
-                           self.graySplitter.join(data),
-                           message.ReplyTo,
-                           {'urlfollowURL': 'http://store.steampowered.com/{}/{}'.format({'app': 'app', 'package': 'sub'}[steamType], steamId)})
+        return self.graySplitter.join(data)
 
     @classmethod
     def getSteamPrice(cls, appType, appId, region):
@@ -393,7 +390,7 @@ class URLFollow(BotCommand):
             response[appId]['data'][priceField]['currency'] = 'AUD'
         return response[appId]['data'][priceField]
 
-    def FollowKickstarter(self, ksID, message):
+    def FollowKickstarter(self, ksID):
         webPage = web.fetchURL('https://www.kickstarter.com/projects/{}/description'.format(ksID))
 
         soup = BeautifulSoup(webPage.body, 'lxml')
@@ -498,17 +495,14 @@ class URLFollow(BotCommand):
 
                 data.append('Duration: {0:.0f} days {1:.1f} hours to go'.format(days, hours))
 
-        return IRCResponse(ResponseType.Say,
-                           self.graySplitter.join(data),
-                           message.ReplyTo,
-                           {'urlfollowURL': shorturl})
+        return self.graySplitter.join(data)
 
-    def FollowTwitch(self, channel, message):
+    def FollowTwitch(self, channel):
         # Heavily based on Didero's DideRobot code for the same
         # https://github.com/Didero/DideRobot/blob/06629fc3c8bddf8f729ce2d27742ff999dfdd1f6/commands/urlTitleFinder.py#L37
         # TODO: other stats?
         if self.twitchClientID is None:
-            return IRCResponse(ResponseType.Say, '[Twitch Client ID not found]', message.ReplyTo)
+            return '[Twitch Client ID not found]'
         
         chanData = {}
         channelOnline = False
@@ -540,26 +534,20 @@ class URLFollow(BotCommand):
             else:
                 channelInfo += assembleFormattedText(A.normal[A.fg.red[' (Offline)']])
 
-            return IRCResponse(ResponseType.Say,
-                               channelInfo,
-                               message.ReplyTo,
-                               {'urlfollowURL': 'https://twitch.tv/{}'.format(channel)})
+            return channelInfo
     
-    def FollowStandard(self, url, message):
+    def FollowStandard(self, url):
         webPage = web.fetchURL(url)
         
         if webPage is None:
             return
 
         if webPage.responseUrl != url:
-            return self.DispatchToFollows(webPage.responseUrl, message)
+            return self.dispatchToFollows(webPage.responseUrl)
         
         title = self.GetTitle(webPage.body)
         if title is not None:
-            return IRCResponse(ResponseType.Say,
-                               u'{0} (at {1})'.format(title, webPage.domain),
-                               message.ReplyTo,
-                               {'urlfollowURL': url})
+            return u'{0} (at {1})'.format(title, webPage.domain)
         
         return
 
@@ -580,3 +568,6 @@ class URLFollow(BotCommand):
             return title
         
         return None
+
+
+urlfollow = URLFollow()

@@ -43,7 +43,7 @@ class BotCommand(BotModule):
         return []
 
     def actions(self):
-        return super(BotCommand, self) + [('botmessage', 1, self.handleCommand)]
+        return super(BotCommand, self).actions() + [('botmessage', 1, self.handleCommand)]
 
     def onLoad(self):
         self.triggerHelp = {}
