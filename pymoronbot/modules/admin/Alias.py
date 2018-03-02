@@ -64,7 +64,7 @@ class Alias(BotCommand):
 
         newAlias = message.ParameterList[2:]
         newAlias[0] = newAlias[0].lower()
-        self._newAlias(alias, newAlias)
+        self._newAlias(alias, u' '.join(newAlias))
         self._syncAliases()
 
         return IRCResponse(ResponseType.Say,
@@ -107,8 +107,7 @@ class Alias(BotCommand):
         alias = message.ParameterList[1].lower()
         if alias in self.aliases:
             return IRCResponse(ResponseType.Say,
-                               u"'{}' is aliased to: {}".format(alias,
-                                                                u" ".join(self.aliases[alias])),
+                               u"'{}' is aliased to: {}".format(alias, self.aliases[alias]),
                                message.ReplyTo)
         else:
             return IRCResponse(ResponseType.Say,
@@ -169,11 +168,9 @@ class Alias(BotCommand):
                                    u"There are no aliases for me to export!",
                                    message.ReplyTo)
 
-        addCommands = [u"{}alias add {} {}".format(self.bot.commandChar,
-                                                   name, u" ".join(command))
+        addCommands = [u"{}alias add {} {}".format(self.bot.commandChar, name, command)
                        for name, command in iteritems(aliases)]
-        helpCommands = [u"{}alias help {} {}".format(self.bot.commandChar,
-                                                     name, helpText)
+        helpCommands = [u"{}alias help {} {}".format(self.bot.commandChar, name, helpText)
                         for name, helpText in iteritems(aliasHelp)]
 
         export = u"{}\n\n{}".format(u"\n".join(sorted(addCommands)),
@@ -245,7 +242,7 @@ class Alias(BotCommand):
                 continue
 
             if subCommand == u"add":
-                self._newAlias(aliasName, aliasCommand)
+                self._newAlias(aliasName, u" ".join(aliasCommand))
                 numAliases += 1
             elif subCommand == u"help":
                 aliasHelp = u" ".join(splitLine[3:])
@@ -285,7 +282,7 @@ class Alias(BotCommand):
             if command in self.aliasHelp:
                 return self.aliasHelp[command]
             else:
-                return u"'{}' is an alias for: {}".format(command, u" ".join(self.aliases[command]))
+                return u"'{}' is an alias for: {}".format(command, self.aliases[command])
 
     def _unrecognizedSubcommand(self, subCommand):
         return u"unrecognized subcommand '{0}', " \
@@ -339,7 +336,7 @@ class Alias(BotCommand):
             return
 
         alias = self.aliases[message.Command.lower()]
-        newMsg = u"{0}{1}".format(self.bot.commandChar, ' '.join(alias))
+        newMsg = u"{0}{1}".format(self.bot.commandChar, alias)
 
         newMsg = newMsg.replace("$sender", message.User.Name)
         if message.Channel is not None:
