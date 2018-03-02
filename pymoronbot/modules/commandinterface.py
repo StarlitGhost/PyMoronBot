@@ -30,19 +30,7 @@ def admin(func=None, msg=''):
         return partial(admin, msg=func)  # this seems wrong, should be msg=msg
 
 
-def ignore(command):
-    @wraps(command)
-    def wrapped(inst, message):
-        if not inst.checkIgnoreList(message):
-            return
-        return command(inst, message)
-
-    return wrapped
-
-
 class BotCommand(BotModule):
-    runInThread = False
-
     def triggers(self):
         return []
 
@@ -71,16 +59,6 @@ class BotCommand(BotModule):
                 return True
         for admin in self.bot.config.getWithDefault('admins', []):
             if fnmatch(message.User.String, admin):
-                return True
-        return False
-
-    def checkIgnoreList(self, message):
-        """
-        @type message: IRCMessage
-        @rtype Boolean
-        """
-        for ignore in self.bot.config.getWithDefault('ignored', []):
-            if fnmatch(message.User.String, ignore):
                 return True
         return False
 

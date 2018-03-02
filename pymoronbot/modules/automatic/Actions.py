@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from twisted.plugin import IPlugin
-from pymoronbot.moduleinterface import IModule, BotModule
+from pymoronbot.moduleinterface import IModule, BotModule, ignore
 from zope.interface import implementer
 
 import re
@@ -18,6 +18,7 @@ class Actions(BotModule):
     def help(self, arg):
         return 'Responds to various actions'
 
+    @ignore
     def handleAction(self, message):
         """
         @type message: IRCMessage

@@ -42,8 +42,6 @@ class URLFollow(BotCommand):
     def help(self, query):
         return 'Automatic module that follows urls and grabs information about the resultant webpage'
 
-    runInThread = True
-
     htmlParser = HTMLParser()
     
     graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
@@ -69,6 +67,8 @@ class URLFollow(BotCommand):
         return self.handleURL(message, auto=False)
 
     def handleURL(self, message, auto=True):
+        if auto and message.Command:
+            return
         if auto and not self.autoFollow:
             return
         if auto and self.checkIgnoreList(message):
@@ -78,7 +78,7 @@ class URLFollow(BotCommand):
         if not match:
             return
 
-        follows = self.bot.moduleHandler.runActionUntilValue('urlfollow', match.group('url'))
+        follows = self.bot.moduleHandler.runActionUntilValue('urlfollow', message, match.group('url'))
         if not follows:
             return
         if not isinstance(follows, list):
@@ -90,10 +90,10 @@ class URLFollow(BotCommand):
 
         return responses
 
-    def dispatchToFollows(self, url):
+    def dispatchToFollows(self, _, url):
         """
+        @type _: IRCMessage
         @type url: unicode
-        @type message: IRCMessage
         """
         youtubeMatch = re.search(r'(youtube\.com/watch.+v=|youtu\.be/)(?P<videoID>[^&#\?]{11})', url)
         imgurMatch   = re.search(r'(i\.)?imgur\.com/(?P<imgurID>[^\.]+)', url)

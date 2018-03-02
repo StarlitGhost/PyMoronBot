@@ -127,9 +127,10 @@ class ModuleHandler(object):
             "TOPIC": lambda: "channeltopic",
         }
         action = typeActionMap[message.Type]()
-        responses = self.runGatheringAction(action, message)
-        if responses:
-            self.sendResponses(responses)
+        # fire off a thread for every incoming message
+        d = threads.deferToThread(self.runGatheringAction, action, message)
+        d.addCallback(self.sendResponses)
+        d.addErrback(self._deferredError)
 
     def sendResponses(self, responses):
         typeActionMap = {
@@ -160,6 +161,9 @@ class ModuleHandler(object):
                 # ^ dirty, but I don't want any modules to kill the bot, especially if I'm working on it live
                 print("Python Execution Error sending responses '{0}': {1}".format(responses, str(sys.exc_info())))
                 traceback.print_tb(sys.exc_info()[2])
+
+    def _deferredError(self, error):
+        pass
 
     def loadAll(self):
         configModulesToLoad = self.bot.config.getWithDefault('modules', ['all'])

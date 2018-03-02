@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from zope.interface import Interface
+from functools import wraps
+from fnmatch import fnmatch
 
 
 class IModule(Interface):
@@ -42,6 +44,16 @@ class IModule(Interface):
         """
 
 
+def ignore(func):
+    @wraps(func)
+    def wrapped(inst, message):
+        if inst.checkIgnoreList(message):
+            return
+        return func(inst, message)
+
+    return wrapped
+
+
 class BotModule(object):
     def actions(self):
         return [('help', 1, self.displayHelp)]
@@ -61,3 +73,13 @@ class BotModule(object):
 
     def onUnload(self):
         pass
+
+    def checkIgnoreList(self, message):
+        """
+        @type message: IRCMessage
+        @rtype Boolean
+        """
+        for ignore in self.bot.config.getWithDefault('ignored', []):
+            if fnmatch(message.User.String, ignore):
+                return True
+        return False
