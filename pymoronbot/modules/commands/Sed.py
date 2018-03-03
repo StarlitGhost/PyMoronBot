@@ -45,7 +45,7 @@ class Sed(BotCommand):
 
     @ignore
     def handleSed(self, message):
-        if message.Command:
+        if message.Command and message.Command.lower() in self.bot.moduleHandler.mappedTriggers:
             return
 
         match = self.match(message.MessageString)
