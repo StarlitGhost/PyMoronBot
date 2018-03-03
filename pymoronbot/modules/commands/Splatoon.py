@@ -4,23 +4,30 @@ Created on Sep 01, 2017
 
 @author: Tyranic-Moron
 """
+from twisted.plugin import IPlugin
+from pymoronbot.moduleinterface import IModule
+from pymoronbot.modules.commandinterface import BotCommand
+from zope.interface import implementer
+
 import json
 import time
 import datetime
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.modules.commandinterface import BotCommand
 
 from pymoronbot.utils import string, web
 
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
+@implementer(IPlugin, IModule)
 class Splatoon(BotCommand):
-    triggers = ['splat']
-    help = "splat [regular/ranked/league/fest]"
-    runInThread = True
+    def triggers(self):
+        return ['splat']
+
+    def help(self, query):
+        return "splat [regular/ranked/league/fest]"
 
     graySplitter = assembleFormattedText(A.normal[' ', A.fg.gray['|'], ' '])
 
@@ -89,4 +96,7 @@ class Splatoon(BotCommand):
                                    subCommands[subCommand](jsonResponse, short=False),
                                    message.ReplyTo)
             else:
-                return IRCResponse(ResponseType.Say, self.help, message.ReplyTo)
+                return IRCResponse(ResponseType.Say, self.help(None), message.ReplyTo)
+
+
+splatoon = Splatoon()

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mar 09, 2016
+
 @author: Tyranic-Moron
 """
 from twisted.plugin import IPlugin

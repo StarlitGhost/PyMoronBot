@@ -1,19 +1,27 @@
 # -*- coding: utf-8 -*-
 """
 Created on Nov 07, 2014
+
 @author: Tyranic-Moron
 """
+from twisted.plugin import IPlugin
+from pymoronbot.moduleinterface import IModule
+from pymoronbot.modules.commandinterface import BotCommand
+from zope.interface import implementer
 
 from future.utils import iteritems
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.modules.commandinterface import BotCommand
 
 
+@implementer(IPlugin, IModule)
 class Flip(BotCommand):
-    triggers = ['flip']
-    help = 'flip <text> - flips the text given to it'
+    def triggers(self):
+        return ['flip']
+
+    def help(self, query):
+        return 'flip <text> - flips the text given to it'
 
     def onLoad(self):
         table = {
@@ -86,3 +94,5 @@ class Flip(BotCommand):
         else:
             return IRCResponse(ResponseType.Say, 'Flip what?', message.ReplyTo)
 
+
+flip = Flip()

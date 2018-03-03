@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
+from twisted.plugin import IPlugin
+from pymoronbot.moduleinterface import IModule
+from pymoronbot.modules.commandinterface import BotCommand
+from zope.interface import implementer
+
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.modules.commandinterface import BotCommand
 
 tang = {'A': 'ALPHA',
         'B': 'BRAVO',
@@ -42,9 +46,13 @@ tang = {'A': 'ALPHA',
         '-': 'DASH'}
 
 
+@implementer(IPlugin, IModule)
 class Tango(BotCommand):
-    triggers = ['tango']
-    help = 'tango <words> - reproduces <words> with the NATO phonetic alphabet, because reasons.'
+    def triggers(self):
+        return ['tango']
+
+    def help(self, query):
+        return 'tango <words> - reproduces <words> with the NATO phonetic alphabet, because reasons.'
 
     def execute(self, message):
         """
@@ -57,3 +65,6 @@ class Tango(BotCommand):
         return IRCResponse(ResponseType.Say,
                            response,
                            message.ReplyTo)
+
+
+tango = Tango()

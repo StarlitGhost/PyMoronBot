@@ -4,15 +4,22 @@ Created on Nov 07, 2014
 
 @author: Tyranic-Moron
 """
+from twisted.plugin import IPlugin
+from pymoronbot.moduleinterface import IModule
+from pymoronbot.modules.commandinterface import BotCommand
+from zope.interface import implementer
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.modules.commandinterface import BotCommand
 
 
+@implementer(IPlugin, IModule)
 class Reverse(BotCommand):
-    triggers = ['reverse', 'backwards']
-    help = 'reverse <text> - reverses the text given to it'
+    def triggers(self):
+        return ['reverse', 'backwards']
+
+    def help(self, query):
+        return 'reverse <text> - reverses the text given to it'
 
     def execute(self, message):
         """
@@ -22,3 +29,6 @@ class Reverse(BotCommand):
             return IRCResponse(ResponseType.Say, message.Parameters[::-1], message.ReplyTo)
         else:
             return IRCResponse(ResponseType.Say, 'Reverse what?', message.ReplyTo)
+
+
+reverse = Reverse()

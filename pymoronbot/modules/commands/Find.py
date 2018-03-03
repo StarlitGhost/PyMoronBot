@@ -32,6 +32,11 @@ class Find(BotCommand):
         try:
             results = web.googleSearch(message.Parameters)
 
+            if not results:
+                return IRCResponse(ResponseType.Say,
+                                   u'[google developer key missing]',
+                                   message.ReplyTo)
+
             firstResult = results[u'items'][0]
 
             title = firstResult[u'title']

@@ -4,18 +4,26 @@ Created on Dec 05, 2013
 
 @author: Tyranic-Moron
 """
+from twisted.plugin import IPlugin
+from pymoronbot.moduleinterface import IModule
+from pymoronbot.modules.commandinterface import BotCommand
+from zope.interface import implementer
+
 import random
 
-from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 from pymoronbot.utils import web
 
 
+@implementer(IPlugin, IModule)
 class Gif(BotCommand):
-    triggers = ['gif']
-    help = 'gif [<year>] - fetches a random gif posted during Desert Bus'
+    def triggers(self):
+        return ['gif']
+
+    def help(self, query):
+        return 'gif [<year>] - fetches a random gif posted during Desert Bus'
     
     def execute(self, message):
         """
@@ -50,3 +58,6 @@ class Gif(BotCommand):
         return IRCResponse(ResponseType.Say,
                            u"Random DB{} gif: {}".format(year, link),
                            message.ReplyTo)
+
+
+gif = Gif()

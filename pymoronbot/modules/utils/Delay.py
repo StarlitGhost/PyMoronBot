@@ -4,6 +4,10 @@ Created on May 26, 2014
 
 @author: Tyranic-Moron
 """
+from twisted.plugin import IPlugin
+from pymoronbot.moduleinterface import IModule
+from pymoronbot.modules.commandinterface import BotCommand
+from zope.interface import implementer
 
 import datetime
 
@@ -11,22 +15,25 @@ from twisted.internet import task
 from twisted.internet import reactor
 from pytimeparse.timeparse import timeparse
 
-from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 from pymoronbot.utils import string
 
 
+@implementer(IPlugin, IModule)
 class Delay(BotCommand):
-    triggers = ['delay', 'later']
-    help = 'delay <duration> <command> (<parameters>) - executes the given command after the specified delay'
+    def triggers(self):
+        return ['delay', 'later']
+
+    def help(self, query):
+        return 'delay <duration> <command> (<parameters>) - executes the given command after the specified delay'
 
     def execute(self, message):
         """
         @type message: IRCMessage
         """
         if len(message.ParameterList) < 2:
-            return IRCResponse(ResponseType.Say, self.help, message.ReplyTo)
+            return IRCResponse(ResponseType.Say, self.help(None), message.ReplyTo)
 
         command = message.ParameterList[1].lower()
         delay = timeparse(message.ParameterList[0])
@@ -63,3 +70,6 @@ class Delay(BotCommand):
             return IRCResponse(ResponseType.Say,
                                "OK, I'll execute that in {}".format(delayString),
                                message.ReplyTo)
+
+
+delay = Delay()

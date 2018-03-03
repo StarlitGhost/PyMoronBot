@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
+from twisted.plugin import IPlugin
+from pymoronbot.moduleinterface import IModule
+from pymoronbot.modules.commandinterface import BotCommand
+from zope.interface import implementer
+
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.modules.commandinterface import BotCommand
 
 from pymoronbot.utils import web
 
@@ -11,9 +15,13 @@ from builtins import str
 from bs4 import BeautifulSoup
 
 
+@implementer(IPlugin, IModule)
 class Mtg(BotCommand):
-    triggers = ['mtg', 'mtgf']
-    help = 'mtg(f) <card name> - fetches details of the Magic: The Gathering card you specify ' \
+    def triggers(self):
+        return ['mtg', 'mtgf']
+
+    def help(self, query):
+        return 'mtg(f) <card name> - fetches details of the Magic: The Gathering card you specify ' \
            'from gatherer.wizards.com. mtgf includes the flavour text, if it has any'
 
     def execute(self, message):
@@ -98,3 +106,6 @@ class Mtg(BotCommand):
         text = re.sub(r'<img.+?name=([^&"]+).+?>', r'\1', text)  # singles and any 'others' left over
 
         return text
+
+
+mtg = Mtg()

@@ -76,19 +76,24 @@ class URLFollow(BotCommand):
 
         match = re.search(r'(?P<url>(https?://|www\.)[^\s]+)', message.MessageString, re.IGNORECASE)
         if not match:
+            if not auto:
+                return IRCResponse(ResponseType.Say,
+                                   u'[no url recognized]',
+                                   message.ReplyTo,
+                                   {'urlfollowURL': u'[no url recognized]'})
             return
 
         follows = self.bot.moduleHandler.runActionUntilValue('urlfollow', message, match.group('url'))
         if not follows:
+            if not auto:
+                return IRCResponse(ResponseType.Say,
+                                   u'[no follows worked for {}]'.format(match.group('url')),
+                                   message.ReplyTo,
+                                   {'urlfollowURL': u'[no follows worked for {}]'})
             return
-        if not isinstance(follows, list):
-            follows = [follows]
+        text, url = follows
 
-        responses = []
-        for follow in follows:
-            responses.append(IRCResponse(ResponseType.Say, follow, message.ReplyTo))
-
-        return responses
+        return IRCResponse(ResponseType.Say, text, message.ReplyTo, {'urlfollowURL': url})
 
     def dispatchToFollows(self, _, url):
         """
@@ -177,7 +182,7 @@ class URLFollow(BotCommand):
             description = u'{} ...'.format(description[:limit].rsplit(' ', 1)[0])
         data.append(description)
 
-        return self.graySplitter.join(data)
+        return self.graySplitter.join(data), 'http://youtu.be/{}'.format(videoID)
     
     def FollowImgur(self, imgurID):
         if self.imgurClientID is None:
@@ -240,7 +245,7 @@ class URLFollow(BotCommand):
                 data.append(u'Size: {0:,d}kb'.format(int(imageData['size']/1024)))
         data.append(u'Views: {0:,d}'.format(imageData['views']))
         
-        return self.graySplitter.join(data)
+        return self.graySplitter.join(data), '[no imgur url]'
 
     def FollowTwitter(self, tweeter, tweetID):
         webPage = web.fetchURL('https://twitter.com/{0}/status/{1}'.format(tweeter, tweetID))
@@ -273,7 +278,7 @@ class URLFollow(BotCommand):
 
         formatString = str(assembleFormattedText(A.normal[A.fg.gray['[{0}]'], A.bold[' {1}:'], ' {2}']))
 
-        return formatString.format(tweetTimeText, user, text)
+        return formatString.format(tweetTimeText, user, text), 'https://twitter.com/{}/status/{}'.format(tweeter, tweetID)
 
     def FollowSteam(self, steamType, steamId):
         steamType = {'app': 'app', 'sub': 'package'}[steamType]
@@ -375,7 +380,7 @@ class URLFollow(BotCommand):
                 description = u'{0} ...'.format(description[:limit].rsplit(' ', 1)[0])
             data.append(description)
 
-        return self.graySplitter.join(data)
+        return self.graySplitter.join(data), 'http://store.steampowered.com/{}/{}'.format({'app': 'app', 'package': 'sub'}[steamType], steamId)
 
     @classmethod
     def getSteamPrice(cls, appType, appId, region):
@@ -495,7 +500,7 @@ class URLFollow(BotCommand):
 
                 data.append('Duration: {0:.0f} days {1:.1f} hours to go'.format(days, hours))
 
-        return self.graySplitter.join(data)
+        return self.graySplitter.join(data), shorturl
 
     def FollowTwitch(self, channel):
         # Heavily based on Didero's DideRobot code for the same
@@ -534,7 +539,7 @@ class URLFollow(BotCommand):
             else:
                 channelInfo += assembleFormattedText(A.normal[A.fg.red[' (Offline)']])
 
-            return channelInfo
+            return channelInfo, 'https://twitch.tv/{}'.format(channel)
     
     def FollowStandard(self, url):
         webPage = web.fetchURL(url)
@@ -543,11 +548,11 @@ class URLFollow(BotCommand):
             return
 
         if webPage.responseUrl != url:
-            return self.dispatchToFollows(webPage.responseUrl)
+            return self.dispatchToFollows(None, webPage.responseUrl)
         
         title = self.GetTitle(webPage.body)
         if title is not None:
-            return u'{0} (at {1})'.format(title, webPage.domain)
+            return u'{0} (at {1})'.format(title, webPage.domain), url
         
         return
 

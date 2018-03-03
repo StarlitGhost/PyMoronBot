@@ -4,19 +4,26 @@ Created on Jul 31, 2013
 
 @author: Tyranic-Moron, Emily
 """
+from twisted.plugin import IPlugin
+from pymoronbot.moduleinterface import IModule
+from pymoronbot.modules.commandinterface import BotCommand
+from zope.interface import implementer
 
 from bs4 import BeautifulSoup
 
-from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 from pymoronbot.utils import web
 
 
+@implementer(IPlugin, IModule)
 class Dinner(BotCommand):
-    triggers = ['dinner']
-    help = 'dinner (meat/veg/drink) - asks WhatTheFuckShouldIMakeForDinner.com' \
+    def triggers(self):
+        return ['dinner']
+
+    def help(self, query):
+        return 'dinner (meat/veg/drink) - asks WhatTheFuckShouldIMakeForDinner.com' \
            ' what you should make for dinner'
     
     def execute(self, message):
@@ -48,3 +55,6 @@ class Dinner(BotCommand):
             error = u"'{}' is not a recognized dinner type, please choose one of {}"\
                 .format(option, u'/'.join(options.keys()))
             return IRCResponse(ResponseType.Say, error, message.ReplyTo)
+
+
+dinner = Dinner()

@@ -46,13 +46,9 @@ class Dominotifications(BotModule):
             self.trackers[orderID] = TrackingDetails(message.User.Name, message.Channel,
                                                      task.LoopingCall(self._pizzaLoop, orderID))
             self._startPizzaTracker(orderID)
-            return IRCResponse(ResponseType.Say,
-                               u"PIZZA DETECTED! Now tracking {}'s Domino's pizza order!".format(message.User.Name),
-                               message.ReplyTo)
+            return u"PIZZA DETECTED! Now tracking {}'s Domino's pizza order!".format(message.User.Name), ''
         else:
-            return IRCResponse(ResponseType.Say,
-                               u"I'm already tracking that pizza for {}".format(self.trackers[orderID].orderer),
-                               message.ReplyTo)
+            return u"I'm already tracking that pizza for {}".format(self.trackers[orderID].orderer), ''
 
     def _startPizzaTracker(self, orderID):
         """

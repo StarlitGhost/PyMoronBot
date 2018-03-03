@@ -4,11 +4,14 @@ Created on Oct 09, 2013
 
 @author: Tyranic-Moron
 """
+from twisted.plugin import IPlugin
+from pymoronbot.moduleinterface import IModule
+from pymoronbot.modules.commandinterface import BotCommand
+from zope.interface import implementer
 
 import json
 import urllib
 
-from pymoronbot.modules.commandinterface import BotCommand
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
@@ -16,9 +19,13 @@ from pymoronbot.utils.api_keys import load_key
 from pymoronbot.utils import web
 
 
+@implementer(IPlugin, IModule)
 class GPSLookup(BotCommand):
-    triggers = ['gps', 'gpslookup']
-    help = "gps(lookup) <address> - Uses Microsoft's Bing Maps geocoding API to " \
+    def triggers(self):
+        return ['gps', 'gpslookup']
+
+    def help(self, query):
+        return "gps(lookup) <address> - Uses Microsoft's Bing Maps geocoding API to " \
            "lookup GPS coordinates for the given address"
 
     def onLoad(self):
@@ -53,3 +60,6 @@ class GPSLookup(BotCommand):
             return IRCResponse(ResponseType.Say,
                                "You didn't give an address to look up",
                                message.ReplyTo)
+
+
+gpsLookup = GPSLookup()

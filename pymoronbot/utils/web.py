@@ -149,6 +149,8 @@ def googleSearch(query):
     @rtype: dict[unicode, T]
     """
     googleKey = load_key(u'Google')
+    if not googleKey:
+        return None
     
     service = build('customsearch', 'v1', developerKey=googleKey)
     res = service.cse().list(
