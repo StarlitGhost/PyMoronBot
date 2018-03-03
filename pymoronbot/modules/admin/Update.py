@@ -20,7 +20,7 @@ import sys
 @implementer(IPlugin, IModule)
 class Update(BotCommand):
     def triggers(self):
-        return ['update', 'updatelibs']
+        return ['update', 'fullupdate']
     
     def help(self, query):
         """
@@ -28,7 +28,7 @@ class Update(BotCommand):
         """
         helpDict = {
             u"update": u"update - pulls the latest code from GitHub",
-            u"updatelibs": u"updatelibs - updates the libraries used by the bot (not implemented yet, does the same as update)"}
+            u"fullupdate": u"updatelibs - updates the libraries used by the bot (not implemented yet, does the same as update)"}
             
         command = query[0].lower()
         if command in helpDict:
@@ -58,11 +58,12 @@ class Update(BotCommand):
                                'Merge after update failed, please merge manually',
                                message.ReplyTo)
 
-        try:
-            subprocess.check_call([os.path.join(os.path.dirname(sys.executable), 'pip'),
-                                   'install', '-r', 'requirements.txt', '-U'])
-        except OSError:
-            print('pip not found, requirements not updated')
+        if message.Command.lower() == 'fullupdate':
+            try:
+                subprocess.check_call([os.path.join(os.path.dirname(sys.executable), 'pip'),
+                                       'install', '-r', 'requirements.txt'])
+            except OSError:
+                print('pip not found, requirements not updated')
         
         return IRCResponse(ResponseType.Say,
                            response,
