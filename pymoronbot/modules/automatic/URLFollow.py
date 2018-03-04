@@ -199,13 +199,13 @@ class URLFollow(BotCommand):
         else:
             url = 'https://api.imgur.com/3/image/{0}'.format(imgurID)
 
-        headers = [('Authorization', 'Client-ID {0}'.format(self.imgurClientID))]
+        headers = {'Authorization': 'Client-ID {0}'.format(self.imgurClientID)}
         
-        webPage = web.fetchURL(url, headers)
+        webPage = web.fetchURL(url, extraHeaders=headers)
         
         if webPage is None:
             url = 'https://api.imgur.com/3/gallery/{0}'.format(imgurID)
-            webPage = web.fetchURL(url, headers)
+            webPage = web.fetchURL(url, extraHeaders=headers)
 
         if webPage is None:
             return
@@ -216,9 +216,11 @@ class URLFollow(BotCommand):
 
         if imageData['title'] is None:
             url = 'https://api.imgur.com/3/gallery/{0}'.format(imgurID)
-            webPage = web.fetchURL(url, headers)
+            webPage = web.fetchURL(url, extraHeaders=headers)
             if webPage is not None:
-                imageData = json.loads(webPage.body)['data']
+                response = json.loads(webPage.body)
+                if response['success']:
+                    imageData = response['data']
 
             if imageData['title'] is None:
                 webPage = web.fetchURL('http://imgur.com/{0}'.format(imgurID))
@@ -511,9 +513,9 @@ class URLFollow(BotCommand):
         
         chanData = {}
         channelOnline = False
-        twitchHeaders = [('Accept', 'application/vnd.twitchtv.v3+json'),
-                         ('Client-ID', self.twitchClientID)]
-        webPage = web.fetchURL(u'https://api.twitch.tv/kraken/streams/{}'.format(channel), twitchHeaders)
+        twitchHeaders = {'Accept': 'application/vnd.twitchtv.v3+json',
+                         'Client-ID': self.twitchClientID}
+        webPage = web.fetchURL(u'https://api.twitch.tv/kraken/streams/{}'.format(channel), extraHeaders=twitchHeaders)
 
         streamData = json.loads(webPage.body)
 
@@ -521,7 +523,7 @@ class URLFollow(BotCommand):
             chanData = streamData['stream']['channel']
             channelOnline = True
         elif 'error' not in streamData:
-            webPage = web.fetchURL(u'https://api.twitch.tv/kraken/channels/{}'.format(channel), twitchHeaders)
+            webPage = web.fetchURL(u'https://api.twitch.tv/kraken/channels/{}'.format(channel), extraHeaders=twitchHeaders)
             chanData = json.loads(webPage.body)
 
         if len(chanData) > 0:

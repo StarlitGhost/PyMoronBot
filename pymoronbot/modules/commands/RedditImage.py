@@ -66,7 +66,7 @@ class RedditImage(BotCommand):
         url = "https://api.imgur.com/3/gallery/r/{}/time/all/{}"
         url = url.format(subreddit, random.randint(0, topRange))
         try:
-            response = web.fetchURL(url, self.headers)
+            response = web.fetchURL(url, extraHeaders=self.headers)
             jsonResponse = json.loads(response.body)
         except json.JSONDecodeError:
             return IRCResponse(ResponseType.Say,

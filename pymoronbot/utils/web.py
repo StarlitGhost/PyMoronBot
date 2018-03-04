@@ -58,7 +58,7 @@ class URLResponse(object):
 def fetchURL(url, params=None, extraHeaders=None):
     """
     @type url: unicode
-    @type extraHeaders: list[tuple]
+    @type extraHeaders: dict
     @rtype: URLResponse
     """
     headers = {
