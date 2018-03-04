@@ -55,17 +55,23 @@ class URLResponse(object):
         del self._body
 
 
-def fetchURL(url, extraHeaders=None):
+def fetchURL(url, params=None, extraHeaders=None):
     """
     @type url: unicode
     @type extraHeaders: list[tuple]
     @rtype: URLResponse
     """
-    headers = {"User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0"}
+    headers = {
+        "User-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0",
+        "Accept": "text/*, "
+                  "application/xml, application/xhtml+xml, "
+                  "application/rss+xml, application/atom+xml, application/rdf+xml, "
+                  "application/json"
+    }
     if extraHeaders:
         headers.update(extraHeaders)
     try:
-        response = requests.get(url, headers=headers, stream=True)
+        response = requests.get(url, params=params, headers=headers, timeout=10)
         responseHeaders = response.headers
         pageType = responseHeaders["content-type"]
 
@@ -85,7 +91,7 @@ def fetchURL(url, extraHeaders=None):
 
 # mostly taken directly from Heufneutje's PyHeufyBot
 # https://github.com/Heufneutje/PyHeufyBot/blob/eb10b5218cd6b9247998d8795d93b8cd0af45024/pyheufybot/utils/webutils.py#L43
-def postURL(url, values, extraHeaders=None):
+def postURL(url, data, extraHeaders=None):
     """
     @type url: unicode
     @type values: dict[unicode, T]
@@ -96,11 +102,11 @@ def postURL(url, values, extraHeaders=None):
     if extraHeaders:
         headers.update(extraHeaders)
 
-    for k, v in iteritems(values):
-        values[k] = str(v)
+    for k, v in iteritems(data):
+        data[k] = str(v)
 
     try:
-        response = requests.post(url, data=values, headers=headers, stream=True)
+        response = requests.post(url, data=data, headers=headers, timeout=10)
         responseHeaders = response.headers
         pageType = responseHeaders["content-type"]
 
@@ -123,7 +129,7 @@ def shortenGoogl(url):
     @type url: unicode
     @rtype: unicode
     """
-    post = '{{"longUrl": "{}"}}'.format(url)
+    post = {"longUrl": url}
 
     googlKey = load_key(u'goo.gl')
 
@@ -135,8 +141,10 @@ def shortenGoogl(url):
     headers = {"Content-Type": "application/json"}
 
     try:
-        response = requests.post(apiURL, data=post, headers=headers)
+        response = requests.post(apiURL, json=post, headers=headers)
         responseJson = response.json()
+        if 'error' in responseJson:
+            return '[Googl Error: {} {}]'.format(responseJson['error']['message'], post['longUrl'])
         return responseJson['id']
 
     except requests.exceptions.RequestException as e:

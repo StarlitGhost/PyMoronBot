@@ -56,8 +56,6 @@ class LRR(BotCommand):
                 #TODO: log an error here that the feed likely no longer exists!
                 continue
 
-            title = DataStore.LRRChecker[feedName]['lastTitle'] = item.find('title').text
-            link = DataStore.LRRChecker[feedName]['lastLink'] = web.shortenGoogl(item.find('link').text)
             newestDate = dparser.parse(item.find('pubDate').text, fuzzy=True, ignoretz=True)
             
             if newestDate > feedDeets['lastUpdate']:
@@ -66,6 +64,8 @@ class LRR(BotCommand):
                 if feedDeets['suppress']:
                     DataStore.LRRChecker[feedName]['suppress'] = False
                 else:
+                    title = DataStore.LRRChecker[feedName]['lastTitle'] = item.find('title').text
+                    link = DataStore.LRRChecker[feedName]['lastLink'] = web.shortenGoogl(item.find('link').text)
                     response = 'New {0}! Title: {1} | {2}'.format(feedName, title, link)
                     responses.append(IRCResponse(ResponseType.Say, response, '#desertbus'))
             
