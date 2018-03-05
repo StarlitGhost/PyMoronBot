@@ -14,8 +14,6 @@ from bs4 import BeautifulSoup
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
-from pymoronbot.utils import web
-
 
 @implementer(IPlugin, IModule)
 class Dinner(BotCommand):
@@ -39,13 +37,13 @@ class Dinner(BotCommand):
             option = message.ParameterList[0]
 
         if option in options:
-            webPage = web.fetchURL(wtfsimfd.format(options[option]))
+            webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', wtfsimfd.format(options[option]))
 
             soup = BeautifulSoup(webPage.body, 'lxml')
 
             phrase = soup.find('dl').text
             item = soup.find('a')
-            link = web.shortenGoogl(item['href'])
+            link = self.bot.moduleHandler.runActionUntilValue('shorten-url', item['href'])
 
             return IRCResponse(ResponseType.Say,
                                u"{}... {} {}".format(phrase, item.text, link),

@@ -7,8 +7,6 @@ from zope.interface import implementer
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
-from pymoronbot.utils import web
-
 
 @implementer(IPlugin, IModule)
 class Googl(BotCommand):
@@ -25,7 +23,7 @@ class Googl(BotCommand):
         if len(message.ParameterList) == 0:
             return IRCResponse(ResponseType.Say, "You didn't give a URL to shorten!", message.ReplyTo)
         
-        url = web.shortenGoogl(message.Parameters)
+        url = self.bot.moduleHandler.runActionUntilValue('shorten-url', message.Parameters)
         
         return IRCResponse(ResponseType.Say, url, message.ReplyTo)
 

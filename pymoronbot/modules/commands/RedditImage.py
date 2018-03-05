@@ -16,7 +16,6 @@ from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 from pymoronbot.utils.api_keys import load_key
-from pymoronbot.utils import web
 
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
@@ -66,7 +65,7 @@ class RedditImage(BotCommand):
         url = "https://api.imgur.com/3/gallery/r/{}/time/all/{}"
         url = url.format(subreddit, random.randint(0, topRange))
         try:
-            response = web.fetchURL(url, extraHeaders=self.headers)
+            response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url, extraHeaders=self.headers)
             jsonResponse = json.loads(response.body)
         except json.JSONDecodeError:
             return IRCResponse(ResponseType.Say,

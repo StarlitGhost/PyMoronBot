@@ -16,7 +16,6 @@ from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 from pymoronbot.utils.api_keys import load_key
-from pymoronbot.utils import web
 
 
 @implementer(IPlugin, IModule)
@@ -41,7 +40,7 @@ class GPSLookup(BotCommand):
 
             url = "http://dev.virtualearth.net/REST/v1/Locations?q={0}&key={1}".format(urllib.quote_plus(message.Parameters), self.api_key)
 
-            page = web.fetchURL(url)
+            page = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
             result = json.loads(page.body)
 
             if result['resourceSets'][0]['estimatedTotal'] == 0:

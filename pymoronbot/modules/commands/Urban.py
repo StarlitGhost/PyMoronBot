@@ -16,8 +16,6 @@ from builtins import str
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
-from pymoronbot.utils import web
-
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
 
@@ -42,7 +40,7 @@ class Urban(BotCommand):
 
         url = 'http://api.urbandictionary.com/v0/define?term={0}'.format(search)
         
-        webPage = web.fetchURL(url)
+        webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
 
         response = json.loads(webPage.body)
 

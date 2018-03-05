@@ -16,7 +16,7 @@ import datetime
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
-from pymoronbot.utils import string, web
+from pymoronbot.utils import string
 
 from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 
@@ -70,7 +70,7 @@ class Splatoon(BotCommand):
         """
 
         url = "https://splatoon2.ink/data/schedules.json"
-        response = web.fetchURL(url)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
         jsonResponse = json.loads(response.body)
 
         if len(message.ParameterList) < 1:

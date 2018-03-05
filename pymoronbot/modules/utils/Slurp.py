@@ -16,8 +16,6 @@ from six import string_types
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
-from pymoronbot.utils import web
-
 from bs4 import BeautifulSoup
 
 
@@ -47,7 +45,7 @@ class Slurp(BotCommand):
         if 'slurp' in message.Metadata and url in message.Metadata['slurp']:
             soup = message.Metadata['slurp'][url]
         else:
-            page = web.fetchURL(url)
+            page = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
             if page is None:
                 return IRCResponse(ResponseType.Say, u"Problem fetching {}".format(url), message.ReplyTo)
             soup = BeautifulSoup(page.body, 'lxml')

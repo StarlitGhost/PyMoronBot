@@ -14,8 +14,6 @@ import random
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
-from pymoronbot.utils import web
-
 
 @implementer(IPlugin, IModule)
 class Gif(BotCommand):
@@ -51,7 +49,7 @@ class Gif(BotCommand):
 
         url = baseURL.format(year)
 
-        webPage = web.fetchURL(url)
+        webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
 
         link = webPage.body
 

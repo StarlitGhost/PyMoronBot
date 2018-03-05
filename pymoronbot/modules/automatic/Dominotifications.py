@@ -10,7 +10,6 @@ from twisted.internet import task, threads
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.utils import web
 
 
 @implementer(IPlugin, IModule)
@@ -76,7 +75,7 @@ class Dominotifications(BotModule):
         trackingDetails = self.trackers[orderID]
 
         trackURL = u'https://www.dominos.co.uk/pizzaTracker/getOrderDetails?id={}'.format(orderID)
-        page = web.fetchURL(trackURL)
+        page = self.bot.moduleHandler.runActionUntilValue('fetch-url', trackURL)
 
         if page is None:
             # tracking API didn't respond

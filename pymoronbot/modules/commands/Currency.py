@@ -17,8 +17,6 @@ from twisted.words.protocols.irc import assembleFormattedText, attributes as A
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
-from pymoronbot.utils import web
-
 
 @implementer(IPlugin, IModule)
 class Currency(BotCommand):
@@ -51,7 +49,7 @@ class Currency(BotCommand):
 
         url = "https://api.fixer.io/latest?base={}&symbols={}"
         url = url.format(ccFrom, ccTo)
-        response = web.fetchURL(url)
+        response = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
         jsonResponse = json.loads(response.body)
         rates = jsonResponse['rates']
 

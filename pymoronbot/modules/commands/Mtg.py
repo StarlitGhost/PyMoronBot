@@ -7,8 +7,6 @@ from zope.interface import implementer
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
-from pymoronbot.utils import web
-
 import re
 from builtins import str
 
@@ -32,7 +30,7 @@ class Mtg(BotCommand):
         for param in message.ParameterList:
             searchTerm += '+[%s]' % param
 
-        webPage = web.fetchURL(searchTerm)
+        webPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', searchTerm)
 
         soup = BeautifulSoup(webPage.body, 'lxml')
 

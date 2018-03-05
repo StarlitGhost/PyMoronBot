@@ -14,7 +14,7 @@ import re
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
-from pymoronbot.utils import string, web
+from pymoronbot.utils import string
 
 
 @implementer(IPlugin, IModule)
@@ -30,7 +30,7 @@ class Find(BotCommand):
         @type message: IRCMessage
         """
         try:
-            results = web.googleSearch(message.Parameters)
+            results = self.bot.moduleHandler.runActionUntilValue('search-web', message.Parameters)
 
             if not results:
                 return IRCResponse(ResponseType.Say,

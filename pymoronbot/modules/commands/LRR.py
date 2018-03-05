@@ -12,7 +12,6 @@ from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
 
 import pymoronbot.utils.LRRChecker as DataStore
-from pymoronbot.utils import web
 
 import dateutil.parser as dparser
 
@@ -43,7 +42,7 @@ class LRR(BotCommand):
             
             DataStore.LRRChecker[feedName]['lastCheck'] = datetime.datetime.utcnow()
             
-            feedPage = web.fetchURL(feedDeets['url'])
+            feedPage = self.bot.moduleHandler.runActionUntilValue('fetch-url', feedDeets['url'])
             
             if feedPage is None:
                 #TODO: log an error here that the feed likely no longer exists!
@@ -64,8 +63,10 @@ class LRR(BotCommand):
                 if feedDeets['suppress']:
                     DataStore.LRRChecker[feedName]['suppress'] = False
                 else:
-                    title = DataStore.LRRChecker[feedName]['lastTitle'] = item.find('title').text
-                    link = DataStore.LRRChecker[feedName]['lastLink'] = web.shortenGoogl(item.find('link').text)
+                    title = item.find('title').text
+                    DataStore.LRRChecker[feedName]['lastTitle'] = title
+                    link = self.bot.moduleHandler.runActionUntilValue('shorten-url', item.find('link').text)
+                    DataStore.LRRChecker[feedName]['lastLink'] = link
                     response = 'New {0}! Title: {1} | {2}'.format(feedName, title, link)
                     responses.append(IRCResponse(ResponseType.Say, response, '#desertbus'))
             

@@ -17,7 +17,6 @@ from bs4 import UnicodeDammit
 
 from pymoronbot.message import IRCMessage
 from pymoronbot.response import IRCResponse, ResponseType
-from pymoronbot.utils import web
 
 
 @implementer(IPlugin, IModule)
@@ -176,9 +175,10 @@ class Alias(BotCommand):
         export = u"{}\n\n{}".format(u"\n".join(sorted(addCommands)),
                                     u"\n".join(sorted(helpCommands)))
 
-        url = web.pasteEE(export,
-                               u"Exported {} aliases for {}".format(self.bot.nickname, self.bot.server),
-                          60)
+        url = self.bot.moduleHandler.runActionUntilValue('upload-pasteee', export,
+                                                         u"Exported {} aliases for {}".format(self.bot.nickname,
+                                                                                              self.bot.server),
+                                                         60)
         return IRCResponse(ResponseType.Say,
                            u"Exported {} aliases and {} help texts to {}".format(len(addCommands),
                                                                                  len(helpCommands),
@@ -201,7 +201,7 @@ class Alias(BotCommand):
 
         url = message.ParameterList[1]
         try:
-            page = web.fetchURL(url)
+            page = self.bot.moduleHandler.runActionUntilValue('fetch-url', url)
         except ValueError:
             return IRCResponse(ResponseType.Say,
                                u"'{}' is not a valid URL".format(url),
