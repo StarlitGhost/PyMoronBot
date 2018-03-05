@@ -49,13 +49,13 @@ class URLResponse(object):
 
 
 @implementer(IPlugin, IModule)
-class Web(BotModule):
+class WebUtils(BotModule):
     def actions(self):
-        return super(Web, self).actions() + [('fetch-url', 1, self.fetchURL),
-                                             ('post-url', 1, self.postURL),
-                                             ('shorten-url', 1, self.shortenGoogl),
-                                             ('search-web', 1, self.googleSearch),
-                                             ('upload-pasteee', 1, self.pasteEE)]
+        return super(WebUtils, self).actions() + [('fetch-url', 1, self.fetchURL),
+                                                  ('post-url', 1, self.postURL),
+                                                  ('shorten-url', 1, self.shortenGoogl),
+                                                  ('search-web', 1, self.googleSearch),
+                                                  ('upload-pasteee', 1, self.pasteEE)]
 
     def fetchURL(self, url, params=None, extraHeaders=None):
         """
@@ -195,4 +195,4 @@ class Web(BotModule):
                     .format(jsonResult["errorcode"], jsonResult["error"])
 
 
-web = Web()
+web = WebUtils()
