@@ -1,15 +1,4 @@
 # -*- coding: utf-8 -*-
-
-# somewhat hacky and I forget what this is solving
-import socket
-
-origGetAddrInfo = socket.getaddrinfo
-
-def getAddrInfoWrapper(host, port, _=0, socktype=0, proto=0, flags=0):
-    return origGetAddrInfo(host, port, socket.AF_INET, socktype, proto, flags)
-
-socket.getaddrinfo = getAddrInfoWrapper
-
 import requests
 import json
 import re
