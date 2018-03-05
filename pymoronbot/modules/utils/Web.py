@@ -184,7 +184,7 @@ class Web(BotModule):
                   u"paste": data,
                   u"expiration": expire,
                   u"format": u"json"}
-        result = postURL(u"http://paste.ee/api", values)
+        result = self.postURL(u"http://paste.ee/api", values)
         if result:
             jsonResult = json.loads(result.body)
             if jsonResult["status"] == "success":
