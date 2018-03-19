@@ -1,9 +1,9 @@
-PyMoronBot [![Stories in Ready](https://badge.waffle.io/MatthewCox/PyMoronBot.png?label=ready&title=Ready)](https://waffle.io/MatthewCox/PyMoronBot) [![Python 3](https://pyup.io/repos/github/MatthewCox/PyMoronBot/python-3-shield.svg)](https://pyup.io/repos/github/MatthewCox/PyMoronBot/) [![Updates](https://pyup.io/repos/github/MatthewCox/PyMoronBot/shield.svg)](https://pyup.io/repos/github/MatthewCox/PyMoronBot/)
+PyMoronBot [![Stories in Ready](https://badge.waffle.io/TyranicMoron/PyMoronBot.png?label=ready&title=Ready)](https://waffle.io/TyranicMoron/PyMoronBot) [![Python 3](https://pyup.io/repos/github/TyranicMoron/PyMoronBot/python-3-shield.svg)](https://pyup.io/repos/github/TyranicMoron/PyMoronBot/) [![Updates](https://pyup.io/repos/github/TyranicMoron/PyMoronBot/shield.svg)](https://pyup.io/repos/github/TyranicMoron/PyMoronBot/)
 ==========
 
 A modular IRC bot with extensive aliasing capabilities, written in Python.
 
-Initially a language port/rewrite of [MoronBot](https://github.com/MatthewCox/MoronBot/) (C#), but now somewhat diverged.
+Initially a language port/rewrite of [MoronBot](https://github.com/TyranicMoron/MoronBot/) (C#), but now somewhat diverged.
 
 Features
 --------
@@ -24,7 +24,7 @@ All of these features can be individually enabled/disabled by loading or unloadi
 Installation Instructions
 -------------------------
 * Install Python 2.7+
-* Clone the repo with `git clone https://github.com/MatthewCox/PyMoronBot.git`
+* Clone the repo with `git clone https://github.com/TyranicMoron/PyMoronBot.git`
 * Create a virtualenv to run the bot in, and activate it
 * Run `pip install -r requirements.txt` to install all the requirements
 * Edit [_defaults.yaml](configs/_defaults.yaml) to set the bot owner and other details
