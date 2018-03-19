@@ -7,7 +7,7 @@ realname: PyMoronBot
 commandChar: .
 
 # where to find the bot's source
-source: https://github.com/MatthewCox/PyMoronBot/
+source: https://github.com/TyranicMoron/PyMoronBot/
 
 # CTCP FINGER response
 finger: GET YOUR FINGER OUT OF THERE
