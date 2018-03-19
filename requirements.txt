@@ -1,6 +1,6 @@
 Twisted==17.9.0
 beautifulsoup4==4.6.0
-lxml==4.1.1
+lxml==4.2.0
 psutil==5.4.3
 python-dateutil==2.7.0
 ply==3.11
@@ -14,11 +14,11 @@ pyasn1==0.4.2
 isodate==0.6.0
 google-api-python-client==1.6.5
 pyxDamerauLevenshtein==1.5
-numpy==1.14.1
-Cython==0.27.3
+numpy==1.14.2
+Cython==0.28.1
 git+git://github.com/andreasvc/pyre2.git@7146ce3#egg=re2
 parsedatetime==2.4
-cryptography==2.1.4
+cryptography==2.2
 future==0.16.0
 six==1.11.0
 ruamel.yaml==0.15.35
