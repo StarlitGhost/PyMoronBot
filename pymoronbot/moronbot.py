@@ -39,7 +39,7 @@ class MoronBot(irc.IRCClient, object):
             self.versionNum = u'1.0'
         self.versionEnv = platform.platform()
 
-        self.sourceURL = self.config.getWithDefault('source', 'https://github.com/MatthewCox/PyMoronBot/')
+        self.sourceURL = self.config.getWithDefault('source', 'https://github.com/TyranicMoron/PyMoronBot/')
 
         self.server = self.config['server']
 
