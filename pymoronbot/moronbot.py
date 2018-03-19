@@ -53,11 +53,13 @@ class MoronBot(irc.IRCClient, object):
         self.logPath = os.path.join(self.rootDir, 'logs')
 
         self.quitting = False
-        self.startTime = datetime.datetime.utcnow()
         reactor.addSystemEventTrigger('before', 'shutdown', self.cleanup)
 
         self.moduleHandler = modulehandler.ModuleHandler(self)
         self.moduleHandler.loadAll()
+        
+        # set start time after modules have loaded, some take a while
+        self.startTime = datetime.datetime.utcnow()
 
     def cleanup(self):
         self.config.writeConfig()
