@@ -18,7 +18,7 @@ numpy==1.14.2
 Cython==0.28.1
 git+git://github.com/andreasvc/pyre2.git@7146ce3#egg=re2
 parsedatetime==2.4
-cryptography==2.2
+cryptography==2.2.1
 future==0.16.0
 six==1.11.0
 ruamel.yaml==0.15.35
